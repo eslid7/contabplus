@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Confirmación de Correo Electrónico</title>
+
+		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+		<style>
+			body {
+				padding-top:50px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+
+			<div class="jumbotron">
+				<div class="space-xs col-xs-12"></div>
+				<div class="row">
+					<div class="col-xs-12 text-center">
+						<img  width="210" height="150" src="/static/img/logo.png">
+					</div>
+				</div>
+			</div>
+
+			<div class="row marketing">
+				<div class="col-xs-12 text-center">
+					<% if (isValid) { %>
+						<div class="alert alert-success">
+							La cuenta ha sido validada correctamente.
+						</div>
+					<% } else {
+						var errorText = "";
+						switch(type) {
+							case 1: %>
+							<div class="row marketing">
+								<div class="alert alert-danger">
+									Tu vínculo de confirmación no es válido.
+								</div></div>
+							<% break;
+							case 2: %>
+								<div class="alert alert-danger">
+									El usuario no existe o tu vínculo de confirmación no es válido.
+								</div>
+							<% break;
+							case 3: %>
+								<div class="alert alert-warning">
+									La cuenta ya ha sido validada anteriormente.
+								</div>
+							<% break;
+							case 4: %>
+								<div class="alert alert-warning">
+									Problemas al verificar la cuenta, por favor intenta de nuevo.
+								</div>
+							<% break;
+						}
+					} %>
+				</div>
+			</div>
+
+		</div>
+	</body>
+</html>

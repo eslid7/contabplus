@@ -1,0 +1,5 @@
+server/public/filesUpload/
+
+.DS_Store
+
+node_modules/

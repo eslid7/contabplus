@@ -1,0 +1,50 @@
+Regla 
+Asp128CF
+
+CREATE DATABASE contabplusdb;
+
+Connection String Produccion
+mysql://a9w5jii9hn4nrvsq:uu5gx03e9bfg3jyx@ofcmikjy9x4lroa2.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/i8rjusrh0yd8qrxn
+
+
+1- Todo en ingles
+2- Nombre columna 3 primeras letras de la tabla y resto nombre indicativo
+
+
+admin super usuario
+adminBusiness Es un admin que solo ve ciertas companias
+user Es un usuario razo ve ciertas cosas
+
+Status
+1- Activo
+2- Inactivo
+3- Pendiente Confirmacion
+
+
+users
+useId, useName, useLogin, usePassword, useStatus
+
+roles
+rolId, rolName
+
+processes
+proId, proName, proUrl
+
+rolesProcesses
+rolIdFk, proIdFk
+
+--se asignan los permisos solo aplica para los ejs vistas
+userspermissions
+useId, proId
+
+usersRoles
+useIdFk, rolIdFK
+
+
+business
+busId, busName, useIdFk, busEmail, busPhone, busStatus
+
+businessUsers
+busIdFk, useIdFk
+
+
