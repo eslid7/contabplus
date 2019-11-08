@@ -1,7 +1,7 @@
 'use strict'
 
 const LocalStrategy = require('passport-local').Strategy
-const userModel = require('../../models/User')
+const userModel = require('../../models/users')
 const userController = require('../../controllers/usersController')
 
 module.exports = new LocalStrategy(

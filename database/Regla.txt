@@ -22,29 +22,32 @@ Status
 
 
 users
-useId, useName, useLogin, usePassword, useStatus
+useId, useName, useLogin, usePassword, useStatus, createdAt, updatedAt, userPhone
 
 roles
-rolId, rolName
+rolId, rolName, createdAt, updatedAt
+
+menu
+menId, menName, menIco, createdAt, updatedAt
 
 processes
-proId, proName, proUrl
+proId, proName, proUrl, menIdFk, createdAt, updatedAt
 
 rolesProcesses
-rolIdFk, proIdFk
+rolIdFk, proIdFk, createdAt, updatedAt
 
 --se asignan los permisos solo aplica para los ejs vistas
 userspermissions
-useId, proId
+useId, proId, createdAt, updatedAt
 
 usersRoles
-useIdFk, rolIdFK
+useIdFk, rolIdFK, createdAt, updatedAt
 
 
 business
-busId, busName, useIdFk, busEmail, busPhone, busStatus
+busId, busName, useIdFk, busEmail, busPhone, busStatus, createdAt, updatedAt
 
 businessUsers
-busIdFk, useIdFk
+busIdFk, useIdFk, createdAt, updatedAt
 
 

@@ -1,6 +1,6 @@
 'use strict'
 
-const userModel = require('../models/User')
+const userModel = require('../models/users')
 const jwt = require('jsonwebtoken')
 const moment = require('moment')
 const crypto = require('crypto')
@@ -8,7 +8,7 @@ const tools = require('../config/utils/tools')
 const MailServices = require('../config/utils/mailServices')
 const mailTemplates = require('../config/utils/emailTemplates')
 const fs = require('fs')
-const path = require('path')
+const path = require('path');
 
 var sess;
 
@@ -22,45 +22,52 @@ function updateUser(req, res) {
   );
 }
 
-function getUser(req, res) {
+async function getUser(req, res) {
+
+  // const userModel=await UserModel.findOne({
+  //     where: {
+  //       'useLogin':'eslid1@gmial.com'
+  //     }
+  //   });
+  // console.log(userModel);
+
   // body...
-  userModel.find({},function (err, users) {
-        res.send(users);
-    });
+
+    // userModel.find(({ attributes: ['useId', 'useName', 'useLogin', 'usePassword'] },function (err, users) {
+    //     res.send(users);
+    // });
+
+  // userModel.findAll().then(users => {
+  //     console.log(users);
+  //   res.status(200).json({users});
+  // });
+
+  userModel.findAll()
+  .then(users => {
+    console.log(users)
+    res.status(200).json({users});
+  })
+  .catch(err => {
+    console.log(err)
+    res.status(400).json({message: err});
+    
+  })
 }
 
 
 function login (req, res) {
-  return userModel.findOne({'email': req.body.email, password: encrypt(req.body.password)}).then(function (userData) {
-    if (userData) {
-      if(userData.verifiedAccount!=1){
+  return userModel.findAll({'useLogin': req.body.email, usePassword: encrypt(req.body.password)}).then(function (userData) {
+    if (userData.length> 0) {
+      if(userData[0].useStatus==3){
         return res.status(400).json({ message: "El usuario no ha validado la cuenta." });
+      }
+      else if(userData[0].useStatus==2){
+        return res.status(400).json({ message: "El usuario ha sido inactivado." });
       }
       else{
           global.User = userData;
-          console.log('coseguido' +req.session);
-          sess = req.session;
-          sess.email=req.body.email;
-          sess.user_id=userData.id;
-          res.status(200).json({
-          id: userData.id,
-          token: userData.token,
-          username: userData.username,
-          name: userData.name,
-          lastName: userData.lastName,
-          secondLastName: userData.secondLastName,
-          createdAt: userData.createdAt,
-          updateAt: userData.updateAt,
-          email: userData.email,
-          facebook: userData.facebook,
-          google: userData.google,
-          phone: userData.phone,
-          password: userData.password,
-          status: userData.status,
-          verifiedAccount: userData.verifiedAccount,
-          avatar: userData.avatar,
-          gender: userData.gender
-        })
+          console.log(userData[0].useStatus);                   
+          res.status(200).json({userData})
       }
     }
     else{
@@ -79,26 +86,21 @@ function deteleUsers (req, res) {
 function signup (req, res) {
 
    // se busca primero para ver si no existe
-  return userModel.findOne({'email': req.body.email}).then(function (userData) {
-    if (userData) {
+  return userModel.findAll({where: {'useLogin':req.body.email}}).then(function (userData) {
+    if (userData.length>0) {
       console.log('coseguido: usuarui' );
-      //return userData
-      return res.status(400).json({ message: "El usuario que intenta registrar ya existe." });
+      return res.status(400).json({ message: "El usuario que intenta registrar ya existe.", userData :userData});
     }
     else{
       console.log('guardando: ' + req.body.email);
       const dataToSave = new userModel({
-        username: req.body.email,
-        name: req.body.name,
-        lastName: req.body.lastName,
-        secondLastName: req.body.secondLastName,
-        createdAt: moment(new Date()).format('DD-MMM-YYYY'),
-        updateAt: moment(new Date()).format('DD-MMM-YYYY'),
-        email: req.body.email,
-        phone: req.body.phone,
-        password: encrypt(req.body.password),
-        status: 0,
-        verifiedAccount: 0,
+        useLogin: req.body.email,
+        useName: req.body.name,
+        usePhone: req.body.phone,
+        usePassword: encrypt(req.body.password),
+        useStatus: 3,
+        createdAt: moment(new Date()).format('YYYY-MM-DD'),
+        updateAt: moment(new Date()).format('YYYY-MM-DD')
       });
       //se devuelve el usuaurio
       return dataToSave.save().then(function (userSaved) {
@@ -106,12 +108,12 @@ function signup (req, res) {
         var linkCode = new Date().getTime();
         MailServices.sendMail( {
           subject: "Confirmación de Correo Electrónico",
-          to: userSaved.email,
+          to: userSaved.useLogin,
           isText: false,
           msn: mailTemplates.accountConfirmation({
-            name: userSaved.name,
-            lastName: userSaved.lastName,
-            encryptData: tools.encryptData(userSaved.id, 'aes256', "b33dd00", "el link de confirmación de correo.")
+            name: userSaved.useName,
+            lastName: "",
+            encryptData: tools.encryptData(userSaved.useLogin, 'aes256', "b33dd00", "el link de confirmación de correo.")
           })
         }, function (resp) {
           res.status(200).json({
@@ -149,34 +151,20 @@ function validateAccount(req, res) {
     // linkCode = dataToArray[0] || "",
     userID = dataDecrypted;
 
-  userModel.findById(userID).then(function (userData) {
-    if (!userData) {
+  userModel.findAll({where: {'useLogin':userID}}).then(function (userData) {
+    if (userData.length==0) {
       throw ({
-        type: 2
+        type: 1
       })
-    } else if (userData.status === 1) {
+    } else if (userData.useStatus === 1) {
       throw ({
         type: 3
       })
     }
     return userData
   }).then(function (userData) {
-    const findBy = {
-      _id: userData._id
-    }
-    const tempUserData = {
-      status: 1,
-      verifiedAccount : 1
-    }
-    return userModel.update(findBy, tempUserData).then(function (userUpdated) {
-      if (userUpdated.ok !== 1) {
-        throw ({
-          type: 4
-        })
-      }
-      userData.status = 1;
-      userData.verifiedAccount = 1;
-      return userData
+    return userModel.update({useStatus :1}, {where : {'useLogin':userID}}).then(function (userUpdated) {
+      return userUpdated;
     })
   }).then(function (userData) {
     return res.render('accountConfirmation', {
@@ -280,7 +268,7 @@ function logout(req,res){
     sess.email = '';
   }
   req.logout()
-    res.redirect('/users/index');
+    res.redirect('/contab/index');
 }
 
 
@@ -289,7 +277,7 @@ function viewAccount(req, res){
     return res.render('account')
   }
   else{
-    res.redirect('/users/index');
+    res.redirect('/contab/index');
   }
 }
 
@@ -300,6 +288,30 @@ function accountData(req, res){
     }
     res.send(userData);
   });
+}
+
+function home(req, res){
+  console.log(global.User)
+
+  if(global.User == undefined){
+     res.redirect('/contab/index');
+  }
+  else{
+    userModel.findAll({'useId':global.User.useId}).then(function (userData) {
+      if (userData.length==0) {
+        throw ('El usuario que intenta buscar no existe.')
+      }
+      else{
+
+        //Debo hacer una funcion que devuelva el menu
+
+        return res.render('home' ,{
+                            userData:userData[0]
+                          })
+      }   
+    });
+  }
+  
 }
 
 module.exports = {
@@ -314,5 +326,6 @@ module.exports = {
   index,
   sign,
   logout,
-  accountData
+  accountData,
+  home
 }

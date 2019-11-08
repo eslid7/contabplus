@@ -9,6 +9,7 @@ const passport = require('passport')
 const passportStatregy = require('./strategies/passport')
 const passportConfig = require('./passport')
 const routes = require('../routes')
+// const { authenticate } = require('../models/dataBD')
 
 
 module.exports.initPassport = function initPassport(app) {
@@ -30,21 +31,16 @@ module.exports.initRoutes = function initRoutes(app) {
   app.use('/', routes)
 }
 
-module.exports.initDB = function initDB() {
-  mysql.Promise = global.Promise
-  mysql.createConnection({
-    host:  config.host,
-    user:  config.user,
-    password:  config.password,
-    database:  config.database,
-    port: config.portDB
-  }).connect(function(err) {
-  if (err) {
-    console.error(`Unable to connect to database: ${config.host} ${config.user}`)
-    throw err};
-    console.log("Connected!");
-  });
-}
+// module.exports.initDB = async function initDB(app) {
+//    const { dbInitialized, error: errDb } = await authenticate()
+//    if (!dbInitialized) {
+//      databaseConnectionFailedLog(errDb)
+//      process.exit(1)
+//    }
+//    else{
+//     console.log('ingresado a dataBD')
+//    }
+// }
 
 module.exports.initMiddlewares = function initMiddlewares(app) {
   app.use(bodyParser.json({ limit: '50mb' }))
@@ -66,7 +62,7 @@ module.exports.initViewsEngine = function initViewsEngine(app) {
 module.exports.init = () => {
   const app = express()
   this.initMiddlewares(app)
-  this.initDB()
+  // this.initDB(app)
   this.initPassport(app)
   this.initRoutes(app)
   this.initViewsEngine(app)
@@ -78,7 +74,7 @@ module.exports.init = () => {
         process.env.NODE_ENV || 'develop'
       )
       console.log('**********************')
-      console.log('patim-server online')
+      console.log('contab-server online')
       console.log('**********************')
     })
     .on('error', err => {

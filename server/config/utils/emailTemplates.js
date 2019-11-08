@@ -19,7 +19,7 @@ module.exports = {
 				<tbody>
 					<tr>
 						<td valign="top" align="left" style="word-break:normal;border-collapse:collapse;font-family:proxima_nova,${serviceEmailTemplateFont},Helvetica,Arial,sans-serif;font-size:25px;line-height:30px;color:#555555;font-weight:100;letter-spacing:0.02em;padding:0px 20px 0px 20px">
-							Hola ${param.name} ${param.lastName},
+							Hola ${param.name} ${param.lastName}
 						</td>
 					</tr>
 				</tbody>
@@ -29,7 +29,7 @@ module.exports = {
 				<tbody>
 					<tr>
 						<td valign="top" align="left" style="word-break:normal;border-collapse:collapse;font-family:proxima_nova, ${serviceEmailTemplateFont},Helvetica,Arial,sans-serif;font-size:15px;line-height:20px;color:#555555;font-weight:300;letter-spacing:0.02em;padding:0px 20px 0px 20px">
-							para activar su cuenta en ${serviceEmailTemplateAppName}, necesita dar click a este link:
+							Para activar su cuenta en ${serviceEmailTemplateAppName}, necesita dar click a este link:
 						</td>
 					</tr>
 					<tr>
@@ -41,7 +41,7 @@ module.exports = {
 					</tr>
 					<tr>
 						<td valign="top" align="left" style="word-break:normal;border-collapse:collapse;font-family:proxima_nova, ${serviceEmailTemplateFont},Helvetica,Arial,sans-serif;font-size:15px;line-height:20px;color:#555555;font-weight:300;letter-spacing:0.02em;padding:0px 20px 0px 20px">
-							Nuestros mejores deseos, Yo solito equipo de ${serviceEmailTemplateAppName}
+							Nuestros mejores deseos, equipo de ${serviceEmailTemplateAppName}
 						</td>
 					</tr>
 				</tbody>

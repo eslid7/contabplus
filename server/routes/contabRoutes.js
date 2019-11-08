@@ -13,4 +13,8 @@ router.route('/index').get(userController.index);
 router.route('/sign').get(userController.sign);
 router.route('/delete').get(userController.deteleUsers);
 
+
+
+router.route('/home').get(userController.home);
+
 module.exports = router;
