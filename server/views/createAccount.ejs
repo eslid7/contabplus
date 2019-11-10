@@ -42,7 +42,7 @@
 			<div class="space-xs col-md-12"></div>
 			<div class="row">
 				<div class="span10 ">
-						<h2>Registrarse</h2>
+						<h2></h2>
 				</div>
 				<div class="span4">
 				</div>
@@ -50,8 +50,8 @@
 		</div>
 		<header style="margin-bottom: 40px;">
 			<div id="navbar">
-				<div class="menu_bar">
-					<a href="#" class="bt-menu"><img src="/cfmx/plantillas/rx/assets/img/hamburger-icon.svg" alt="menu"></a>
+				<div style="display: inherit;width: 200px;">					
+					<img src="/static/img/logo.png" alt="logo" style="width: 120px;position: absolute;">
 				</div>
 				<nav>
 					<ul>
@@ -66,14 +66,14 @@
 		<div id="createNewUser" style="margin-left:3%" class="main-wrapper">
 			<div  class="span12">
 				<form name="sendDataNewUser" id="sendDataNewUser" action="#">
-					<p style="text-align:justify;">Al email se le va enviar un correo el cual permite la confirmación de la cuenta: </p>
+					<p style="text-align:justify;">Al email se le va enviar un correo, el cual se emplea para la confirmación de la cuenta: </p>
 					<div class="row-fluid">
 						<div class="control-group">
 							<labe for="name">
 								Email
 							</labe>
 							<div class="controls">
-								<input type="text" name="email" id="email" class="m-wrap span12" placeholder="Email">
+								<input type="text" name="email" id="email" class="m-wrap span12" placeholder="Email" maxlength="100">
 							</div>
 						</div>
 					</div>
@@ -83,7 +83,7 @@
 								Contraseña
 							</labe>
 							<div class="controls">
-								<input type="password" name="password" id="password" class="m-wrap span12" placeholder="Contraseña">
+								<input type="password" name="password" id="password" class="m-wrap span12" placeholder="Contraseña" maxlength="100">
 							</div>
 						</div>
 					</div>
@@ -93,7 +93,7 @@
 								Nombre Completo
 							</labe>
 							<div class="controls">
-								<input type="text" name="name" id="name" class="m-wrap span12" placeholder="Nombre Completo">
+								<input type="text" name="name" id="name" class="m-wrap span12" placeholder="Nombre Completo" maxlength="100">
 							</div>
 						</div>
 					</div>
@@ -103,7 +103,7 @@
 								Teléfono
 							</labe>
 							<div class="controls">
-								<input type="text" name="phone" id="phone" class="m-wrap span12" placeholder="Teléfono">
+								<input type="text" name="phone" id="phone" class="m-wrap span12" placeholder="Teléfono" maxlength="50">
 							</div>
 						</div>
 					</div>

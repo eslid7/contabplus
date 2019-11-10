@@ -1,6 +1,11 @@
 'use strict'
 
 const userModel = require('../models/users')
+const menuModel = require('../models/menu')
+const rolesProcessesModel = require('../models/rolesProcesses')
+const usersRolesModel = require('../models/usersRoles')
+
+const processesModel = require('../models/processes')
 const jwt = require('jsonwebtoken')
 const moment = require('moment')
 const crypto = require('crypto')
@@ -291,6 +296,59 @@ function accountData(req, res){
 }
 
 function home(req, res){
+  if(global.User == undefined){
+     res.redirect('/contab/index');
+  }
+  else{
+      userModel.findAll({'useId':global.User[0].useId}).then(function (userData) {
+        if (userData.length==0) {
+          throw ('El usuario que intenta buscar no existe.')
+        }
+        else{
+
+          menuModel.hasMany(processesModel,{foreignKey:'menIdFk'});
+          processesModel.hasMany(rolesProcessesModel,{foreignKey:'proIdFk'});
+          rolesProcessesModel.hasMany(usersRolesModel,{foreignKey:'rolIdFk', sourceKey: 'rolIdFk'});
+
+          menuModel.findAll({attributes: ['menId', 'menName','menIco'],
+              include: [{
+                model: processesModel,
+                required: true,
+                include : [{  
+                  model: rolesProcessesModel,
+                  required: true,
+                  include : [{  
+                    model: usersRolesModel,                  
+                    required: true,
+                    where : {'useIdFk':global.User[0].useId}
+                  }]
+                }]
+              }]                    
+            }).then(menu => {   
+              global.Menu = menu;         
+              processesModel.findAll({attributes:['proId','proName','proUrl', 'menIdFk'],
+                include : [{  
+                  model: rolesProcessesModel,
+                  required: true,
+                  include : [{  
+                    model: usersRolesModel,                  
+                    required: true,
+                    where : {'useIdFk':global.User[0].useId}
+                  }]
+                }]
+            }).then(processes=>{
+                global.Processes = processes; 
+                return res.render('home' ,{
+                  userData:userData[0]                
+                }); 
+              })
+            });
+      }
+    });
+  }
+}
+
+function profile(req, res){
   console.log(global.User)
 
   if(global.User == undefined){
@@ -305,7 +363,7 @@ function home(req, res){
 
         //Debo hacer una funcion que devuelva el menu
 
-        return res.render('home' ,{
+        return res.render('profile' ,{
                             userData:userData[0]
                           })
       }   
@@ -313,7 +371,6 @@ function home(req, res){
   }
   
 }
-
 module.exports = {
   login,
   signup,
@@ -327,5 +384,6 @@ module.exports = {
   sign,
   logout,
   accountData,
-  home
+  home,
+  profile
 }

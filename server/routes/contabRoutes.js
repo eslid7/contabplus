@@ -16,5 +16,6 @@ router.route('/delete').get(userController.deteleUsers);
 
 
 router.route('/home').get(userController.home);
+router.route('/profile').get(userController.profile);
 
 module.exports = router;

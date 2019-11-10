@@ -1,0 +1,154 @@
+<% include partials/header %>
+	<!-- BEGIN PAGE -->
+	<div class="page-content">
+
+		<!-- BEGIN PAGE CONTAINER-->
+		<div class="container-fluid">
+			<!-- BEGIN PAGE HEADER-->
+			<div class="row-fluid">
+				<div class="span12">
+					<h3>Mi cuenta</h3>
+				</div>
+			</div>
+			<div class="row-fluid">
+					<div class="span12">
+						<div class="tabbable tabbable-custom boxless">
+							<ul class="nav nav-tabs">
+								<li class="active"><a href="#tab_1" data-toggle="tab">Mi cuenta</a></li>
+								<li class=""><a href="#tab_2" data-toggle="tab">Contraseña</a></li>
+							</ul>
+							<div class="tab-content">
+								<div class="tab-pane active" id="tab_1">
+									<div class="portlet box blue">
+										<div class="portlet-title">
+											<div class="caption"><i class="icon-reorder"></i></div>
+											<div class="tools">
+												<a href="javascript:;" class="collapse"></a>
+												<a href="#portlet-config" data-toggle="modal" class="config"></a>
+												<a href="javascript:;" class="reload"></a>
+												<a href="javascript:;" class="remove"></a>
+											</div>
+										</div>
+										<div class="portlet-body form">
+											<!-- BEGIN FORM-->
+											<form action="#" class="horizontal-form">
+												<h3 class="form-section">Información Personal</h3>
+												<div class="row-fluid">
+													<div class="span6 ">
+														<div class="control-group">
+															<label class="control-label" for="firstName">Nombre Completo</label>
+															<div class="controls">
+																<input type="text" id="firstName" class="m-wrap span12" placeholder="Nombre Completo" value="<%= userData.useName%>">
+															</div>
+														</div>
+													</div>
+													<!--/span-->
+													<div class="span6 ">
+														<div class="control-group">
+															<label class="control-label" for="lastName">Teléfono</label>
+															<div class="controls">
+																<input type="text" id="lastName" class="m-wrap span12" placeholder="Teléfono" value="<%= userData.usePhone%>">
+															</div>
+														</div>
+													</div>
+													<!--/span-->
+												</div>
+												<!--/row-->
+												<div class="row-fluid">
+													<div class="span6 ">
+														<div class="control-group">
+															<label class="control-label">Email**</label>
+															<div class="controls">
+																 <%= userData.useLogin%>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="row-fluid">
+													<div class="span12 ">
+														**El email no se puede modificar dado que es la identificación, en ese caso seria crear una nueva cuenta con el otro correo.
+													</div>
+												</div>         
+												<div class="form-actions">
+													<div class="span10 ">
+													</div>
+													<div class="span2">
+														<button type="submit" class="btn blue"><i class="icon-ok"></i> Guardar</button>
+													</div>
+												</div>
+											</form>
+											<!-- END FORM--> 
+										</div>
+									</div>
+								</div>
+								<div class="tab-pane" id="tab_2">
+									<div class="portlet box green">
+										<div class="portlet-title">
+											<div class="caption"><i class="icon-reorder"></i></div>
+											<div class="tools">
+												<a href="javascript:;" class="collapse"></a>
+												<a href="#portlet-config" data-toggle="modal" class="config"></a>
+												<a href="javascript:;" class="reload"></a>
+												<a href="javascript:;" class="remove"></a>
+											</div>
+										</div>
+										<div class="portlet-body form">
+											<!-- BEGIN FORM-->
+											<form action="#" class="form-horizontal">
+												<h3 class="form-section">Modificar Contraseña</h3>
+												<div class="row-fluid">
+													<div class="span12 ">
+														<div class="control-group">
+															<label class="control-label span3">Contraseña actual</label>
+															<div class="controls span4	">
+																<input type="text" class="m-wrap span12" placeholder="Contraseña actual">
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="row-fluid">
+													<!--/span-->
+													<div class="span12">
+														<div class="control-group">
+															<label class="control-label span3">Nueva Contraseña</label>
+															<div class="controls span4">
+																<input type="text" class="m-wrap span12" placeholder="Nueva Contraseña">
+															</div>
+														</div>
+													</div>
+													<!--/span-->
+												</div>
+												<!--/row-->
+												<div class="row-fluid">
+													<div class="span12 ">
+														<div class="control-group">
+															<label class="control-label span3">Confirmar Nueva Contraseña</label>
+															<div class="controls span4">
+																<input type="text" class="m-wrap span12" placeholder="Confirmar Nueva Contraseña">
+															</div>
+														</div>
+													</div>													
+												</div>
+												<!--/row-->        
+												          												
+												<!--/row-->
+												<div class="form-actions">
+													<div class="span10 ">
+													</div>
+													<div class="span2">
+														<button type="submit" class="btn blue"><i class="icon-ok"></i> Guardar</button>
+													</div>
+												</div>
+											</form>
+											<!-- END FORM-->                
+										</div>
+									</div>
+								</div>							
+							</div>
+						</div>
+					</div>
+				</div>
+
+		</div>			
+	</div>
+<% include partials/footer %>

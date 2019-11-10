@@ -1,4 +1,3 @@
-
 const Sequelize = require('sequelize');
 const sequelize = require('../config/env/connection')
 
@@ -18,34 +17,5 @@ users.init({
   sequelize,
   modelName: 'users'
 });
-
+users.removeAttribute('id');
 module.exports = users;
-
-//// Posible 
-
-// module.exports = (sequelize, DataTypes) => {
-// 	 const users = sequelize.define(
-//     'users',
-//     {
-//      	useId: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-// 	    useName: {type:  DataTypes.STRING, allowNull: false},
-// 	    useLogin: {type:  DataTypes.STRING, allowNull: false},
-// 	    usePassword: {type:  DataTypes.STRING, allowNull: false},
-// 	    useStatus: {type: DataTypes.INTEGER, allowNull: false},
-//       createdAt: {type: DataTypes.TIME, allowNull: true},
-//       updatedAt: {type: DataTypes.TIME, allowNull: true}
-//     },
-//     {
-//       tableName: 'users'
-//     }
-//   )
-
-//   // WorkspaceUser.associate = models => {
-//   //   WorkspaceUser.belongsTo(models.Workspace, { foreignKey: 'workspaceId' })
-//   //   WorkspaceUser.belongsTo(models.User, { foreignKey: 'userId' })
-//   //   WorkspaceUser.belongsTo(models.Rol, { foreignKey: 'rolId' })
-//   // }
-
-//   // WorkspaceUser.removeAttribute('id')
-//   return users;
-// }

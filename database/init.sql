@@ -5,10 +5,19 @@ CREATE TABLE users (
 	usePassword VARCHAR(255) NOT NULL, 
 	useStatus INT NOT NULL,
 	userPhone varchar(60),
-	createdAt  TIMESTAMP, 
+	createdAt TIMESTAMP, 
 	updatedAt TIMESTAMP
 );
 
+-- SELECT distinct(menId), menName, menIco
+-- FROM menu 
+-- INNER JOIN processes
+-- 	ON processes.menIdFk = menu.menId
+-- INNER JOIN rolesProcesses
+-- 	ON rolesProcesses.proIdFk = processes.proId
+-- INNER JOIN usersRoles
+--  	ON usersRoles.rolIdFK  = rolesProcesses.rolIdFk
+--  WHERE usersRoles.useIdFk = 4
 
 CREATE TABLE roles (
 	rolId INT AUTO_INCREMENT PRIMARY KEY,
@@ -17,13 +26,22 @@ CREATE TABLE roles (
 	updatedAt TIMESTAMP
 );
 
+CREATE TABLE menu (
+	menId INT AUTO_INCREMENT PRIMARY KEY,
+	menName VARCHAR(200) NOT NULL,
+	menIco VARCHAR(60) NOT NULL,
+	createdAt  TIMESTAMP, 
+	updatedAt TIMESTAMP
+);
 
 CREATE TABLE processes (
 	proId INT AUTO_INCREMENT PRIMARY KEY,
 	proName VARCHAR(100) NOT NULL,
 	proUrl VARCHAR(255) NOT NULL,
+	menIdFk INT,
 	createdAt  TIMESTAMP, 
-	updatedAt TIMESTAMP
+	updatedAt TIMESTAMP,
+	FOREIGN KEY (menIdFk) REFERENCES menu(menId)
 );
 
 
@@ -31,10 +49,12 @@ CREATE TABLE rolesProcesses (
 	rolIdFk INT NOT NULL,
 	proIdFk INT NOT NULL,
 	createdAt  TIMESTAMP, 
-	updatedAt TIMESTAMP
+	updatedAt TIMESTAMP,
+	FOREIGN KEY (rolIdFk) REFERENCES roles(rolId),
+	FOREIGN KEY (proIdFk) REFERENCES processes(proId)
 );
 
-
+---- sin crear por el momento
 CREATE TABLE userspermissions (
 	useId INT NOT NULL,
 	proId INT NOT NULL,
@@ -47,7 +67,9 @@ CREATE TABLE usersRoles (
 	useIdFk INT NOT NULL,
 	rolIdFK INT NOT NULL,
 	createdAt  TIMESTAMP, 
-	updatedAt TIMESTAMP
+	updatedAt TIMESTAMP,
+	FOREIGN KEY (rolIdFk) REFERENCES roles(rolId),
+	FOREIGN KEY (useIdFk) REFERENCES users(useId)
 );
 
 CREATE TABLE business (
