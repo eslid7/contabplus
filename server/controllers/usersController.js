@@ -15,38 +15,8 @@ const mailTemplates = require('../config/utils/emailTemplates')
 const fs = require('fs')
 const path = require('path');
 
-var sess;
-
-function updateUser(req, res) {
-  console.log('here')
-  userModel.update(
-    { _id: "59cebae00016b06026ce9eb4" },
-    { $set: {
-      token:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5Y2ViYWUwMDAxNmIwNjAyNmNlOWViNCJ9.ZJVI_d4c4gC4JTd-Teiswx--4sWAa-TjYTwMKxwdM7Y"
-    }}
-  );
-}
 
 async function getUser(req, res) {
-
-  // const userModel=await UserModel.findOne({
-  //     where: {
-  //       'useLogin':'eslid1@gmial.com'
-  //     }
-  //   });
-  // console.log(userModel);
-
-  // body...
-
-    // userModel.find(({ attributes: ['useId', 'useName', 'useLogin', 'usePassword'] },function (err, users) {
-    //     res.send(users);
-    // });
-
-  // userModel.findAll().then(users => {
-  //     console.log(users);
-  //   res.status(200).json({users});
-  // });
-
   userModel.findAll()
   .then(users => {
     console.log(users)
@@ -57,28 +27,6 @@ async function getUser(req, res) {
     res.status(400).json({message: err});
     
   })
-}
-
-
-function login (req, res) {
-  return userModel.findAll({'useLogin': req.body.email, usePassword: encrypt(req.body.password)}).then(function (userData) {
-    if (userData.length> 0) {
-      if(userData[0].useStatus==3){
-        return res.status(400).json({ message: "El usuario no ha validado la cuenta." });
-      }
-      else if(userData[0].useStatus==2){
-        return res.status(400).json({ message: "El usuario ha sido inactivado." });
-      }
-      else{
-          global.User = userData;
-          console.log(userData[0].useStatus);                   
-          res.status(200).json({userData})
-      }
-    }
-    else{
-      return res.status(400).json({ message: "El usuario o contraseña invalida." });
-    }
-  });
 }
 
 function deteleUsers (req, res) {
@@ -269,22 +217,10 @@ function sign(req, res){
 // }
 
 function logout(req,res){
-  if (typeof sess !== 'undefined' && sess.email!=''){
-    sess.email = '';
-  }
-  req.logout()
-    res.redirect('/contab/index');
+  global.User ='undefined';
+  res.redirect('/contab/index');
 }
 
-
-function viewAccount(req, res){
-  if (typeof sess !== 'undefined' && sess.email!=''){
-    return res.render('account')
-  }
-  else{
-    res.redirect('/contab/index');
-  }
-}
 
 function accountData(req, res){
   userModel.findById(global.User.useId).then(function (userData) {
@@ -295,64 +231,85 @@ function accountData(req, res){
   });
 }
 
+function login (req, res) {
+  return userModel.findAll({where:{'useLogin': req.body.email, usePassword: encrypt(req.body.password)}}).then(function (userData) {
+    if (userData.length> 0) {
+      if(userData[0].useStatus==3){
+        return res.status(400).json({ message: "El usuario no ha validado la cuenta." });
+      }
+      else if(userData[0].useStatus==2){
+        return res.status(400).json({ message: "El usuario ha sido inactivado." });
+      }
+      else{
+          global.User = userData;               
+          res.status(200).json({userData})
+      }
+    }
+    else{
+      return res.status(400).json({ message: "El usuario o contraseña invalida." });
+    }
+  });
+}
+
 function home(req, res){
+  
   if(global.User == undefined){
-     res.redirect('/contab/index');
+     res.redirect('/contab/sign');
   }
   else{
-      userModel.findAll({'useId':global.User[0].useId}).then(function (userData) {
-        if (userData.length==0) {
-          throw ('El usuario que intenta buscar no existe.')
-        }
-        else{
+    console.log(global.User[0].useId)
+    userModel.findAll({where:{'useId':global.User[0].useId}}).then(function (userData) {
+      if (userData.length==0) {
+        throw ('El usuario que intenta buscar no existe.')
+      }
+      else{
 
-          menuModel.hasMany(processesModel,{foreignKey:'menIdFk'});
-          processesModel.hasMany(rolesProcessesModel,{foreignKey:'proIdFk'});
-          rolesProcessesModel.hasMany(usersRolesModel,{foreignKey:'rolIdFk', sourceKey: 'rolIdFk'});
+        menuModel.hasMany(processesModel,{foreignKey:'menIdFk'});
+        processesModel.hasMany(rolesProcessesModel,{foreignKey:'proIdFk'});
+        rolesProcessesModel.hasMany(usersRolesModel,{foreignKey:'rolIdFk', sourceKey: 'rolIdFk'});
 
-          menuModel.findAll({attributes: ['menId', 'menName','menIco'],
-              include: [{
-                model: processesModel,
+        menuModel.findAll({attributes: ['menId', 'menName','menIco'],
+            include: [{
+              model: processesModel,
+              required: true,
+              include : [{  
+                model: rolesProcessesModel,
                 required: true,
                 include : [{  
-                  model: rolesProcessesModel,
+                  model: usersRolesModel,                  
                   required: true,
-                  include : [{  
-                    model: usersRolesModel,                  
-                    required: true,
-                    where : {'useIdFk':global.User[0].useId}
-                  }]
+                  where : {'useIdFk':global.User[0].useId}
                 }]
-              }]                    
-            }).then(menu => {   
-              global.Menu = menu;         
-              processesModel.findAll({attributes:['proId','proName','proUrl', 'menIdFk'],
-                include : [{  
-                  model: rolesProcessesModel,
-                  required: true,
-                  include : [{  
-                    model: usersRolesModel,                  
-                    required: true,
-                    where : {'useIdFk':global.User[0].useId}
-                  }]
-                }]
-            }).then(processes=>{
-                global.Processes = processes; 
-                return res.render('home' ,{
-                  userData:userData[0]                
-                }); 
-              })
-            });
+              }]
+            }]                    
+        }).then(menu => {   
+          global.Menu = menu;         
+          processesModel.findAll({attributes:['proId','proName','proUrl', 'menIdFk'],
+            include : [{  
+              model: rolesProcessesModel,
+              required: true,
+              include : [{  
+                model: usersRolesModel,                  
+                required: true,
+                where : {'useIdFk':global.User[0].useId}
+              }]
+            }]
+        }).then(processes=>{
+            global.Processes = processes; 
+            return res.render('home' ,{
+              userData:userData[0],
+              active : 0                                  
+            }); 
+          })
+        });
       }
     });
   }
 }
 
 function profile(req, res){
-  console.log(global.User)
-
   if(global.User == undefined){
-     res.redirect('/contab/index');
+     res.redirect('/contab/sign');
   }
   else{
     userModel.findAll({'useId':global.User.useId}).then(function (userData) {
@@ -360,21 +317,21 @@ function profile(req, res){
         throw ('El usuario que intenta buscar no existe.')
       }
       else{
-
-        //Debo hacer una funcion que devuelva el menu
-
         return res.render('profile' ,{
-                            userData:userData[0]
+                            userData:userData[0],
+                            active : -1,
+                            titlePage : 'Mi cuenta'
                           })
       }   
     });
   }
   
 }
+
 module.exports = {
   login,
   signup,
-  updateUser,
+  // updateUser,
   validateAccount,
   resendMail,
   createAccount,

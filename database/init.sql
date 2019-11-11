@@ -72,6 +72,7 @@ CREATE TABLE usersRoles (
 	FOREIGN KEY (useIdFk) REFERENCES users(useId)
 );
 
+------------------------------------------------------------------------
 CREATE TABLE business (
 	busId INT AUTO_INCREMENT PRIMARY KEY,
 	busName VARCHAR(100) NOT NULL,
@@ -90,3 +91,16 @@ CREATE TABLE businessUsers (
 	updatedAt TIMESTAMP
 );
 
+----------------------------------------------------------------------
+
+CREATE TABLE accountingCatalog (
+	accId INT AUTO_INCREMENT PRIMARY KEY,
+	accName VARCHAR(100) NOT NULL,
+	accCode VARCHAR(4) NOT NULL,
+	accQuantityNivels INT NOT NULL,
+	accNivels VARCHAR(250), 
+	accStatus INT NOT NULL,
+	useIdFk INT NOT NULL,
+	createdAt  TIMESTAMP,
+	updatedAt TIMESTAMP
+);

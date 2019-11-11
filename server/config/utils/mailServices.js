@@ -5,17 +5,17 @@ module.exports = {
     const smtpTransport = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'beedooserver@gmail.com',
-        pass: 'asp128soin',
+        user: 'contabplusinfo@gmail.com',
+        pass: 'Asp128CF',
       },
     })
 
     const contentToSend = {
-      from: 'beedooServer <no-reply@beedooServer.cr>',
+      from: 'contabplusinfo <no-reply@contabplus>',
       to: mailContent.to,
       subject: mailContent.subject
         ? mailContent.subject
-        : 'Mensaje de beedooServer',
+        : 'Mensaje de ContabPlus',
     }
 
     if (mailContent.isText) {

@@ -5,7 +5,11 @@
 <!-- BEGIN HEAD -->
 <head>
   <meta charset="utf-8" />
-  <title>ContabPlus</title>
+  <% if(typeof titlePage !== 'undefined'){ %>
+    <title><%= titlePage %></title>
+  <% }else{ %>
+    <title>ContabPlus</title>
+  <% }%>
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <meta content="" name="description" />
   <meta content="" name="author" />
@@ -18,6 +22,7 @@
   <link href="/static/css/style-responsive.css" rel="stylesheet" type="text/css"/>
   <link href="/static/css/blue.css" rel="stylesheet" type="text/css" id="style_color"/>
   <link href="/static/css/uniform.default.css" rel="stylesheet" type="text/css"/>
+  <link href="/static/css/bootstrap-table.min.css" rel="stylesheet" type="text/css">
   <!-- END GLOBAL MANDATORY STYLES -->
   <link rel="shortcut icon" href="favicon.ico" />
 </head>
@@ -169,14 +174,15 @@
           </form> -->
           <!-- END RESPONSIVE QUICK SEARCH FORM -->
         </li>
-        <li class="start active">
+
+        <li class="start <% if(active == 0) { %> active<% } %> ">
           <a href="/contab/home">
           <i class="icon-home "></i> 
           <span class="title">Inicio</span>
           </a>
         </li>
-        <% for(var j = 0; j < global.Menu.length; j++) { %>
-        <li >
+        <% for(var j = 0; j < global.Menu.length; j++) { %>          
+        <li  <% if(active == global.Menu[j].menId) { %> class="active" <% } %>  </li>
           <a href="javascript:;">
           <i class="<%=global.Menu[j].menIco%>"></i> 
           <span class="title"><%=global.Menu[j].menName%></span>
