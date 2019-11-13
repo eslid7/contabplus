@@ -4,7 +4,7 @@ CREATE TABLE users (
 	useLogin VARCHAR(100) NOT NULL, 
 	usePassword VARCHAR(255) NOT NULL, 
 	useStatus INT NOT NULL,
-	userPhone varchar(60),
+	usePhone varchar(60),
 	createdAt TIMESTAMP, 
 	updatedAt TIMESTAMP
 );
