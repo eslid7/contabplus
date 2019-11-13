@@ -17,9 +17,11 @@ router.route('/delete').get(userController.deteleUsers);
 
 router.route('/home').get(userController.home);
 router.route('/profile').get(userController.profile);
+router.route('/').get(userController.index);
 
 // contabController
 router.route('/viewAccountingCatalog').get(appContabController.viewAccountingCatalog);
 router.route('/accountingCatalog').get(appContabController.accountingCatalog);
+
 
 module.exports = router;
