@@ -31,17 +31,6 @@ module.exports.initRoutes = function initRoutes(app) {
   app.use('/', routes)
 }
 
-// module.exports.initDB = async function initDB(app) {
-//    const { dbInitialized, error: errDb } = await authenticate()
-//    if (!dbInitialized) {
-//      databaseConnectionFailedLog(errDb)
-//      process.exit(1)
-//    }
-//    else{
-//     console.log('ingresado a dataBD')
-//    }
-// }
-
 module.exports.initMiddlewares = function initMiddlewares(app) {
   app.use(bodyParser.json({ limit: '50mb' }))
   app.use(

@@ -78,6 +78,9 @@ function signup (req, res) {
     }
   }).catch(function (err) {
     // en caso de error se devuelve el error
+    res.status(400).json({
+      message: "Error al crear el usuario."
+    })
     console.log('error: ' + err);
     return err
   })
@@ -233,6 +236,7 @@ function accountData(req, res){
 
 function login (req, res) {
   return userModel.findAll({where:{'useLogin': req.body.email, usePassword: encrypt(req.body.password)}}).then(function (userData) {
+    console.log(userData)
     if (userData.length> 0) {
       if(userData[0].useStatus==3){
         return res.status(400).json({ message: "El usuario no ha validado la cuenta." });
@@ -311,19 +315,17 @@ function profile(req, res){
   if(global.User == undefined){
      res.redirect('/contab/sign');
   }
-  else{
-    userModel.findAll({'useId':global.User.useId}).then(function (userData) {
-      if (userData.length==0) {
-        throw ('El usuario que intenta buscar no existe.')
-      }
-      else{
-        return res.render('profile' ,{
-                            userData:userData[0],
-                            active : -1,
-                            titlePage : 'Mi cuenta'
-                          })
-      }   
-    });
+  else{   
+    if (global.User.length==0) {
+      throw ('El usuario que intenta buscar no existe.')
+    }
+    else{
+      return res.render('profile' ,{
+                          userData:global.User[0],
+                          active : -1,
+                          titlePage : 'Mi cuenta'
+                        })
+    }   
   }
   
 }
