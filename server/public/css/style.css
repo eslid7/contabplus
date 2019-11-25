@@ -5475,3 +5475,14 @@ div.checker.disabled:hover,
 div.radio.disabled:hover {
     cursor: not-allowed;  
 }
+
+.labelTextNivel{
+  height: 39px;
+  padding: 8px;
+}
+
+div[id='loading-div']{
+  margin-top: 17%;
+  margin-left: 45%;
+  color:white;
+}

@@ -69,9 +69,9 @@
 					<p style="text-align:justify;">Al email se le va enviar un correo, el cual se emplea para la confirmación de la cuenta: </p>
 					<div class="row-fluid">
 						<div class="control-group">
-							<labe for="name">
+							<label for="name">
 								Email
-							</labe>
+							</label>
 							<div class="controls">
 								<input type="text" name="email" id="email" class="m-wrap span12" placeholder="Email" maxlength="100">
 							</div>
@@ -79,9 +79,9 @@
 					</div>
 					<div class="row-fluid">
 						<div class="control-group ">
-							<labe for="name">
+							<label for="name">
 								Contraseña
-							</labe>
+							</label>
 							<div class="controls">
 								<input type="password" name="password" id="password" class="m-wrap span12" placeholder="Contraseña" maxlength="100">
 							</div>
@@ -89,9 +89,9 @@
 					</div>
 					<div class="row-fluid">
 						<div class="control-group col-md-12 ">
-							<labe for="name">
+							<label for="name">
 								Nombre Completo
-							</labe>
+							</label>
 							<div class="controls">
 								<input type="text" name="name" id="name" class="m-wrap span12" placeholder="Nombre Completo" maxlength="100">
 							</div>
@@ -99,9 +99,9 @@
 					</div>
 					<div class="row-fluid">
 						<div class="control-group col-md-12 ">
-							<labe for="name">
+							<label for="name">
 								Teléfono
-							</labe>
+							</label>
 							<div class="controls">
 								<input type="text" name="phone" id="phone" class="m-wrap span12" placeholder="Teléfono" maxlength="50">
 							</div>
@@ -172,7 +172,7 @@
 	}
 
 	$('#sendDataNewUser').validate({
-		errorElement: 'label', //default input error message container
+		errorElement: 'labell', //default input error message container
 		errorClass: 'help-inline', // default input error message class
 		ignore: "",
 		rules: {
@@ -190,9 +190,9 @@
 		highlight: function (element) { // hightlight error inputs
 			$(element).closest('.control-group').addClass('error'); // set error class to the control group
 		},
-		success: function (label) {
-			label.closest('.control-group').removeClass('error');
-			label.remove();
+		success: function (labell) {
+			labell.closest('.control-group').removeClass('error');
+			labell.remove();
 		},
 		errorPlacement: function (error, element) {
 			if (element.closest('.icon-search').size() === 1) {

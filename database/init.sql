@@ -97,10 +97,16 @@ CREATE TABLE accountingCatalog (
 	accId INT AUTO_INCREMENT PRIMARY KEY,
 	accName VARCHAR(100) NOT NULL,
 	accCode VARCHAR(4) NOT NULL,
+	accIsGlobal INT NOT NULL,
 	accQuantityNivels INT NOT NULL,
 	accNivels VARCHAR(250), 
 	accStatus INT NOT NULL,
+	accSeparator VARCHAR(2), 
 	useIdFk INT NOT NULL,
 	createdAt  TIMESTAMP,
 	updatedAt TIMESTAMP
 );
+
+
+
+
