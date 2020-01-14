@@ -192,18 +192,18 @@
 								<input type="text" name="accNivel12" id="accNivel12" class="m-wrap span12" placeholder="Dígitos" maxlength="6">
 							</div>
 							<div class="control-group span6 ">
-								<input type="text" id="accName1" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">										
-								<input type="text" id="accName2" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">
-								<input type="text" id="accName3" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">										
-								<input type="text" id="accName4" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">	
-								<input type="text" id="accName5" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">										
-								<input type="text" id="accName6" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">	
-								<input type="text" id="accName7" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">										
-								<input type="text" id="accName8" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">	
-								<input type="text" id="accName9" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">										
-								<input type="text" id="accName10" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">	
-								<input type="text" id="accName11" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">										
-								<input type="text" id="accName12" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">											
+								<input type="text" id="accName1" name="accName1" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">										
+								<input type="text" id="accName2" name="accName2" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">
+								<input type="text" id="accName3" name="accName3" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">										
+								<input type="text" id="accName4" name="accName4" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">	
+								<input type="text" id="accName5" name="accName5" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">										
+								<input type="text" id="accName6" name="accName6" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">	
+								<input type="text" id="accName7" name="accName7" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">										
+								<input type="text" id="accName8" name="accName8" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">	
+								<input type="text" id="accName9" name="accName9" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">										
+								<input type="text" id="accName10" name="accName10" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">	
+								<input type="text" id="accName11" name="accName11" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">										
+								<input type="text" id="accName12" name="accName12" class="m-wrap span12" placeholder="Nombre nivel" maxlength="20">											
 							</div>							
 						</div>
 						<div class="row-fluid">
@@ -295,7 +295,8 @@
 					field: 'accStatus',
 					title: 'Estado',
 					sortable: true,
-					width: '15%'
+					width: '15%',
+					formatter: operateFormatterState
 				}
 			]
 		});
@@ -303,6 +304,16 @@
 	function getHeight() {
 		return $(window).height();
 	}
+	function operateFormatterState(value, row, index) {
+        return [
+            "<button type='button' class='btn ",
+            ((row.accStatus == 1) ? "green" : "red"),
+            " btnActiveInactive'>",
+            "<i class='icon-off'></i> ",
+            ((row.accStatus == 1) ? "Activo" : "Inactivo"),
+            "</button>"
+        ].join('');
+    }
 	//make catalog
 	$('#accountingCatalog').validate({
 		errorElement: 'label', //default input error message container
@@ -336,27 +347,38 @@
 			form.submit();
 		}
 	});
-
+    function refreshTable() {
+        $('.bt-table').bootstrapTable('refresh', {silent: true});
+    }
 	function fnAccountingCatalog(){
 		if($('#accountingCatalog').valid()){
 			$.ajax({
 				type: "POST",
 				url: "/contab/accountingCatalog",
 				data: $('#accountingCatalog').serialize(), //se envia el form serializado
-				async: true,
 				beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
 					showIsLoading("Procesando...");
 				}
-			}).done(function (data) {
-				$('#modalAccountingCatalog').hide();				
+			}).done(function () {
+				$('#modalAccountingCatalog').modal('hide');
+				hideIsLoading();
+				cleanForm();	
+				refreshTable(); 						
 			}).fail(function (data) {
-				$('#modalAccountingCatalog').hide();
-				hideIsLoading();
 				fnOpenErrorDialog(data.responseJSON.message);
-			}).always(function (data) {
-				$('#modalAccountingCatalog').hide();
 				hideIsLoading();
-			});
+			})
 		}	
+	}
+	function cleanForm(){
+		$('#accCode').val('');
+		$('#accName').val('');
+		$('#accQuantityNivels').val(1).trigger('change');
+		for(var a=1;  a<13; a++){			
+			$('#accNivel'+a).val('')
+			$('#accName'+a).val('')			
+		}
+		$('#accSeparatorCheck').attr('checked', true);
+		$('#accSeparator').val('');
 	}
 </script>

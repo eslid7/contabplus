@@ -4,6 +4,7 @@ const userModel = require('../models/users')
 const menuModel = require('../models/menu')
 const rolesProcessesModel = require('../models/rolesProcesses')
 const usersRolesModel = require('../models/usersRoles')
+const rolesModel = require('../models/roles')
 
 const processesModel = require('../models/processes')
 const jwt = require('jsonwebtoken')
@@ -16,11 +17,25 @@ const fs = require('fs')
 const path = require('path');
 
 
-async function getUser(req, res) {
-  userModel.findAll()
+async function getUsers(req, res) {
+
+  userModel.hasOne(usersRolesModel,{foreignKey:'useIdFk', sourceKey: 'useId'});
+  usersRolesModel.hasOne(rolesModel,{foreignKey:'rolId', sourceKey: 'rolIdFK'});
+  userModel.findAll({ attributes:['useName','useLogin','usePhone','useId','useStatus'],
+    include : [{  attributes:['useIdFk'],
+        model: usersRolesModel, 
+        required: false,        
+        include : [{  attributes:['rolId','rolName'],
+          model: rolesModel,
+          required: false
+      }] 
+    }]
+  })
   .then(users => {
+ 
+
     console.log(users)
-    res.status(200).json({users});
+    res.status(200).json({rows:users, total:users.length});
   })
   .catch(err => {
     console.log(err)
@@ -330,6 +345,30 @@ function profile(req, res){
   
 }
 
+
+function viewUsers(req, res){
+  if(global.User == undefined){
+     res.redirect('/contab/sign');
+  }
+  else{   
+    if (global.User.length==0) {
+      throw ('El usuario que intenta buscar no existe.')
+    }
+    else{
+      rolesModel.findAll().then(function (rolesData) {
+
+        return res.render('viewUsers' ,{
+          userData:global.User[0],
+          active : -1,
+          titlePage : 'Administrar Usuarios',
+          roles : rolesData
+        })
+      })    
+    }   
+  }
+  
+}
+
 module.exports = {
   login,
   signup,
@@ -337,12 +376,13 @@ module.exports = {
   validateAccount,
   resendMail,
   createAccount,
-  getUser,
+  getUsers,
   deteleUsers,
   index,
   sign,
   logout,
   accountData,
   home,
-  profile
+  profile,
+  viewUsers
 }

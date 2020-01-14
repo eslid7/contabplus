@@ -153,7 +153,6 @@
 				type: "POST",
 				url: "/auth/signup",
 				data: $('#sendDataNewUser').serialize(), //se envia el form serializado
-				async: true,
 				beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
 					showIsLoading("Procesando...");
 				}

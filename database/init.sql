@@ -91,6 +91,13 @@ CREATE TABLE businessUsers (
 	updatedAt TIMESTAMP
 );
 
+CREATE TABLE businessAccountingC (
+	busIdFk INT NOT NULL,
+	accIdFk INT NOT NULL,
+	createdAt  TIMESTAMP, 
+	updatedAt TIMESTAMP
+);
+
 ----------------------------------------------------------------------
 
 CREATE TABLE accountingCatalog (
@@ -99,7 +106,7 @@ CREATE TABLE accountingCatalog (
 	accCode VARCHAR(4) NOT NULL,
 	accIsGlobal INT NOT NULL,
 	accQuantityNivels INT NOT NULL,
-	accNivels VARCHAR(250), 
+	accNivels VARCHAR(500), 
 	accStatus INT NOT NULL,
 	accSeparator VARCHAR(2), 
 	useIdFk INT NOT NULL,
