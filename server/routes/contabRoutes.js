@@ -30,4 +30,7 @@ router.route('/viewDefineCatalog').get(appContabController.viewDefineCatalog);
 router.route('/viewBusiness').get(appContabController.viewBusiness);
 router.route('/business').get(appContabController.business);
 router.route('/saveBusiness').post(appContabController.saveBusiness);
+
+router.route('/definedAccountingCatalog').get(appContabController.definedAccountingCatalog);
+router.route('/definedAccountingCatalog').post(appContabController.saveDefinedAccountingCatalog);
 module.exports = router;

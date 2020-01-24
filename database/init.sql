@@ -115,5 +115,13 @@ CREATE TABLE accountingCatalog (
 );
 
 
+CREATE TABLE definedAccountingCatalog (
+	accIdFk INT NOT NULL,
+	busIdFk INT NOT NULL,
+	useIdFk INT NOT NULL,
+	createdAt  TIMESTAMP,
+	updatedAt TIMESTAMP
+);
+
 
 

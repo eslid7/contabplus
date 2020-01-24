@@ -1,7 +1,8 @@
 'use strict'
-const accountingCatalogModel = require('../models/accountingCatalog')
-const businessModel = require('../models/business')
+const accountingCatalogModel = require('../models/accountingCatalog');
+const businessModel = require('../models/business');
 const moment = require('moment');
+const definedAccountingCatalogModel = require('../models/definedAccountingCatalog');
 
 function viewAccountingCatalog(req, res){
     if(global.User == undefined){
@@ -19,7 +20,7 @@ function viewAccountingCatalog(req, res){
 }
 
 function accountingCatalog(req, res){
-    accountingCatalogModel.findAll().then( accountingCatalog => {
+    accountingCatalogModel.findAll({where:{'useIdFK': global.User[0].useId}}).then( accountingCatalog => {
         return res.status(200).json({rows: accountingCatalog, total:accountingCatalog.length});
     })
 } 
@@ -80,11 +81,20 @@ function viewDefineCatalog(req, res){
        res.redirect('/contab/sign');
     }
     else{
-        return res.render('defineCatalog' ,{
-                userData:global.User[0],
-                active : 2,
-                titlePage : 'Definir catálogo contable'
+        // obtengo las empresas
+        // obtengo los catalogos
+        accountingCatalogModel.findAll({where:{'useIdFK': global.User[0].useId}}).then( accountingCatalog => {
+            businessModel.findAll({where:{'useIdFK': global.User[0].useId}}).then( business => {
+                return res.render('defineCatalog' ,{
+                    userData:global.User[0],
+                    active : 2,
+                    titlePage : 'Definir catálogo contable',
+                    accountingCatalog : accountingCatalog,
+                    business : business
+                })   
             })
+        })
+
            
     }
     
@@ -106,7 +116,7 @@ function viewBusiness(req, res){
 }
 
 function business(req, res){
-    businessModel.findAll().then( business => {
+    businessModel.findAll({where:{'useIdFK': global.User[0].useId}}).then( business => {
         return res.status(200).json({rows: business, total:business.length});
     })
 } 
@@ -127,6 +137,37 @@ function saveBusiness(req, res){
       })
 
 }
+
+function definedAccountingCatalog(req, res){
+    definedAccountingCatalogModel.hasOne(businessModel,{foreignKey:'busId',sourceKey: 'busIdFk'});
+    definedAccountingCatalogModel.hasOne(accountingCatalogModel,{foreignKey:'accId',sourceKey: 'accIdFk'});
+    definedAccountingCatalogModel.findAll({where:{'useIdFK': global.User[0].useId},
+        include: [{
+            model: businessModel,
+            require : true
+        }, {  
+            model: accountingCatalogModel,
+            required: true
+        }]
+    }).then(definedAccountingCatalog =>{
+        
+        return res.status(200).json({rows: definedAccountingCatalog, total:definedAccountingCatalog.length});
+    })
+}
+function saveDefinedAccountingCatalog(req, res){
+    definedAccountingCatalogModel
+    const dataToSave = new definedAccountingCatalogModel({
+        accIdFk: req.body.accId,
+        useIdFk: global.User[0].useId,
+        busIdFk: req.body.busId,
+        createdAt: moment(new Date()).format('YYYY-MM-DD'),
+        updateAt: moment(new Date()).format('YYYY-MM-DD')
+    });
+    return dataToSave.save().then(function (businessSaved) {
+        res.status(200).json({ message: "Se ha creado con exito" });
+    })
+}
+
 module.exports = {
     viewAccountingCatalog,
     accountingCatalog,
@@ -134,5 +175,7 @@ module.exports = {
     viewDefineCatalog,
     viewBusiness,
     business,
-    saveBusiness
+    saveBusiness,
+    definedAccountingCatalog,
+    saveDefinedAccountingCatalog
 }
