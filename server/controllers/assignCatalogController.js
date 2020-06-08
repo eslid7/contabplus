@@ -26,9 +26,10 @@ function viewAsignCatalog(req, res){
 function getCatalog(req, res){
     definedAccountingCatalogModel.findAll({where: {'useIdFK': global.User[0].useId, 'busIdFk': req.params.id}, attributes: [sequelize.fn('max', sequelize.col('updatedAt')),'accIdFk'], group : ['accIdFk'] }).then( definedCatalog => { 
         accountingCatalogModel.findOne({where: {'accId': definedCatalog[0].accIdFk }}).then( accountCatalog => {            
-            res.status(200).json({ accountCatalog: accountCatalog });
+            return   res.status(200).json({ accountCatalog: accountCatalog });
         })
     })
+
 }
 
 function listHistory(req, res){

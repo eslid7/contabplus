@@ -124,8 +124,12 @@
 <% include partials/footer %>
 <script type="text/javascript">
 	$(document).ready(function(){
-        handleTableData();
-        fnGetCatalog();	
+        <% if(business.length == 0) { %>
+            
+        <%} else {%>
+            handleTableData();
+            fnGetCatalog();	
+        <% }%>
 	});
 	isFirtsDatatable = true;
 	function handleTableData () {
