@@ -123,5 +123,14 @@ CREATE TABLE definedAccountingCatalog (
 	updatedAt TIMESTAMP
 );
 
-
+---  Datos iniciando segunda programacion 
+CREATE TABLE definedAccCatMonth (
+	accIdFk INT NOT NULL,
+	busIdFk INT NOT NULL,
+	useIdFk INT NOT NULL,
+	month INT NOT NULL,
+	year INT NOT NULL,
+	createdAt  TIMESTAMP,
+	updatedAt TIMESTAMP
+);
 

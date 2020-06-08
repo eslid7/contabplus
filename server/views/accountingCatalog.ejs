@@ -293,7 +293,7 @@
 					width: '5%'
 				}, {
 					field: 'accStatus',
-					title: 'Estado',
+					title: 'Editar',
 					sortable: true,
 					width: '15%',
 					formatter: operateFormatterState
@@ -306,11 +306,9 @@
 	}
 	function operateFormatterState(value, row, index) {
         return [
-            "<button type='button' class='btn ",
-            ((row.accStatus == 1) ? "green" : "red"),
-            " btnActiveInactive'>",
-            "<i class='icon-off'></i> ",
-            ((row.accStatus == 1) ? "Activo" : "Inactivo"),
+            "<button type='button' class='btn green' ",
+            " onclick='seeData("+row.accId+")'>",
+            "<i class='icon-off'></i> Editar ",
             "</button>"
         ].join('');
     }
@@ -380,5 +378,38 @@
 		}
 		$('#accSeparatorCheck').attr('checked', true);
 		$('#accSeparator').val('');
+	}
+
+	function seeData(id){
+		$.ajax({
+				type: "GET",
+				url: "/contab/accountingCatalog/"+id,		
+				beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+					showIsLoading("Procesando...");
+				}
+			}).done(function (data) {
+				$('#accPk').val(id);
+				$('#accCode').val(data.accountingCatalog.accCode);
+				$('#accName').val(data.accountingCatalog.accName);
+				$('#accQuantityNivels').val(data.accountingCatalog.accQuantityNivels).trigger('change');
+				$('#accIsGlobal').val(data.accountingCatalog.accIsGlobal).trigger('change');	
+				console.log(data.accountingCatalog.accNivels)			
+				for(var a=1;  a<data.accountingCatalog.accQuantityNivels; a++){								
+					$('#accNivel'+a).val('')
+					$('#accName'+a).val('')			
+				}
+				if(data.accountingCatalog.accSeparator!=''){
+					$('#accSeparatorCheck').attr('checked', false);
+				}
+				else{
+					$('#accSeparatorCheck').attr('checked', true);
+				}				
+				$('#accSeparator').val(data.accountingCatalog.accSeparator);
+				$('#modalAccountingCatalog').modal('show');
+				hideIsLoading();								
+			}).fail(function (data) {
+				fnOpenErrorDialog(data.responseJSON.message);
+				hideIsLoading();
+			})
 	}
 </script>

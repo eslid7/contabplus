@@ -356,17 +356,40 @@ function viewUsers(req, res){
     }
     else{
       rolesModel.findAll().then(function (rolesData) {
-
-        return res.render('viewUsers' ,{
-          userData:global.User[0],
-          active : -1,
-          titlePage : 'Administrar Usuarios',
-          roles : rolesData
-        })
+        userModel.findAll().then(function (usersData){
+          return res.render('viewUsers' ,{
+            userData:global.User[0],
+            active : -1,
+            titlePage : 'Administrar Usuarios',
+            roles : rolesData,
+            users : usersData,
+          })
+        })        
       })    
     }   
   }
   
+}
+
+function saveRol(req, res){
+  if(req.body.userId){
+    usersRolesModel.update({rolIdFk :req.body.roles}, {where : {'useIdFK' :req.body.userId}}).then(function (userUpdated) {
+      return  res.status(200).json({ message: "Se ha actualizado con exito" , userUpdated: userUpdated});
+    })
+  }
+  else{
+    const dataToSave = new usersRolesModel({
+      useIdFk: req.body.users,
+      rolIdFK: req.body.roles,
+      createdAt: moment(new Date()).format('YYYY-MM-DD'),
+      updateAt: moment(new Date()).format('YYYY-MM-DD')
+    });
+
+    dataToSave.save().then(function (rolSave) {
+      return  res.status(200).json({ message: "Se ha actualizado con exito" , rolSave: rolSave});
+    })
+  }
+
 }
 
 module.exports = {
@@ -384,5 +407,6 @@ module.exports = {
   accountData,
   home,
   profile,
-  viewUsers
+  viewUsers,
+  saveRol
 }

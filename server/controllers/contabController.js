@@ -20,9 +20,16 @@ function viewAccountingCatalog(req, res){
 }
 
 function accountingCatalog(req, res){
-    accountingCatalogModel.findAll({where:{'useIdFK': global.User[0].useId}}).then( accountingCatalog => {
-        return res.status(200).json({rows: accountingCatalog, total:accountingCatalog.length});
-    })
+    if (typeof(req.params.id) !== "undefined") {
+        accountingCatalogModel.findAll({where:{'useIdFK': global.User[0].useId, "accId" : req.params.id}}).then( accountingCatalog => {
+            return res.status(200).json({accountingCatalog :accountingCatalog[0]});
+        })
+    }
+    else{
+        accountingCatalogModel.findAll({where:{'useIdFK': global.User[0].useId}}).then( accountingCatalog => {
+            return res.status(200).json({rows: accountingCatalog, total:accountingCatalog.length});
+        })
+    }
 } 
 
 function saveAccountingCatalog(req, res){
@@ -154,8 +161,9 @@ function definedAccountingCatalog(req, res){
         return res.status(200).json({rows: definedAccountingCatalog, total:definedAccountingCatalog.length});
     })
 }
+
 function saveDefinedAccountingCatalog(req, res){
-    definedAccountingCatalogModel
+    
     const dataToSave = new definedAccountingCatalogModel({
         accIdFk: req.body.accId,
         useIdFk: global.User[0].useId,
@@ -177,5 +185,5 @@ module.exports = {
     business,
     saveBusiness,
     definedAccountingCatalog,
-    saveDefinedAccountingCatalog
+    saveDefinedAccountingCatalog,
 }

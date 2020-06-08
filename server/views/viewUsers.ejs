@@ -27,9 +27,9 @@
 								<div class="portlet-body">
 									<div class="table-toolbar">
 										<div class="btn-group">
-											<!-- <button id="newAccountingCatalog" class="btn green" onclick="$('#modalAccountingCatalog').modal('show')">
-											Catálogo contable <i class="icon-plus"></i>
-											</button> -->
+											<button id="addRol" class="btn green" onclick="$('#modalAppRol').modal('show')">
+												Asignar Rol <i class="icon-plus"></i>
+											</button>
 										</div>
 										<div class="btn-group pull-right">
 											<!-- <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="icon-angle-down"></i>
@@ -63,7 +63,7 @@
             <h3 id='titleCatalog'>Modificar rol</h3>
         </div>
         <div class="modal-body">
-            <form id="accountingCatalog" >
+            <form id="updateRol" >
                 <input type="hidden" name="userId" id="userId" >
                 <div class="row-fluid">
                     <div class="control-group span6 ">
@@ -87,6 +87,47 @@
         <div class="modal-footer">
             <button type="button" class="btn dark btn-outline" data-dismiss="modal">Cerrar</button>
             <button type="button" class="btn green" onclick="fnSaveRol()">Guardar</button>
+        </div>
+	</div>
+	
+	<div id="modalAppRol" class="modal hide fade">
+        <div class="modal-header">
+            <button data-dismiss="modal" class="close" type="button">X</button>
+            <h3 id='titleCatalog'>Agregar rol</h3>
+        </div>
+        <div class="modal-body">
+            <form id="addRolForm" >
+                <div class="row-fluid">
+                    <div class="control-group span6 ">
+						<label for="accCode">
+                            Usuario
+                        </label>
+                        <div class="controls">
+                           <select id="users" name="users">
+                            <% for(var a = 0; a < users.length; a++){ %>
+                               <option value="<%= users[a].useId %>"><%= users[a].useName %> </option>
+                            <% } %>
+                           </select>
+                        </div>
+                        <label for="accCode">
+                            Roles
+                        </label>
+                        <div class="controls">
+                           <select id="roles" name="roles">
+                            <% for(var i = 0; i < roles.length;i++){ %>
+                               <option value="<%= roles[i].rolId %>"><%= roles[i].rolName %> </option>
+                            <% } %>
+                           </select>
+                        </div>
+                    </div>
+                    <div class="control-group span6 ">                       
+                    </div>
+                </div>							
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn dark btn-outline" data-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn green" onclick="fnAddSaveRol()">Guardar</button>
         </div>
     </div>
 
@@ -215,7 +256,7 @@
     function fnActiveInactive(row, indx) {
         $.ajax({
             type: "POST",
-            url: "/contab/users/activate?userId"+row.useId,
+            url: "/contab/users/activate?userId="+row.useId,
             beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
                 showIsLoading("Procesando...");
             }
@@ -232,5 +273,39 @@
             hideIsLoading();
         });
     }
+	function fnSaveRol(){
+		$.ajax({
+            type: "POST",
+			url: "/contab/saveRol",
+			data: $('#updateRol').serialize(), //se envia el form serializado
+            beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                showIsLoading("Procesando...");
+            }
+        }).done(function (data) {
+			refreshTable();
+			$('#modalRol').modal('hide');
+        }).fail(function (data) {
+            fnOpenErrorDialog(data.responseJSON._error.message);
+        }).always(function (data) {
+            hideIsLoading();
+        });
+	}
 
+	function fnAddSaveRol(){
+		$.ajax({
+            type: "POST",
+			url: "/contab/saveRol",
+			data: $('#addRolForm').serialize(), //se envia el form serializado
+            beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                showIsLoading("Procesando...");
+            }
+        }).done(function (data) {
+			refreshTable();
+			$('#modalRol').modal('hide');
+        }).fail(function (data) {
+            fnOpenErrorDialog(data.responseJSON._error.message);
+        }).always(function (data) {
+            hideIsLoading();
+        });
+	}
 </script>

@@ -3,6 +3,8 @@ const express = require('express')
 
 const appContabController = require('../controllers/contabController');
 const userController = require('../controllers/usersController')
+const assignCatalogController = require('../controllers/assignCatalogController')
+
 const router = express.Router()
 
 router.route('/users').get(userController.getUsers);
@@ -33,4 +35,13 @@ router.route('/saveBusiness').post(appContabController.saveBusiness);
 
 router.route('/definedAccountingCatalog').get(appContabController.definedAccountingCatalog);
 router.route('/definedAccountingCatalog').post(appContabController.saveDefinedAccountingCatalog);
+router.route('/accountingCatalog/:id').get(appContabController.accountingCatalog);
+router.route('/saveRol').post(userController.saveRol);
+
+//assignCatalogController
+router.route('/viewAsignCatalog').get(assignCatalogController.viewAsignCatalog);
+router.route('/getCatalog/:id').get(assignCatalogController.getCatalog);
+router.route('/listHistory/:id').get(assignCatalogController.listHistory);
+router.route('/saveAsignCatalog').post(assignCatalogController.saveAsignCatalog);
+
 module.exports = router;

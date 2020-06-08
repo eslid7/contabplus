@@ -55,7 +55,7 @@
 					<h3 id='titleCatalog'>Empresas</h3>
 				</div>
 				<div class="modal-body">
-					<form id="businessCatalog" >
+					<form id="businessCatalog" action="#" >
 						<input type="hidden" name="busId" id="busId" >
 						<div class="row-fluid">
 							<div class="control-group span6 ">
@@ -191,14 +191,16 @@
 				beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
 					showIsLoading("Procesando...");
 				}
-			}).done(function () {
+			}).done(function (data) {
 				$('#modalBusiness').modal('hide');
+				fnOpenSusessDialog(data.message)
 				hideIsLoading();
 				cleanForm();	
 				refreshTable(); 						
 			}).fail(function (data) {
 				fnOpenErrorDialog(data.responseJSON.message);
 				hideIsLoading();
+				$('#modalBusiness').modal('hide');
 			})
 		}	
 	}
