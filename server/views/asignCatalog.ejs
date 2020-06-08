@@ -125,7 +125,7 @@
 <script type="text/javascript">
 	$(document).ready(function(){
         <% if(business.length == 0) { %>
-            
+
         <%} else {%>
             handleTableData();
             fnGetCatalog();	
@@ -190,8 +190,7 @@
             beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
                 showIsLoading("Procesando...");
             }
-        }).done(function (data) {         
-            console.log(data)    
+        }).done(function (data) {            
             hideIsLoading(); 
             fnOpenSusessDialog(data.message)
 			refreshTable();
@@ -209,7 +208,7 @@
                 showIsLoading("Procesando...");
             }
         }).done(function (data) {	
-            hideIsLoading();		
+            hideIsLoading();	
             $('#accIdName').html(data.accountCatalog.accName);
             $('#accId').val(data.accountCatalog.accId);
             if(data.accountCatalog.accIsGlobal==1){
@@ -218,9 +217,9 @@
             else{
                 $('#accIsGlobal').html('Individual')
             }
-           
         }).fail(function (data) {
-            fnOpenErrorDialog(data.responseJSON._error.message);
+            hideIsLoading();
+            fnOpenErrorDialog(data.responseJSON.message);
         }).always(function (data) {
             hideIsLoading();
         });
@@ -243,6 +242,7 @@
             }
            
         }).fail(function (data) {
+            hideIsLoading();
             fnOpenErrorDialog(data.responseJSON._error.message);
         }).always(function (data) {
             hideIsLoading();
