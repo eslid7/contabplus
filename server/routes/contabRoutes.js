@@ -4,6 +4,8 @@ const express = require('express')
 const appContabController = require('../controllers/contabController');
 const userController = require('../controllers/usersController')
 const assignCatalogController = require('../controllers/assignCatalogController')
+const assignPermitCatalogController = require('../controllers/assignPermitCatalogController')
+
 
 const router = express.Router()
 
@@ -17,7 +19,7 @@ router.route('/index').get(userController.index);
 router.route('/sign').get(userController.sign);
 router.route('/delete').get(userController.deteleUsers);
 
-
+router.route('/users/changeStatus').post(userController.changeStatus)
 
 
 router.route('/home').get(userController.home);
@@ -43,5 +45,12 @@ router.route('/viewAsignCatalog').get(assignCatalogController.viewAsignCatalog);
 router.route('/getCatalog/:id').get(assignCatalogController.getCatalog);
 router.route('/listHistory/:id').get(assignCatalogController.listHistory);
 router.route('/saveAsignCatalog').post(assignCatalogController.saveAsignCatalog);
+
+
+//viewAsignPermit
+router.route('/viewAsignPermit').get(assignPermitCatalogController.viewAsignPermit);
+router.route('/saveAsignPermit').post(assignPermitCatalogController.saveAsignPermit);
+router.route('/assignHistory/:id').get(assignPermitCatalogController.assignHistory);
+router.route('/deleteAssignHistory/:id').post(assignPermitCatalogController.deleteAssignHistory);
 
 module.exports = router;

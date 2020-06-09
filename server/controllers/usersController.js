@@ -34,7 +34,7 @@ async function getUsers(req, res) {
   .then(users => {
  
 
-    console.log(users)
+    // console.log(users)
     res.status(200).json({rows:users, total:users.length});
   })
   .catch(err => {
@@ -392,6 +392,21 @@ function saveRol(req, res){
 
 }
 
+function changeStatus(req, res){
+  if(global.User == undefined){
+    res.redirect('/contab/sign');
+  }
+  else{ 
+    let useStatus = 1
+    if(req.query.status ==1){
+      useStatus = 2
+    }
+    userModel.update({useStatus :useStatus}, {where :{'useId':req.query.useId}}).then(function(){
+      return  res.status(200).json({ message: "Se ha actualizado con exito" });
+    })
+  }
+}
+
 module.exports = {
   login,
   signup,
@@ -408,5 +423,6 @@ module.exports = {
   home,
   profile,
   viewUsers,
-  saveRol
+  saveRol,
+  changeStatus,
 }

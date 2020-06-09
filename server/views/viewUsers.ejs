@@ -256,17 +256,12 @@
     function fnActiveInactive(row, indx) {
         $.ajax({
             type: "POST",
-            url: "/contab/users/activate?userId="+row.useId,
+            url: "/contab/users/changeStatus?useId="+row.useId+"&status="+row.useStatus,
             beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
                 showIsLoading("Procesando...");
             }
         }).done(function (data) {
-            $(".bt-table").bootstrapTable('updateRow', {
-                index: indx,
-                row: {
-                    useStatus: data.useStatus
-                }
-            });
+            refreshTable()
         }).fail(function (data) {
             fnOpenErrorDialog(data.responseJSON._error.message);
         }).always(function (data) {

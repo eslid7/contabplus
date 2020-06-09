@@ -40,4 +40,5 @@ router.route('/authenticated').get(authHelper.isAuth, (req, res) => {
 router.route('/logout').get(userController.logout)
 
 
+
 module.exports = router

@@ -8,7 +8,7 @@ CREATE TABLE users (
 	createdAt TIMESTAMP, 
 	updatedAt TIMESTAMP
 );
-
+--- estados 1 activo 2 inactivo 3 cuenta sin validar
 -- SELECT distinct(menId), menName, menIco
 -- FROM menu 
 -- INNER JOIN processes
@@ -84,9 +84,15 @@ CREATE TABLE business (
 	updatedAt TIMESTAMP
 );
 
-CREATE TABLE businessUsers (
+-- permitId 1 consultar, permitId 1 modificar
+
+CREATE TABLE businessUsersPermit (
+	bupId INT AUTO_INCREMENT PRIMARY KEY,
 	busIdFk INT NOT NULL,
 	useIdFk INT NOT NULL,
+	useIdFkOwner INT NOT NULL, 
+	accIdFk INT NOT NULL,
+	permitId INT NOT NULL,
 	createdAt  TIMESTAMP, 
 	updatedAt TIMESTAMP
 );

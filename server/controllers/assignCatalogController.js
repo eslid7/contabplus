@@ -58,10 +58,10 @@ function saveAsignCatalog(req, res){
         year: req.body.year,
         createdAt: moment(new Date()).format('YYYY-MM-DD'),
         updateAt: moment(new Date()).format('YYYY-MM-DD')
-      });
-      dataToSave.save().then(function () {
+    });
+    dataToSave.save().then(function () {
         return res.status(200).json({ message: "Se ha creado con exito" });
-      })
+    })
 }
 
 module.exports = {
