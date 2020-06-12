@@ -140,3 +140,23 @@ CREATE TABLE definedAccCatMonth (
 	updatedAt TIMESTAMP
 );
 
+--- accType 1 Activo, 2 Pasivo, 3 Patrimonio, 4 Ingresos, 5 Costos Ventas, 6 Gastos, 7 Costos Producción   
+-- accTypeBalance 1 Deudor 2 Acreedor
+
+CREATE TABLE accountingAccount(
+	aacId INT AUTO_INCREMENT PRIMARY KEY,
+	accIdFk INT NOT NULL,
+	busIdFk INT NOT NULL,
+	useIdFk INT NOT NULL,
+	aacCode VARCHAR(255) NOT NULL,
+	aacName VARCHAR(255) NOT NULL,
+	aacType INT NOT NULL,
+	aacTypeBalance INT NOT NULL,
+	aacFuncionality VARCHAR(555) NOT NULL,
+	aacObservations VARCHAR(555) NOT NULL,
+	aacStatus INT NOT NULL,
+	aacMoney INT NOT NULL,
+	aacNivels VARCHAR(500), 
+	createdAt  TIMESTAMP,
+	updatedAt TIMESTAMP
+);

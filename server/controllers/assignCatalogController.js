@@ -26,7 +26,24 @@ function viewAsignCatalog(req, res){
 function getCatalog(req, res){
     definedAccountingCatalogModel.findAll({where: {'useIdFK': global.User[0].useId, 'busIdFk': req.params.id}, attributes: [sequelize.fn('max', sequelize.col('updatedAt')),'accIdFk'], group : ['accIdFk'] }).then( definedCatalog => { 
         if(definedCatalog[0]){
-            accountingCatalogModel.findOne({where: {'accId': definedCatalog[0].accIdFk }}).then( accountCatalog => {            
+            accountingCatalogModel.findOne({where: {'accId': definedCatalog[0].accIdFk}}).then( accountCatalog => {       
+                return   res.status(200).json({ accountCatalog: accountCatalog });
+            })
+        }
+        else{
+            return   res.status(400).json({ message: "No se a definido el catálogo para esta empresa." });
+        }        
+    })
+
+}
+
+function getCatalogs(req, res){
+    definedAccountingCatalogModel.findAll({where: {'useIdFK': global.User[0].useId, 'busIdFk': req.params.id}, attributes: [sequelize.fn('max', sequelize.col('updatedAt')),'accIdFk'], group : ['accIdFk'] }).then( definedCatalog => { 
+        if(definedCatalog[0]){
+            const definedCatalogs = definedCatalog.map(
+                definedCatalog => definedCatalog.dataValues.accIdFk
+            )
+            accountingCatalogModel.findAll({where: {'accId': {[sequelize.Op.in]: definedCatalogs }}}).then( accountCatalog => {       
                 return   res.status(200).json({ accountCatalog: accountCatalog });
             })
         }
@@ -69,4 +86,5 @@ module.exports = {
     getCatalog,
     listHistory,
     saveAsignCatalog,
+    getCatalogs,
 }

@@ -3,6 +3,7 @@ const accountingCatalogModel = require('../models/accountingCatalog');
 const businessModel = require('../models/business');
 const moment = require('moment');
 const definedAccountingCatalogModel = require('../models/definedAccountingCatalog');
+const sequelize = require('sequelize');
 
 function viewAccountingCatalog(req, res){
     if(global.User == undefined){
@@ -20,15 +21,34 @@ function viewAccountingCatalog(req, res){
 }
 
 function accountingCatalog(req, res){
+    let likeData = []
+    if(typeof(req.query.search) !== "undefined" && req.query.search !== ''){
+        likeData=[{'accName': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'accCode': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'accQuantityNivels': {[sequelize.Op.like]: `%${req.query.search}%`}} ]
+    }
     if (typeof(req.params.id) !== "undefined") {
-        accountingCatalogModel.findAll({where:{'useIdFK': global.User[0].useId, "accId" : req.params.id}}).then( accountingCatalog => {
+        accountingCatalogModel.findAll({where:{'useIdFK': global.User[0].useId, "accId" : req.params.id, $or: likeData}}).then( accountingCatalog => {
             return res.status(200).json({accountingCatalog :accountingCatalog[0]});
         })
     }
     else{
-        accountingCatalogModel.findAll({where:{'useIdFK': global.User[0].useId}}).then( accountingCatalog => {
-            return res.status(200).json({rows: accountingCatalog, total:accountingCatalog.length});
-        })
+        if(typeof(req.query.search) !== "undefined" && req.query.search !== ''){
+            accountingCatalogModel.findAll({
+                where:{
+                    'useIdFK': global.User[0].useId,
+                    [sequelize.Op.or]: likeData
+                }}).then( accountingCatalog => {
+                return res.status(200).json({rows: accountingCatalog, total:accountingCatalog.length});
+            })
+        }
+        else{
+            accountingCatalogModel.findAll({
+                where:{
+                    'useIdFK': global.User[0].useId
+                }}).then( accountingCatalog => {
+                return res.status(200).json({rows: accountingCatalog, total:accountingCatalog.length});
+            })
+        }    
+
     }
 } 
 
@@ -64,22 +84,40 @@ function saveAccountingCatalog(req, res){
         accNivel12: req.body.accNivel12        
     };
 
-    const dataToSave = new accountingCatalogModel({
-        accName: req.body.accName,
-        accIsGlobal: req.body.accIsGlobal,
-        accCode: req.body.accCode,
-        accQuantityNivels: req.body.accQuantityNivels,
-        accNivels: JSON.stringify(accNivels).toString(),
-        accStatus : 1,
-        accSeparator : req.body.accSeparator,
-        useIdFk : global.User[0].useId,
-        createdAt: moment(new Date()).format('YYYY-MM-DD'),
-        updateAt: moment(new Date()).format('YYYY-MM-DD')
-      });
-      //se devuelve el usuaurio
-      return dataToSave.save().then(function (accountingCatalogSaved) {
-        res.status(200).json({ message: "Se ha creado con exito" });
-      })
+
+    if(req.body.accId){
+        accountingCatalogModel.update({
+            accName: req.body.accName,
+            accIsGlobal: req.body.accIsGlobal,
+            accCode: req.body.accCode,
+            accQuantityNivels: req.body.accQuantityNivels,
+            accNivels: JSON.stringify(accNivels).toString(),
+            accStatus : 1,
+            accSeparator : req.body.accSeparator,
+            updateAt: moment(new Date()).format('YYYY-MM-DD')
+            }, {where : {'accId' :req.body.accId}}).then(function () {
+            return  res.status(200).json({ message: "Se ha actualizado con exito" });
+        })
+    }
+    else{
+        const dataToSave = new accountingCatalogModel({
+            accName: req.body.accName,
+            accIsGlobal: req.body.accIsGlobal,
+            accCode: req.body.accCode,
+            accQuantityNivels: req.body.accQuantityNivels,
+            accNivels: JSON.stringify(accNivels).toString(),
+            accStatus : 1,
+            accSeparator : req.body.accSeparator,
+            useIdFk : global.User[0].useId,
+            createdAt: moment(new Date()).format('YYYY-MM-DD'),
+            updateAt: moment(new Date()).format('YYYY-MM-DD')
+        });
+          //se devuelve el usuaurio
+        return dataToSave.save().then(function (accountingCatalogSaved) {
+            res.status(200).json({ message: "Se ha creado con exito" });
+        })
+    }
+
 
 }
 
@@ -123,9 +161,22 @@ function viewBusiness(req, res){
 }
 
 function business(req, res){
-    businessModel.findAll({where:{'useIdFK': global.User[0].useId}}).then( business => {
-        return res.status(200).json({rows: business, total:business.length});
-    })
+    let likeData = []
+    if(typeof(req.query.search) !== "undefined" && req.query.search !== ''){
+        likeData=[{'busName': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'busEmail': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'busPhone': {[sequelize.Op.like]: `%${req.query.search}%`}} ]
+        businessModel.findAll({
+            where:{'useIdFK': global.User[0].useId,
+            [sequelize.Op.or]: likeData
+        }}).then( business => {
+            return res.status(200).json({rows: business, total:business.length});
+        })
+    }
+    else{
+        businessModel.findAll({where:{'useIdFK': global.User[0].useId}}).then( business => {
+            return res.status(200).json({rows: business, total:business.length});
+        })
+    }
+
 } 
 
 function saveBusiness(req, res){
@@ -148,18 +199,38 @@ function saveBusiness(req, res){
 function definedAccountingCatalog(req, res){
     definedAccountingCatalogModel.hasOne(businessModel,{foreignKey:'busId',sourceKey: 'busIdFk'});
     definedAccountingCatalogModel.hasOne(accountingCatalogModel,{foreignKey:'accId',sourceKey: 'accIdFk'});
-    definedAccountingCatalogModel.findAll({where:{'useIdFK': global.User[0].useId},
-        include: [{
-            model: businessModel,
-            require : true
-        }, {  
-            model: accountingCatalogModel,
-            required: true
-        }]
-    }).then(definedAccountingCatalog =>{
-        
-        return res.status(200).json({rows: definedAccountingCatalog, total:definedAccountingCatalog.length});
-    })
+    
+    if(typeof(req.query.search) !== "undefined" && req.query.search !== ''){      
+        let likeData =  [{'$accountingCatalog.accName$': {[sequelize.Op.like]: `%${req.query.search}%`}},{'$business.busName$': {[sequelize.Op.like]: `%${req.query.search}%`}}]  
+        definedAccountingCatalogModel.findAll({ 
+            where:{'useIdFK': global.User[0].useId,
+            [sequelize.Op.or]: likeData
+            },
+            include: [{
+                model: businessModel,
+                require: true,
+            }, {  
+                model: accountingCatalogModel,
+                required: true,
+            }]
+        }).then(definedAccountingCatalog =>{        
+            return res.status(200).json({rows: definedAccountingCatalog, total:definedAccountingCatalog.length});
+        })
+    }
+    else{
+
+        definedAccountingCatalogModel.findAll({where:{'useIdFK': global.User[0].useId},
+            include: [{
+                model: businessModel,
+                require : true
+            }, {  
+                model: accountingCatalogModel,
+                required: true
+            }]
+        }).then(definedAccountingCatalog =>{        
+            return res.status(200).json({rows: definedAccountingCatalog, total:definedAccountingCatalog.length});
+        })
+    }
 }
 
 function saveDefinedAccountingCatalog(req, res){

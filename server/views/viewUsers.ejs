@@ -71,7 +71,7 @@
                             Roles
                         </label>
                         <div class="controls">
-                           <select id="roles" name="roles">
+                           <select id="roles" name="roles" class="span6">     
                             <% for(var i = 0; i < roles.length;i++){ %>
                                <option value="<%= roles[i].rolId %>"><%= roles[i].rolName %> </option>
                             <% } %>
@@ -103,17 +103,19 @@
                             Usuario
                         </label>
                         <div class="controls">
-                           <select id="users" name="users">
+                           <select id="users" name="users" class="span10">     
                             <% for(var a = 0; a < users.length; a++){ %>
                                <option value="<%= users[a].useId %>"><%= users[a].useName %> </option>
                             <% } %>
                            </select>
-                        </div>
+                        </div>                  
+                    </div>
+                    <div class="control-group span6 ">
                         <label for="accCode">
                             Roles
                         </label>
                         <div class="controls">
-                           <select id="roles" name="roles">
+                           <select id="roles" name="roles" class="span6 roles">     
                             <% for(var i = 0; i < roles.length;i++){ %>
                                <option value="<%= roles[i].rolId %>"><%= roles[i].rolName %> </option>
                             <% } %>
@@ -134,6 +136,9 @@
 <% include partials/footer %>
 <script type="text/javascript">
 	$(document).ready(function(){
+        $('#users').select2({});
+        $('#roles').select2({});        
+        $('.roles').select2({});
 		handleTableData();
 		$('#accQuantityNivels').change(function() {
 			for(var i=0; i<13; i++){

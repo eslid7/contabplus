@@ -34,7 +34,7 @@
                                                     <% if(business.length == 0) { %>   
                                                         No hay empresas disponibles
                                                     <%} else {%>
-                                                    <select id="busId" name="busId">
+                                                    <select id="busId" name="busId" class="span2">
                                                         <% for(var j = 0; j < business.length; j++) { %>   
                                                             <option value="<%=business[j].busId%>"> <%=business[j].busName%></option>
                                                         <% }%>
@@ -66,7 +66,7 @@
                                                    Año
                                                 </label>
                                                 <div class="controls">  
-                                                    <select id="year" name="year">
+                                                    <select id="year" name="year" class="span4">
                                                         <option value="2019"> 2019</option>
                                                         <option value="2020"> 2020</option>
                                                         <option value="2021"> 2021</option>
@@ -79,7 +79,7 @@
                                                    Mes
                                                 </label>
                                                 <div class="controls"> 
-                                                    <select id="month" name="month">
+                                                    <select id="month" name="month" class="span6">
                                                         <option value="1"> Enero</option>
                                                         <option value="2"> Febrero</option>
                                                         <option value="3"> Marzo</option>
@@ -90,7 +90,7 @@
                                                         <option value="8"> Agosto</option>
                                                         <option value="9"> Setiembre</option>
                                                         <option value="10"> Octubre</option>
-                                                        <option value="11"> Novimienbre</option>
+                                                        <option value="11"> Noviembre</option>
                                                         <option value="12"> Diciembre</option>
                                                     </select>                                              
                                                 </div>
@@ -124,6 +124,9 @@
 <% include partials/footer %>
 <script type="text/javascript">
 	$(document).ready(function(){
+        $('#busId').select2({});
+        $('#year').select2({});
+        $('#month').select2({});
         <% if(business.length == 0) { %>
 
         <%} else {%>

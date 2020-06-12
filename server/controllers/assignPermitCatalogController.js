@@ -24,7 +24,7 @@ function viewAsignPermit(req, res){
                     return res.render('viewAssigPermit' ,{
                     userData:global.User[0],
                     active : -1,
-                    titlePage : 'Administrar Usuarios',
+                    titlePage : 'Asignar permisos',
                     business : business,
                     users : usersData,
                     })
