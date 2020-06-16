@@ -7,6 +7,9 @@ class business extends Model {}
 business.init({
     busId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
     busName: {type:  Sequelize.STRING, allowNull: false},
+    busJuriricalId: {type:  Sequelize.STRING, allowNull: false},
+    busNameFantasy: {type:  Sequelize.STRING, allowNull: false},
+    busMoney: {type:  Sequelize.INTEGER, allowNull: false},
     useIdFk: {type:  Sequelize.INTEGER, allowNull: false},
     busStatus: {type:  Sequelize.INTEGER, allowNull: false},
     busEmail: {type: Sequelize.STRING, allowNull: false},

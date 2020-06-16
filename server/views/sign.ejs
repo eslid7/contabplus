@@ -109,8 +109,8 @@
 </html>
 
 <script type="text/javascript">
+	document.cookie = 'userData=; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 	function fnLogin(argument) {
-		// body...
 		if($('#formLogin').valid()){
 			$.ajax({
 				type: "POST",
@@ -120,7 +120,8 @@
 				beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
 					showIsLoading("Procesando...");
 				}
-			}).done(function (data) {
+			}).done(function (data) {				
+				document.cookie ="userData="+data.token+"; "
 				window.location.href ='/contab/home';
 			}).fail(function (data) {
 				console.log(data.responseJSON.message);

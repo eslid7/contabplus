@@ -185,20 +185,20 @@
           <span class="title">Inicio</span>
           </a>
         </li>
-        <% for(var j = 0; j < global.Menu.length; j++) { %>          
-        <li  <% if(active == global.Menu[j].menId) { %> class="active" <% } %>  </li>
+        <% for(var j = 0; j <menu.length; j++) { %>          
+        <li  <% if(active == menu[j].menId) { %> class="active" <% } %>  </li>
           <a href="javascript:;">
-          <i class="<%=global.Menu[j].menIco%>"></i> 
-          <span class="title"><%=global.Menu[j].menName%></span>
+          <i class="<%=menu[j].menIco%>"></i> 
+          <span class="title"><%=menu[j].menName%></span>
           <span class="arrow "></span>
           </a>
           <ul class="sub-menu">
               
-            <% for(var i = 0; i < global.Processes.length; i++) { %>
-              <% if(global.Processes[i].menIdFk == global.Menu[j].menId) { %>
+            <% for(var i = 0; i < processes.length; i++) { %>
+              <% if(processes[i].menIdFk == menu[j].menId) { %>
                 <li >
-                  <a href="<%=global.Processes[i].proUrl%>">
-                    <%=global.Processes[i].proName%></a>
+                  <a href="<%=processes[i].proUrl%>">
+                    <%=processes[i].proName%></a>
                 </li> 
               <% } %> 
             <% } %>          

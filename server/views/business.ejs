@@ -7,7 +7,7 @@
 				<!-- BEGIN PAGE HEADER-->
 				<div class="row-fluid">
 					<div class="span12">
-						<h3>Empresas</h3>
+						<h3>Empresa</h3>
 					</div>
                 </div>
                 <div class="row-fluid">
@@ -60,11 +60,42 @@
 						<div class="row-fluid">
 							<div class="control-group span6 ">
 								<label for="accCode">
-									Nombre
+									Cedula Jurídica
+								</label>
+								<div class="controls">
+									<input type="text" name="busJuriricalId" id="busJuriricalId" class="m-wrap span12" placeholder="Cedula Jurídica" maxlength="100">
+								</div>
+							</div>
+							<div class="control-group span6 ">
+								<label for="accCode">
+									Razon social
 								</label>
 								<div class="controls">
 									<input type="text" name="busName" id="busName" class="m-wrap span12" placeholder="Nombre" maxlength="100">
 								</div>
+							</div>							
+						</div>
+						<div class="row-fluid">
+							<div class="control-group span6 ">
+								<label for="accCode">
+									Nombre fantasia
+								</label>
+								<div class="controls">
+									<input type="text" name="busNameFantasy" id="busNameFantasy" class="m-wrap span12" placeholder="Nombre fantasia" maxlength="100">
+								</div>
+							</div>
+							<div class="control-group span6 ">		
+								<div class="control-group span6">
+									<label for="accCode">
+										Moneda
+									</label>
+									<div class="controls" >  
+										<select id="busMoney" name="busMoney" class="span10">
+											<option value="1">Colón</option>
+											<option value="2">Dolar</option>
+										</select>                                               
+									</div>
+								</div>						
 							</div>							
 						</div>
 						<div class="row-fluid">
@@ -96,6 +127,7 @@
 <% include partials/footer %>
 <script type="text/javascript">
 	$(document).ready(function(){
+		$('#busMoney').select2({});
 		handleTableData();
 	});
 	isFirtsDatatable = true;
@@ -105,7 +137,13 @@
 			method: 'GET',
 			url: '/contab/business',
 			cache: false,
-			columns: [
+			columns: [			
+				{
+					field: 'busJuriricalId',
+					title: 'Cedula jurídica',
+					sortable: true,
+					width: '15%'
+				},
 				{
 					field: 'busName',
 					title: 'Nombre',
@@ -115,7 +153,7 @@
 					field: 'busEmail',
 					title: 'Email',
 					sortable: true,
-					width: '25%'
+					width: '10%'
 				}, {
 					field: 'busPhone',
 					title: 'Teléfono',
@@ -152,12 +190,16 @@
 		rules: {
 			busName: { required: true },
             busEmail: {required: true},
-            busPhone : {required: true}
+			busPhone : {required: true},
+			busJuriricalId: {required: true},
+			busNameFantasy: {required: true}
 		},
 		messages: { // custom messages
 			busName: { required: "El campo es requerido." },
             busEmail: { required: "El campo es requerido." },
-            busPhone :{ required: "El campo es requerido." }
+			busPhone: { required: "El campo es requerido." },
+			busJuriricalId: {required: "El campo es requerido." },
+			busNameFantasy: {required: "El campo es requerido." }
 		},
 		highlight: function (element) { // hightlight error inputs
 			$(element).closest('.control-group').addClass('error'); // set error class to the control group

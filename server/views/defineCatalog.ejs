@@ -167,8 +167,9 @@
 			cleanForm();	
 			refreshTable(); 						
 		}).fail(function (data) {
-			fnOpenErrorDialog(data.responseJSON.message);
 			hideIsLoading();
+			$('#modalDefinedAccountingCatalog').modal('hide');
+			fnOpenErrorDialog(data.responseJSON.message);			
 		})	
 	}
 	function cleanForm(){

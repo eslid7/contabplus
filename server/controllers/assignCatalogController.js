@@ -5,26 +5,33 @@ const definedAccCatMonthModel = require('../models/definedAccontingCatMonth');
 const definedAccountingCatalogModel = require('../models/definedAccountingCatalog');
 const sequelize = require('sequelize');
 const moment = require('moment');
+const jwt = require('jwt-simple');
 
 
 function viewAsignCatalog(req, res){
-    if(global.User == undefined){
-       res.redirect('/contab/sign');
+    if(req.headers.cookie==undefined){
+        res.redirect('/contab/sign');
     }
     else{
-        businessModel.findAll({where:{'useIdFK': global.User[0].useId}}).then( business => {            
+        let data = req.headers.cookie.split("=");
+        const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
+        businessModel.findAll({where:{'useIdFK': token.useId}}).then( business => {            
             return res.render('asignCatalog' ,{
-                userData:global.User[0],
+                userData: token,
                 active : 1,
                 titlePage : 'Asignar catálogo contable',
-                business: business
+                business: business,
+                processes : token.processes,
+                menu : token.menu   
             })
         })           
     }    
 }
 
 function getCatalog(req, res){
-    definedAccountingCatalogModel.findAll({where: {'useIdFK': global.User[0].useId, 'busIdFk': req.params.id}, attributes: [sequelize.fn('max', sequelize.col('updatedAt')),'accIdFk'], group : ['accIdFk'] }).then( definedCatalog => { 
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
+    definedAccountingCatalogModel.findAll({where: {'useIdFK': token.useId, 'busIdFk': req.params.id}, attributes: [sequelize.fn('max', sequelize.col('updatedAt')),'accIdFk'], group : ['accIdFk'] }).then( definedCatalog => { 
         if(definedCatalog[0]){
             accountingCatalogModel.findOne({where: {'accId': definedCatalog[0].accIdFk}}).then( accountCatalog => {       
                 return   res.status(200).json({ accountCatalog: accountCatalog });
@@ -38,7 +45,9 @@ function getCatalog(req, res){
 }
 
 function getCatalogs(req, res){
-    definedAccountingCatalogModel.findAll({where: {'useIdFK': global.User[0].useId, 'busIdFk': req.params.id}, attributes: [sequelize.fn('max', sequelize.col('updatedAt')),'accIdFk'], group : ['accIdFk'] }).then( definedCatalog => { 
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
+    definedAccountingCatalogModel.findAll({where: {'useIdFK': token.useId, 'busIdFk': req.params.id}, attributes: [sequelize.fn('max', sequelize.col('updatedAt')),'accIdFk'], group : ['accIdFk'] }).then( definedCatalog => { 
         if(definedCatalog[0]){
             const definedCatalogs = definedCatalog.map(
                 definedCatalog => definedCatalog.dataValues.accIdFk
@@ -67,18 +76,50 @@ function listHistory(req, res){
 }
 
 function saveAsignCatalog(req, res){ 
-    const dataToSave = new definedAccCatMonthModel({
-        accIdFk: req.body.accId,
-        useIdFk: global.User[0].useId,
-        busIdFk: req.body.busId,
-        month: req.body.month,
-        year: req.body.year,
-        createdAt: moment(new Date()).format('YYYY-MM-DD'),
-        updateAt: moment(new Date()).format('YYYY-MM-DD')
-    });
-    dataToSave.save().then(function () {
-        return res.status(200).json({ message: "Se ha creado con exito" });
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
+    //validacion si ya existe o que no se puede brincar
+    definedAccCatMonthModel.findAll({where:{accIdFk: req.body.accId, busIdFk: req.body.busId, month: req.body.month,year: req.body.year}}).then(definedAccCatMonth=>{
+        if(definedAccCatMonth.length > 0){
+            return res.status(400).json({ message: "Para este periodo ya esta asignado un catálogo contable." });
+        }
+        else{   
+            definedAccCatMonthModel.findOne({
+                    where:{  accIdFk: req.body.accId,  busIdFk: req.body.busId}, 
+                    order : [['updatedAt','DESC']]
+                }).then(definedAccCatMonthMax=>{
+                    if(definedAccCatMonthMax){  
+                        console.log(definedAccCatMonthMax.month)                     
+                        if(definedAccCatMonthMax.month == 12){
+                            let newYear = definedAccCatMonthMax.year +1
+                            if(1 != req.body.month || newYear != req.body.year){
+                                return res.status(400).json({ message: "No se puede agregar este periodo porque no es el siguiente por agregar." });
+                            }
+                        }
+                        else{
+                            let newMonth = definedAccCatMonthMax.month +1
+                            if(newMonth != req.body.month || definedAccCatMonthMax.year != req.body.year){
+                                return res.status(400).json({ message: "No se puede agregar este periodo porque no es el siguiente por agregar." });
+                            }
+                        }
+                    }
+                    const dataToSave = new definedAccCatMonthModel({
+                        accIdFk: req.body.accId,
+                        useIdFk: token.useId,
+                        busIdFk: req.body.busId,
+                        month: req.body.month,
+                        year: req.body.year,
+                        createdAt: moment(new Date()).format('YYYY-MM-DD'),
+                        updateAt: moment(new Date()).format('YYYY-MM-DD')
+                    });
+                    dataToSave.save().then(function () {
+                        return res.status(200).json({ message: "Se ha creado con exito" });
+                    })
+            })
+            
+        }
     })
+
 }
 
 module.exports = {

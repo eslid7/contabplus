@@ -58,5 +58,8 @@ router.route('/deleteAssignHistory/:id').post(assignPermitCatalogController.dele
 //accountingAccount
 router.route('/viewMantenanceAcco').get(accountingAccountController.viewMantenanceAcco);
 router.route('/saveAccountingAccount').post(accountingAccountController.saveAccountingAccount);
+router.route('/getAccountingAccount/:id').get(accountingAccountController.getAccountingAccount);
+router.route('/getAccountingAccountSearch/:id').get(accountingAccountController.getAccountingAccountSearch);
+
 
 module.exports = router;

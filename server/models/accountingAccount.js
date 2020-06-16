@@ -16,7 +16,7 @@ accountingAccount.init({
     aacFuncionality: {type: Sequelize.STRING, allowNull: false},
     aacObservations: {type: Sequelize.STRING, allowNull: false},
     aacStatus: {type: Sequelize.INTEGER, allowNull: false},
-    aacNivelss: {type: Sequelize.STRING, allowNull: false},
+    aacNivels: {type: Sequelize.STRING, allowNull: true},
     aacMoney: {type: Sequelize.INTEGER, allowNull: false},
     createdAt: {type: Sequelize.TIME, allowNull: true},
     updatedAt: {type: Sequelize.TIME, allowNull: true}

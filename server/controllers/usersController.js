@@ -7,7 +7,7 @@ const usersRolesModel = require('../models/usersRoles')
 const rolesModel = require('../models/roles')
 
 const processesModel = require('../models/processes')
-const jwt = require('jsonwebtoken')
+const jwt = require('jwt-simple');
 const moment = require('moment')
 const crypto = require('crypto')
 const tools = require('../config/utils/tools')
@@ -239,19 +239,19 @@ function logout(req,res){
   res.redirect('/contab/index');
 }
 
-
 function accountData(req, res){
-  userModel.findById(global.User.useId).then(function (userData) {
-    if (!userData) {
-      throw ('El usuario que intenta buscar no existe.')
-    }
-    res.send(userData);
-  });
+  if(req.headers.cookie==undefined){
+    throw ('El usuario que intenta buscar no existe.')
+  }
+  else{
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
+    res.send(token);
+  }
 }
 
 function login (req, res) {
   return userModel.findAll({where:{'useLogin': req.body.email, usePassword: encrypt(req.body.password)}}).then(function (userData) {
-    console.log(userData)
     if (userData.length> 0) {
       if(userData[0].useStatus==3){
         return res.status(400).json({ message: "El usuario no ha validado la cuenta." });
@@ -259,9 +259,60 @@ function login (req, res) {
       else if(userData[0].useStatus==2){
         return res.status(400).json({ message: "El usuario ha sido inactivado." });
       }
-      else{
-          global.User = userData;               
-          res.status(200).json({userData})
+      else{                   
+          menuModel.hasMany(processesModel,{foreignKey:'menIdFk'});
+          processesModel.hasMany(rolesProcessesModel,{foreignKey:'proIdFk'});
+          rolesProcessesModel.hasMany(usersRolesModel,{foreignKey:'rolIdFk', sourceKey: 'rolIdFk'});
+
+          menuModel.findAll({attributes: ['menId', 'menName','menIco'],
+              include: [{
+                model: processesModel,
+                required: true,
+                include : [{  
+                  model: rolesProcessesModel,
+                  required: true,
+                  include : [{  
+                    model: usersRolesModel,                  
+                    required: true,
+                    where : {'useIdFk':userData[0].useId}
+                  }]
+                }]
+              }]                    
+          }).then(menu => {            
+            processesModel.findAll({attributes:['proId','proName','proUrl', 'menIdFk'],raw: true,
+              include : [{  
+                model: rolesProcessesModel,
+                required: true,
+                include : [{  
+                  model: usersRolesModel,                  
+                  required: true,
+                  where : {'useIdFk':userData[0].useId}
+                }]
+              }]
+          }).then(processes=>{
+              let newArrayProcess = new Array();
+              for(let a=0; a<processes.length; a++){
+                newArrayProcess.push({
+                  proId: processes[a].proId,
+                  proName: processes[a].proName,
+                  menIdFk: processes[a].menIdFk,
+                  proUrl: processes[a].proUrl
+                })
+              }
+              let newArrayMenu = new Array();
+              for(let a=0; a<menu.length; a++){
+                newArrayMenu.push({
+                  menId: menu[a].menId,
+                  menIco: menu[a].menIco,
+                  menName: menu[a].menName
+                })
+              }                            
+              const dataToken = { processes:newArrayProcess,useId:userData[0].useId, useName:userData[0].useName,menu:newArrayMenu}
+              const token =  jwt.encode(dataToken,'b33dd00.@','HS256') 
+              return res.status(200).json({token});              
+            })
+          });
+          
       }
     }
     else{
@@ -271,103 +322,72 @@ function login (req, res) {
 }
 
 function home(req, res){
-  
-  if(global.User == undefined){
-     res.redirect('/contab/sign');
+  if(req.headers.cookie==undefined){
+    res.redirect('/contab/sign');
   }
   else{
-    console.log(global.User[0].useId)
-    userModel.findAll({where:{'useId':global.User[0].useId}}).then(function (userData) {
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
+    userModel.findAll({where:{'useId':token.useId}}).then(function (userData) {
       if (userData.length==0) {
         throw ('El usuario que intenta buscar no existe.')
       }
       else{
-
-        menuModel.hasMany(processesModel,{foreignKey:'menIdFk'});
-        processesModel.hasMany(rolesProcessesModel,{foreignKey:'proIdFk'});
-        rolesProcessesModel.hasMany(usersRolesModel,{foreignKey:'rolIdFk', sourceKey: 'rolIdFk'});
-
-        menuModel.findAll({attributes: ['menId', 'menName','menIco'],
-            include: [{
-              model: processesModel,
-              required: true,
-              include : [{  
-                model: rolesProcessesModel,
-                required: true,
-                include : [{  
-                  model: usersRolesModel,                  
-                  required: true,
-                  where : {'useIdFk':global.User[0].useId}
-                }]
-              }]
-            }]                    
-        }).then(menu => {   
-          global.Menu = menu;         
-          processesModel.findAll({attributes:['proId','proName','proUrl', 'menIdFk'],
-            include : [{  
-              model: rolesProcessesModel,
-              required: true,
-              include : [{  
-                model: usersRolesModel,                  
-                required: true,
-                where : {'useIdFk':global.User[0].useId}
-              }]
-            }]
-        }).then(processes=>{
-            global.Processes = processes; 
-            return res.render('home' ,{
-              userData:userData[0],
-              active : 0                                  
-            }); 
-          })
-        });
+        return res.render('home' ,{
+          userData: userData[0],
+          active : 0,
+          processes : token.processes,
+          menu : token.menu                              
+        });         
       }
     });
   }
 }
 
 function profile(req, res){
-  if(global.User == undefined){
-     res.redirect('/contab/sign');
+  if(req.headers.cookie==undefined){
+    res.redirect('/contab/sign');
   }
-  else{   
-    if (global.User.length==0) {
-      throw ('El usuario que intenta buscar no existe.')
-    }
-    else{
+  else{
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
+    userModel.findAll({where:{'useId':token.useId}}).then(function (userData) {
       return res.render('profile' ,{
-                          userData:global.User[0],
-                          active : -1,
-                          titlePage : 'Mi cuenta'
-                        })
-    }   
+                            userData: userData[0],
+                            active : -1,
+                            titlePage : 'Mi cuenta',
+                            processes : token.processes,
+                            menu : token.menu  
+      })
+    })
+     
   }
   
 }
 
 
 function viewUsers(req, res){
-  if(global.User == undefined){
-     res.redirect('/contab/sign');
+  if(req.headers.cookie==undefined){
+    res.redirect('/contab/sign');
   }
-  else{   
-    if (global.User.length==0) {
-      throw ('El usuario que intenta buscar no existe.')
-    }
-    else{
-      rolesModel.findAll().then(function (rolesData) {
-        userModel.findAll().then(function (usersData){
-          return res.render('viewUsers' ,{
-            userData:global.User[0],
-            active : -1,
-            titlePage : 'Administrar Usuarios',
-            roles : rolesData,
-            users : usersData,
-          })
-        })        
-      })    
-    }   
-  }
+  else{
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
+    rolesModel.findAll().then(function (rolesData) {
+      userModel.findAll().then(function (usersData){
+        return res.render('viewUsers' ,{
+          userData: token,
+          active : -1,
+          titlePage : 'Administrar Usuarios',
+          roles : rolesData,
+          users : usersData,
+          processes : token.processes,
+          menu : token.menu  
+        })
+      })        
+    })    
+  }   
+  
   
 }
 
@@ -393,10 +413,12 @@ function saveRol(req, res){
 }
 
 function changeStatus(req, res){
-  if(global.User == undefined){
+  if(req.headers.cookie==undefined){
     res.redirect('/contab/sign');
   }
-  else{ 
+  else{
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
     let useStatus = 1
     if(req.query.status ==1){
       useStatus = 2

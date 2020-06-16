@@ -24,7 +24,7 @@
 									</div> -->
 								</div>
 								<div class="portlet-body">									
-                                    <form id="definedAssignCatalog" action="#">
+                                    <form id="definedAssignCatalog" name="definedAssignCatalog" action="#">
                                         <div class="row-fluid">
                                             <div class="control-group span12 ">
                                                 <label for="accCode">
@@ -98,7 +98,7 @@
                                             <div class="control-group span2 ">                                               
                                             </div>
                                             <div class="control-group span2 ">
-                                                <button id="addAsign" class="btn green" onclick="fnSaveAssignCatalog()">
+                                                <button id="addAsign" type="button" class="btn green" onclick="fnSaveAssignCatalog()">
                                                     Agregar <i class="icon-plus"></i>
                                                 </button>                                              
                                             </div>						
@@ -133,7 +133,7 @@
             handleTableData();
             fnGetCatalog();	
         <% }%>
-	});
+    });
 	isFirtsDatatable = true;
 	function handleTableData () {
 		$('#listAsign').bootstrapTable({
@@ -198,8 +198,8 @@
             fnOpenSusessDialog(data.message)
 			refreshTable();
         }).fail(function (data) {
-            hideIsLoading();
-            fnOpenErrorDialog(data);
+            hideIsLoading();            
+            fnOpenErrorDialog(data.responseJSON.message)
         })
 	}
 

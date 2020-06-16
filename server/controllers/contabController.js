@@ -4,16 +4,21 @@ const businessModel = require('../models/business');
 const moment = require('moment');
 const definedAccountingCatalogModel = require('../models/definedAccountingCatalog');
 const sequelize = require('sequelize');
+const jwt = require('jwt-simple');
 
 function viewAccountingCatalog(req, res){
-    if(global.User == undefined){
-       res.redirect('/contab/sign');
+    if(req.headers.cookie==undefined){
+        res.redirect('/contab/sign');
     }
     else{
+        let data = req.headers.cookie.split("=");
+        const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
         return res.render('accountingCatalog' ,{
-                userData:global.User[0],
+                userData: token,
                 active : 2,
-                titlePage : 'Catálogo contable'
+                titlePage : 'Catálogo contable',
+                processes : token.processes,
+                menu : token.menu 
             })
            
     }
@@ -21,12 +26,14 @@ function viewAccountingCatalog(req, res){
 }
 
 function accountingCatalog(req, res){
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
     let likeData = []
     if(typeof(req.query.search) !== "undefined" && req.query.search !== ''){
         likeData=[{'accName': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'accCode': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'accQuantityNivels': {[sequelize.Op.like]: `%${req.query.search}%`}} ]
     }
     if (typeof(req.params.id) !== "undefined") {
-        accountingCatalogModel.findAll({where:{'useIdFK': global.User[0].useId, "accId" : req.params.id, $or: likeData}}).then( accountingCatalog => {
+        accountingCatalogModel.findAll({where:{'useIdFK': token.useId, "accId" : req.params.id}}).then( accountingCatalog => {
             return res.status(200).json({accountingCatalog :accountingCatalog[0]});
         })
     }
@@ -34,7 +41,7 @@ function accountingCatalog(req, res){
         if(typeof(req.query.search) !== "undefined" && req.query.search !== ''){
             accountingCatalogModel.findAll({
                 where:{
-                    'useIdFK': global.User[0].useId,
+                    'useIdFK': token.useId,
                     [sequelize.Op.or]: likeData
                 }}).then( accountingCatalog => {
                 return res.status(200).json({rows: accountingCatalog, total:accountingCatalog.length});
@@ -43,7 +50,7 @@ function accountingCatalog(req, res){
         else{
             accountingCatalogModel.findAll({
                 where:{
-                    'useIdFK': global.User[0].useId
+                    'useIdFK': token.useId
                 }}).then( accountingCatalog => {
                 return res.status(200).json({rows: accountingCatalog, total:accountingCatalog.length});
             })
@@ -53,6 +60,8 @@ function accountingCatalog(req, res){
 } 
 
 function saveAccountingCatalog(req, res){
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
     //hacer las validaciones que el numero no exista
     // si ya existe el ID seria update por el momento save
 
@@ -108,7 +117,7 @@ function saveAccountingCatalog(req, res){
             accNivels: JSON.stringify(accNivels).toString(),
             accStatus : 1,
             accSeparator : req.body.accSeparator,
-            useIdFk : global.User[0].useId,
+            useIdFk : token.useId,
             createdAt: moment(new Date()).format('YYYY-MM-DD'),
             updateAt: moment(new Date()).format('YYYY-MM-DD')
         });
@@ -122,20 +131,24 @@ function saveAccountingCatalog(req, res){
 }
 
 function viewDefineCatalog(req, res){
-    if(global.User == undefined){
-       res.redirect('/contab/sign');
+    if(req.headers.cookie==undefined){
+        res.redirect('/contab/sign');
     }
     else{
+        let data = req.headers.cookie.split("=");
+        const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
         // obtengo las empresas
         // obtengo los catalogos
-        accountingCatalogModel.findAll({where:{'useIdFK': global.User[0].useId}}).then( accountingCatalog => {
-            businessModel.findAll({where:{'useIdFK': global.User[0].useId}}).then( business => {
+        accountingCatalogModel.findAll({where:{'useIdFK': token.useId}}).then( accountingCatalog => {
+            businessModel.findAll({where:{'useIdFK': token.useId}}).then( business => {
                 return res.render('defineCatalog' ,{
-                    userData:global.User[0],
+                    userData: token,
                     active : 2,
                     titlePage : 'Definir catálogo contable',
                     accountingCatalog : accountingCatalog,
-                    business : business
+                    business : business,
+                    processes : token.processes,
+                    menu : token.menu 
                 })   
             })
         })
@@ -146,33 +159,38 @@ function viewDefineCatalog(req, res){
 }
 
 function viewBusiness(req, res){
-    if(global.User == undefined){
-       res.redirect('/contab/sign');
+    if(req.headers.cookie==undefined){
+        res.redirect('/contab/sign');
     }
     else{
+        let data = req.headers.cookie.split("=");
+        const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
         return res.render('business' ,{
-                userData:global.User[0],
+                userData: token,
                 active : 1,
-                titlePage : 'Empresas'
-            })
-           
-    }
-    
+                titlePage : 'Empresas',
+                processes : token.processes,
+                menu : token.menu 
+            })           
+    }    
 }
 
 function business(req, res){
+
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
     let likeData = []
     if(typeof(req.query.search) !== "undefined" && req.query.search !== ''){
-        likeData=[{'busName': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'busEmail': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'busPhone': {[sequelize.Op.like]: `%${req.query.search}%`}} ]
+        likeData=[{'busName': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'busEmail': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'busPhone': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'busJuriricalId': {[sequelize.Op.like]: `%${req.query.search}%`}} ]
         businessModel.findAll({
-            where:{'useIdFK': global.User[0].useId,
+            where:{'useIdFK': token.useId,
             [sequelize.Op.or]: likeData
         }}).then( business => {
             return res.status(200).json({rows: business, total:business.length});
         })
     }
     else{
-        businessModel.findAll({where:{'useIdFK': global.User[0].useId}}).then( business => {
+        businessModel.findAll({where:{'useIdFK': token.useId}}).then( business => {
             return res.status(200).json({rows: business, total:business.length});
         })
     }
@@ -180,10 +198,15 @@ function business(req, res){
 } 
 
 function saveBusiness(req, res){
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
     const dataToSave = new businessModel({
         busName: req.body.busName,
-        useIdFk: global.User[0].useId,
+        useIdFk: token.useId,
         busStatus: 1,
+        busJuriricalId: req.body.busJuriricalId,
+        busNameFantasy: req.body.busNameFantasy,
+        busMoney: req.body.busMoney,
         busEmail: req.body.busEmail,
         busPhone: req.body.busPhone,
         createdAt: moment(new Date()).format('YYYY-MM-DD'),
@@ -197,13 +220,16 @@ function saveBusiness(req, res){
 }
 
 function definedAccountingCatalog(req, res){
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
+
     definedAccountingCatalogModel.hasOne(businessModel,{foreignKey:'busId',sourceKey: 'busIdFk'});
     definedAccountingCatalogModel.hasOne(accountingCatalogModel,{foreignKey:'accId',sourceKey: 'accIdFk'});
     
     if(typeof(req.query.search) !== "undefined" && req.query.search !== ''){      
         let likeData =  [{'$accountingCatalog.accName$': {[sequelize.Op.like]: `%${req.query.search}%`}},{'$business.busName$': {[sequelize.Op.like]: `%${req.query.search}%`}}]  
         definedAccountingCatalogModel.findAll({ 
-            where:{'useIdFK': global.User[0].useId,
+            where:{'useIdFK': token.useId,
             [sequelize.Op.or]: likeData
             },
             include: [{
@@ -219,7 +245,7 @@ function definedAccountingCatalog(req, res){
     }
     else{
 
-        definedAccountingCatalogModel.findAll({where:{'useIdFK': global.User[0].useId},
+        definedAccountingCatalogModel.findAll({where:{'useIdFK': token.useId},
             include: [{
                 model: businessModel,
                 require : true
@@ -233,18 +259,29 @@ function definedAccountingCatalog(req, res){
     }
 }
 
-function saveDefinedAccountingCatalog(req, res){
-    
-    const dataToSave = new definedAccountingCatalogModel({
-        accIdFk: req.body.accId,
-        useIdFk: global.User[0].useId,
-        busIdFk: req.body.busId,
-        createdAt: moment(new Date()).format('YYYY-MM-DD'),
-        updateAt: moment(new Date()).format('YYYY-MM-DD')
-    });
-    return dataToSave.save().then(function (businessSaved) {
-        res.status(200).json({ message: "Se ha creado con exito" });
-    })
+function saveDefinedAccountingCatalog(req, res){   
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
+
+    //agregar validacion de solo un catalogo
+    definedAccountingCatalogModel.findAll({where:{accIdFk: req.body.accId, busIdFk: req.body.busId}}).then(definedAccountingCatalog=>{
+        if(definedAccountingCatalog.length > 0){
+            res.status(400).json({ message: "Ya existe un catálogo definido para la empresa." });
+        }
+        else{
+            const dataToSave = new definedAccountingCatalogModel({
+                accIdFk: req.body.accId,
+                useIdFk: token.useId,
+                busIdFk: req.body.busId,
+                createdAt: moment(new Date()).format('YYYY-MM-DD'),
+                updateAt: moment(new Date()).format('YYYY-MM-DD')
+            });
+            return dataToSave.save().then(function () {
+                res.status(200).json({ message: "Se ha creado con exito" });
+            })
+        }
+
+    })    
 }
 
 module.exports = {

@@ -76,6 +76,9 @@ CREATE TABLE usersRoles (
 CREATE TABLE business (
 	busId INT AUTO_INCREMENT PRIMARY KEY,
 	busName VARCHAR(100) NOT NULL,
+	busJuriricalId VARCHAR(100) NOT NULL,
+	busNameFantasy VARCHAR(100) NOT NULL,
+	busMoney INT NOT NULL, 
 	useIdFk INT NOT NULL, 
 	busStatus INT NOT NULL,
 	busEmail VARCHAR(60), 
