@@ -6,6 +6,7 @@ const usersModel = require('../models/users')
 const businessUsersPermitModel = require('../models/businessUsersPermit')
 const accountingCatalogModel = require('../models/accountingCatalog')
 const jwt = require('jwt-simple');
+const sequelize = require('sequelize');
 const moment = require('moment')
 
 
@@ -53,6 +54,15 @@ function saveAsignPermit(req, res){
 function assignHistory(req, res){
     let data = req.headers.cookie.split("=");
     const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
+    let likeData = []
+    let offsetData =0
+    let limitData =10
+    if(typeof(req.query.offset) !== "undefined" && req.query.offset !== ''){
+        offsetData = req.query.offset
+    }
+    if(typeof(req.query.limit) !== "undefined" && req.query.limit !== ''){
+        limitData = req.query.limit
+    }
     /// mis empresas?
     businessUsersPermitModel.hasOne(accountingCatalogModel,{foreignKey:'accId',sourceKey: 'accIdFk'});
     businessUsersPermitModel.hasOne(usersModel,{foreignKey:'useId',sourceKey: 'useIdFk'});
@@ -71,9 +81,53 @@ function assignHistory(req, res){
             require : true
         },
     ]
-    }).then( businessUsersPermit => { 
-        return res.status(200).json({rows: businessUsersPermit, total:businessUsersPermit.length});
-    })
+    }).then( businessUsersPermitAll => { 
+        if(typeof(req.query.search) !== "undefined" && req.query.search !== ''){
+            likeData=[{'$accountingCatalog.accName$': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'$user.useName$': {[sequelize.Op.like]: `%${req.query.search}%`}}]
+                businessUsersPermitModel.findAll({where: {'busIdFk': req.params.id, [sequelize.Op.or]: likeData},
+                    include: [{
+                        model: accountingCatalogModel,
+                        require : true
+                    },
+                    {
+                        model: usersModel,
+                        require : true
+                    },
+                    {
+                        model: businessModel,
+                        require : true
+                    },
+                ],
+                offset: (offsetData*1),
+                limit : (limitData*1),
+                }).then( businessUsersPermit => { 
+                    return res.status(200).json({rows: businessUsersPermit, total:businessUsersPermitAll.length});
+                })            
+        }
+        else{
+            businessUsersPermitModel.findAll({where: {'busIdFk': req.params.id},
+                include: [{
+                    model: accountingCatalogModel,
+                    require : true
+                },
+                {
+                    model: usersModel,
+                    require : true
+                },
+                {
+                    model: businessModel,
+                    require : true
+                },
+            ],
+            offset: (offsetData*1),
+            limit : (limitData*1),
+            }).then( businessUsersPermit => { 
+                return res.status(200).json({rows: businessUsersPermit, total:businessUsersPermitAll.length});
+            })
+        }  
+    })     
+   
+    
 }
 
 function deleteAssignHistory(req, res){

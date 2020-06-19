@@ -4,8 +4,14 @@ const accountingAccountModel = require('../models/accountingAccount')
 const moment = require('moment')
 const sequelize = require('sequelize');
 const jwt = require('jwt-simple');
+const pify = require('pify');
+const path = require('path');
+const multer = require('multer');
+const excelToJson = require('convert-excel-to-json');
+const fs = require('fs');
 
 function viewMantenanceAcco(req, res){
+    
     if(req.headers.cookie==undefined){
         res.redirect('/contab/sign');
     }
@@ -35,14 +41,14 @@ function saveAccountingAccount(req, res){
     //primero si el nivel es mayor a 1 validar que exista el nivel anterior
     let aacCode = req.body.aacCode
     let aacCodeToSave = req.body.aacCodeToSave
-
+    
     //buscar el nivel se debe borrar +1 para buscar el nivel anterior
     accountingAccountModel.findOne({where: {'accIdFk': req.body.accId, 'aacCode': req.body.aacNivelBefore}}).then( accountingAccountRaiz => { 
         if(accountingAccountRaiz || req.body.aacNivelBefore == ''){
             //verificar que no exista
             accountingAccountModel.findOne({where: {'accIdFk': req.body.accId, 'aacCode': aacCodeToSave}}).then( accountingAccountExist => { 
                 if(accountingAccountExist){
-                    return res.status(400).json({ message: `No se puede crear, la cuenta  ${req.body.aacNivelBefore} ya existe.` });
+                    return res.status(400).json({ message: `No se puede crear, la cuenta  ${aacCodeToSave} ya existe.` });
                 }
                 else{
                     const dataToSave = new accountingAccountModel({
@@ -113,8 +119,55 @@ function getAccountingAccount(req, res){
 }
 function getAccountingAccountSearch(req, res){
     accountingAccountModel.findOne({where: {'accIdFk': req.params.id,'aacCode': req.query.aacCode}}).then( accountingAccount => { 
-        return res.status(200).json({accountingAccount});
+        // necesito si es un nivel 2 devolver el data de nivel 1
+        if(req.query.levelToSave!= undefined&& req.query.levelToSave>1){
+            accountingAccountModel.findOne({attributes:['aacType'],where: {'accIdFk': req.params.id,'aacCode': req.query.aacNivelFirst}}).then( accountingAccountRaiz => { 
+                return res.status(200).json({accountingAccount, accountingAccountRaiz});
+            })
+        }
+        else{
+            return res.status(200).json({accountingAccount, accountingAccountRaiz: null});
+        }
+        
     })
+}
+
+async function loadFile (req,res){
+    var d = new Date();
+    console.log(d.getTime())
+    newFileName= d.getTime()
+    try {
+        const storage = multer.diskStorage({
+            destination: 'server/public/filesUpload/',
+            filename(req, file, cb) {
+              cb(null, newFileName+file.originalname)
+            },
+        });
+        const upload = pify(multer({ storage }).single('newFile'))
+        const appDir = path.dirname(require.main.filename);
+    
+        await upload(req, res)
+    
+        console.log("result2")
+        var newpath = appDir+'/server/public/filesUpload/'+newFileName+req.file.originalname
+        console.log(newpath)
+        const result = excelToJson({
+            source: fs.readFileSync(newpath)  
+        });
+        console.log("result2")
+        console.log(result)
+        for(a=1; a<result.Hoja1.length; a++){
+            console.log(result.Hoja1[a].A) // codigo cuenta 1 validar que no existe, 2 validar que tenga papa si es el caso
+            console.log(result.Hoja1[a].B) //nombre
+        }
+    
+    
+        return res.status(200).json({ message: "Se ha procesado con exito." });
+    } catch (error) {
+        return res.status(200).json({ message: error.message });
+    }
+ 
+
 }
 
 
@@ -123,4 +176,5 @@ module.exports = {
     saveAccountingAccount,
     getAccountingAccount,
     getAccountingAccountSearch,
+    loadFile,
 }

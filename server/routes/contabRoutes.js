@@ -60,6 +60,8 @@ router.route('/viewMantenanceAcco').get(accountingAccountController.viewMantenan
 router.route('/saveAccountingAccount').post(accountingAccountController.saveAccountingAccount);
 router.route('/getAccountingAccount/:id').get(accountingAccountController.getAccountingAccount);
 router.route('/getAccountingAccountSearch/:id').get(accountingAccountController.getAccountingAccountSearch);
+router.route('/loadFile').post(accountingAccountController.loadFile);
+
 
 
 module.exports = router;

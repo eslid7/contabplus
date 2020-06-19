@@ -18,14 +18,16 @@
 									
 								</div>
 								<div class="portlet-body">									
-                                    <form id="accountingAccount" name="accountingAccount" action="#">
+                                    <form id="accountingAccount" name="accountingAccount" action="#">                                        
+                                        <input type="hidden" name="aacId" id="aacId" value="">
+                                        <input type="hidden" name="aacNivelFirst" id="aacNivelFirst" value="">                                        
                                         <input type="hidden" name="aacCodeToSave" id="aacCodeToSave" value="">
                                         <input type="hidden" name="aacNivelBefore" id="aacNivelBefore" value="">
                                         <input type="hidden" name="levelToSave" id="levelToSave" value="1">                                        
                                         <div class="row-fluid">
                                             <div class="control-group span5 ">
                                                 <div class="row-fluid">
-                                                    <div class="control-group span12 ">
+                                                    <div class="control-group span5 ">
                                                         <label for="accCode">
                                                             Empresa
                                                         </label>
@@ -33,14 +35,16 @@
                                                             <% if(business.length == 0) { %>   
                                                                 No hay empresas disponibles
                                                             <%} else {%>
-                                                            <select id="busId" name="busId" class="span5" tabindex=1>   
+                                                            <select id="busId" name="busId" class="span12" tabindex=1>   
                                                                 <% for(var j = 0; j < business.length; j++) { %>   
                                                                     <option value="<%=business[j].busId%>"> <%=business[j].busName%></option>
                                                                 <% }%>
                                                             </select>
                                                             <% }%>
                                                         </div>
-                                                    </div>                                            
+                                                    </div> 
+                                                    <div class="control-group span7 ">                                                                                                                                                   
+                                                    </div>                                           
                                                 </div>
                                                 <div class="row-fluid">
                                                     <div class="control-group span6 ">
@@ -72,6 +76,13 @@
                                                         </div>                                              
                                                     </div>
                                                 </div>
+                                                <div class="row-fluid">
+                                                    <div class="control-group span12 ">
+                                                        <!-- <button type="button"  onclick="fnPlantilla()">Descargar plantilla</button> -->
+                                                       <a href="/static/Importar_Cuentas.xls" class="btn blue span6" target="_blank" >Descargar plantilla</a> 
+                                                        <button type="button" class="btn blue span6" onclick="$('#modalImportFile').modal('show');">Importar cuentas contables</button> 
+                                                    </div>
+                                                </div>  
                                                 <div class="row-fluid" id="horizontal1">
                                                     <div class="control-group span12 ">
                                                         <label for="accCode">
@@ -90,8 +101,6 @@
                                                         <div class="controls" >  
                                                             <input type="text" name="aacName" id="aacName" class="span11" />                                                  
                                                         </div>
-                                                    </div>
-                                                    <div class="control-group span4 ">
                                                     </div>							
                                                 </div>
                                                 <div class="row-fluid" id="vertical1">
@@ -238,10 +247,14 @@
                                                         </div>
                                                     </div>
                                                     <div class="row-fluid">
-                                                        <div class="control-group span8 ">                                                    
+                                                        <div class="control-group span6 "> 
+                                                        </div>
+                                                        <div class="control-group span2 ">  
+                                                            <button id="inactiveButton" type="button" class="btn red span12" onclick="fnInactive()">Inactivar</button>                                                                                                 
                                                         </div>
                                                         <div class="control-group span4 ">   
-                                                            <button type="button" class="btn green" onclick="fnSaveAccountingAccount()">Guardar</button>                                               
+                                                            <button type="button" class="btn green span6" onclick="fnSaveAccountingAccount()">Guardar</button>                                               
+                                                            <button type="button" class="btn span6" onclick="clean()">Cancelar</button>                                               
                                                         </div>
                                                     </div>								
                                                 </div>
@@ -265,7 +278,32 @@
 					</div>
 			</div>
 			
-	</div>	
+    </div>	
+        <!-- BEGIN SAMPLE PORTLET CONFIGURATION MODAL FORM-->
+        <div id="modalImportFile" class="modal hide fade">
+            <div class="modal-header">
+                <button data-dismiss="modal" class="close" type="button">X</button>
+                <h3 id='titleCatalog'>Importar cuentas contables </h3>
+            </div>
+            <div class="modal-body">
+                <form name="sendNewFile" id="sendNewFile"  enctype="multipart/form-data" >
+                    <div class="row-fluid">
+                        <div class="control-group span6 ">
+                            <label for="accCode">
+                                Seleccione el archivo por importar
+                            </label>
+                            <div class="controls">
+                                <input id="newFile" name="newFile" class="file" type="file" accept=".xls, .xsls" data-initial-Caption="Archivo XLS">
+                            </div>
+                        </div>							
+                    </div>						
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn dark btn-outline" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn green" onclick="loadFile()">Guardar</button>
+            </div>
+        </div>
 
 <% include partials/footer %>
 <script type="text/javascript">
@@ -277,17 +315,19 @@
         $('#aacTypeBalance').select2({});
         $('#aacMoney').select2({});   
         $('#aacDirection').select2({});
+        $('#inactiveButton').hide()
         aacDirection()
              
         <% if(business.length != 0) { %>
             fnGetCatalog();	
-            setTimeout(function(){ handleTableData(); }, 300);         
+            setTimeout(function(){ handleTableData(); }, 300);   
+            setTimeout(function(){ $('.search input').attr('placeholder','Buscar por código o nombre')   }, 500);      
         <% }%>
 	});
 	isFirtsDatatable = true;
 	function handleTableData() {
 		$('#listAsignPermit').bootstrapTable({
-			height: 510,
+			height: 645,
 			method: 'GET',
 			url: '/contab/getAccountingAccount/'+$('#accId').val(),
 			cache: false,
@@ -314,37 +354,125 @@
 					sortable: false,
                     width: '5%',
                     formatter: operateFormatter2
+				}, {
+					field: 'aacId',
+					title: 'Editar',
+					sortable: true,
+					width: '5%',
+					formatter: operateFormatterEdit
 				}
                 
-			]
+            ]
 		});
-	};
+    };
+    function operateFormatterEdit(value, row, index) {
+        return [
+            "<button type='button' class='btn green' ",
+            " onclick='seeData("+row.aacId+", "+index+")'>",
+            "<i class='icon-off'></i> Editar ",
+            "</button>"
+        ].join('');
+    }
+    function seeData(aacId, index){
+        console.log($('#listAsignPermit').bootstrapTable('getData')[index])
+        console.log(aacId)
+        $('#aacDirecaacIdtion').val()
+        /// catalogo ????
+        $('#aacCode').val($('#listAsignPermit').bootstrapTable('getData')[index].aacCode)
+        
+        $('#aacName').val($('#listAsignPermit').bootstrapTable('getData')[index].aacName)
+        console.log($('#listAsignPermit').bootstrapTable('getData')[index].aacType)
+        $('#aacType').val($('#listAsignPermit').bootstrapTable('getData')[index].aacType).trigger('change');
+        $('#aacTypeBalance').val($('#listAsignPermit').bootstrapTable('getData')[index].aacTypeBalance).trigger('change');
+        $('#aacMoney').val($('#listAsignPermit').bootstrapTable('getData')[index].aacMoney).trigger('change');
+        $('#aacFuncionality').val($('#listAsignPermit').bootstrapTable('getData')[index].aacFuncionality)
+        $('#aacObservations').val($('#listAsignPermit').bootstrapTable('getData')[index].aacObservations)
+        $('#inactiveButton').show()
+        putMask($('#aacCode').val())
+        if($('#aacDirection').val() == 1){
+
+        }
+        else{
+            //vertical
+            loadDataVertical($('#aacCode').val())
+            level = $('#levelToSave').val()*1+1
+            for(var a=level;  a<13; a++){																	
+                $('#accNivel'+a).val('')
+                $('#accName'+a).val('')	
+                $('#accNivel'+a).prop( "disabled", true );
+                $('#accName'+a).prop( "disabled", true );      		
+            }
+        }
+
+        if($('#levelToSave').val()!=1){
+            $('#aacType').attr('disabled',true).trigger('change');
+        }
+        else{
+            $('#aacType').attr('disabled',false).trigger('change');
+        }
+        
+    }
 	function getHeight() {
 		return $(window).height();
     }
     
     function operateFormatter(value, row, index) {
+        aacType=''
+        if(row.aacType== 1){
+            aacType ='Activo'
+        }
+        else if(row.aacType== 2){
+            aacType ='Pasivo'
+        }
+        else if(row.aacType== 3){
+            aacType ='Patrimonio'
+        }
+        else if(row.aacType== 4){
+            aacType ='Ingresos'
+        }
+        else if(row.aacType== 5){
+            aacType ='Costos Ventas'
+        }
+        else if(row.aacType== 6){
+            aacType ='Gastos'
+        }
+        else{
+            aacType ='Costos Producción'
+        }
         return [
-            ((row.aacType == 1) ? "Activo" : "Pasivo"),
+            aacType,
         ].join('');
     }
-    function operateFormatter2(value, row, index) {
+    function operateFormatter2(value, row, index) {       
         return [
             ((row.aacTypeBalance == 1) ? "Deudor" : "Acreedor"),
-        ].join('');
-    }
-    function operateFormatter3(value, row, index) {
-        return [
-            "<button type='button' class='btn red",
-            " btnActiveInactive' onclick='fnEliminar("+ row.bupId +")'>",
-            "<i class='icon-off'></i> ",
-           "Eliminar",
-            "</button>"
         ].join('');
     }
 
     function refreshTable() {
         $('.bt-table').bootstrapTable('refresh',{url: '/contab/getAccountingAccount/'+$('#accId').val()});
+    }
+
+    function fnInactive(){
+        //agregar un confirm??
+
+        $.ajax({
+            type: "GET",
+			url: "/contab/inactiveAccountingAccount/"+$('#aacId').val(),		
+            beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                showIsLoading("Procesando...");
+            }
+        }).done(function (data) {	
+            hideIsLoading();
+            clean()	
+            showData(data)
+        }).fail(function (data) {
+            clean()	
+            hideIsLoading();
+            fnOpenErrorDialog(data.responseJSON.message);
+        }).always(function (data) {
+            hideIsLoading();
+        }); 
     }
 
     // opcion 1 
@@ -356,9 +484,11 @@
                 showIsLoading("Procesando...");
             }
         }).done(function (data) {	
-            hideIsLoading();	
+            hideIsLoading();
+            clean()	
             showData(data)
         }).fail(function (data) {
+            clean()	
             hideIsLoading();
             fnOpenErrorDialog(data.responseJSON.message);
         }).always(function (data) {
@@ -367,6 +497,7 @@
     }
 
     function aacDirection(){
+        clean()
         if($('#aacDirection').val() == 1){
             $('#vertical1').hide();
             $('#vertical2').hide();
@@ -390,7 +521,8 @@
             beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
                 showIsLoading("Procesando...");
             }
-        }).done(function (data) {	
+        }).done(function (data) {
+            clean()		
             hideIsLoading();                
             showData(data)
             refreshTable()
@@ -415,7 +547,7 @@
         else{
             $('#accIsGlobal').html('Individual')
         }
-        console.log('accQuantityNivels',accQuantityNivels)
+
         for(var a=1;  a<=accQuantityNivels; a++){																	
             $('#accNivel'+a).val('')	
             $('#accName'+a).val('')	
@@ -520,7 +652,6 @@
                 dataMask = dataMask+'9'		
             }
         }
-
         
         $("#aacCode").inputmask("mask", {"mask": dataMask, "clearIncomplete": false ,'removeMaskOnSubmit': true, 'autoUnmask': true,});
         // el length
@@ -555,6 +686,7 @@
         nivel11= nivel10+jsonData.accNivel11*1
         nivel12= nivel11+jsonData.accNivel12*1
         newAccount = $('#aacCode').val();
+        extraData=''
 
         if(newAccount.length==jsonData.accNivel1*1 || newAccount.length== nivel2 || newAccount.length==nivel3 || newAccount.length==nivel4 || newAccount.length==nivel5 || 
             newAccount.length== nivel6 || newAccount.length==nivel7 || newAccount.length==nivel8 || newAccount.length==nivel9 || newAccount.length== nivel10 || newAccount.length==nivel11 || newAccount.length==nivel12){
@@ -566,11 +698,14 @@
             if(($('#aacName').val()==''&&$('#aacDirection').val()==1) || ($('#accName'+$('#levelToSave').val()).val()==''&&$('#aacDirection').val()==2) ){
                 fnOpenErrorDialog("El nombre de la cuenta es requerido");
             }
-            else{
+            else{                
+                if($('#aacType').prop( "disabled")){
+                    extraData="&aacType="+$('#aacType').val()
+                }
                 $.ajax({
                     type: "POST",
                     url: "/contab/saveAccountingAccount",
-                    data: $('#accountingAccount').serialize(), //se envia el form serializado          
+                    data: $('#accountingAccount').serialize()+extraData, //se envia el form serializado          
                     beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
                         showIsLoading("Procesando...");
                     }
@@ -583,9 +718,7 @@
                     hideIsLoading();
                     fnOpenErrorDialog(data.responseJSON.message);
                 })
-            }
-                
-
+            }                
         }
         else{
             fnOpenErrorDialog("Debe digitar un código de cuenta válida");
@@ -630,17 +763,22 @@
             //obtener el nombre del nivel si existe
             $.ajax({
                 type: "GET",
-                url: "/contab/getAccountingAccountSearch/"+$('#accId').val()+"?aacCode="+newAccount,       
+                url: "/contab/getAccountingAccountSearch/"+$('#accId').val()+"?aacCode="+newAccount+"&aacNivelFirst="+$('#aacNivelFirst').val()+"&levelToSave="+$('#levelToSave').val(),       
                 beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
                     showIsLoading("Procesando...");
                 }
             }).done(function (data) {  
                 console.log(data)
+                $('#aacCodeToSave').val(newAccount)
                 if(data.accountingAccount!=null){
                     $('#aacName').val(data.accountingAccount.aacName);
                 }
                 else{
                     $('#aacName').val('');
+                }
+                if($('#levelToSave').val()>1 &&  data.accountingAccountRaiz!=null){
+                    $('#aacType').val(data.accountingAccountRaiz.aacType).trigger('change');
+                    $('#aacType').prop( "disabled", true );
                 }
 
                 hideIsLoading();                                         
@@ -664,15 +802,20 @@
         nivel10= nivel9+jsonData.accNivel10*1
         nivel11= nivel10+jsonData.accNivel11*1
         nivel12= nivel11+jsonData.accNivel12*1
+        levelToSave = 1
         for(var a=0;  a<dataMask.length; a++){	
             if(jsonData.accNivel1==a||nivel2==a||nivel3==a||nivel4==a||nivel5==a||nivel6==a||nivel7==a||nivel8==a||nivel9==a||nivel10==a||nivel11==a||nivel12==a){
                 $('#aacNivelBefore').val(newDataWithMask)
+                if(jsonData.accNivel1==a){
+                    $('#aacNivelFirst').val(newDataWithMask)
+                }
+                levelToSave = levelToSave+1
                 newDataWithMask = newDataWithMask+accSeparator
             }	            															
             newDataWithMask = newDataWithMask+dataMask.charAt(a)		
         }   
         // debo buscar el primer nivel para el manejo de tipo de cuenta y saldo y bloquear tipo de cuenta
-
+        $('#levelToSave').val(levelToSave)
         return newDataWithMask
     }
 
@@ -683,8 +826,8 @@
         $('#aacName').val('')
         $('#aacCode').val('')
         $('#aacObservations').val('')
-        $('#aacObservations').val('')
-
+        $('#aacFuncionality').val('')
+        $('#aacCode').val('')
         for(var a=1;  a<13; a++){																	
             $('#accNivel'+a).val('')
             $('#accName'+a).val('')	
@@ -693,7 +836,9 @@
                 $('#accName'+a).prop( "disabled", true );  
             }    		
         }  
-        
+        $('#inactiveButton').hide()
+        $('#aacNivelFirst').val('')
+        $('#aacType').attr('disabled',false).trigger('change');
     }
     ////// vertical
     function fnSearchVertical(data, level){
@@ -710,7 +855,6 @@
         $('#aacCode').val(dataToSearch)
         dataToSearch =putMask(dataToSearch)
         $('#aacCodeToSave').val(dataToSearch)
-        console.log(dataToSearch)
         //acordame de llenar los otros
         search =true;
         if(search){
@@ -724,12 +868,21 @@
             }).done(function (data) {  
                 
                 if(data.accountingAccount!=null){
-                    $('#accName'+level).val(data.accountingAccount.aacName)	    
+                    $('#accName'+level).val(data.accountingAccount.aacName)	  
+                    $('#aacType').val(data.accountingAccount.aacType).trigger('change');
+                    $('#aacTypeBalance').val(data.accountingAccount.aacTypeBalance).trigger('change'); 
+                    $('#aacMoney').val(data.accountingAccount.aacMoney).trigger('change'); 
                     //enable next level
                     level=level+1
                     $('#levelToSave').val(level)
-                    $('#accNivel'+level).prop( "disabled", false );
-                    $('#accName'+level).prop( "disabled", false );               
+                    if($('#levelToSave').val()>1){                        
+                        $('#aacType').prop( "disabled", true );
+                    } 
+                    if($('#aacId')==''){
+                        $('#accNivel'+level).prop( "disabled", false );
+                        $('#accName'+level).prop( "disabled", false );          
+                    }
+                         
                 }
                 else{
                     $('#levelToSave').val(level)
@@ -764,4 +917,153 @@
                 fnSearchVertical($(this).val(), $(this).attr('position'))
         })
     }
+
+    function loadDataVertical(data){
+        dataToSee =''
+        nivel2= jsonData.accNivel1*1+jsonData.accNivel2*1
+        nivel3= nivel2+jsonData.accNivel3*1
+        nivel4= nivel3+jsonData.accNivel4*1
+        nivel5= nivel4+jsonData.accNivel5*1
+        nivel6= nivel5+jsonData.accNivel6*1
+        nivel7= nivel6+jsonData.accNivel7*1
+        nivel8= nivel7+jsonData.accNivel8*1
+        nivel9= nivel8+jsonData.accNivel9*1
+        nivel10= nivel9+jsonData.accNivel10*1
+        nivel11= nivel10+jsonData.accNivel11*1
+        nivel12= nivel11+jsonData.accNivel12*1
+
+        for(var a=0;  a<=data.length; a++){	
+            		
+            if(jsonData.accNivel1==a){                
+                $('#accNivel1').val(dataToSee).change();
+                dataToSee =''
+            }
+            if(nivel2==a){
+                console.log(dataToSee,'dataToSee')
+                $('#accNivel2').val(dataToSee).change();
+                $('#accNivel2').prop( "disabled", false );   
+                $('#accName2').prop( "disabled", false );  
+                dataToSee ='' 
+            }
+            if(nivel3==a){
+                $('#accNivel3').val(dataToSee).change();
+                $('#accNivel3').prop( "disabled", false );   
+                $('#accName3').prop( "disabled", false );  
+                dataToSee ='' 
+            }
+            if(nivel4==a){
+                $('#accNivel4').val(dataToSee).change();
+                $('#accNivel4').prop( "disabled", false );   
+                $('#accName4').prop( "disabled", false );  
+                dataToSee ='' 
+            }
+            if(nivel5==a){
+                $('#accNivel5').val(dataToSee).change();
+                $('#accNivel5').prop( "disabled", false );   
+                $('#accName5').prop( "disabled", false );  
+                dataToSee ='' 
+            }
+            if(nivel6==a){
+                $('#accNivel6').val(dataToSee).change();
+                $('#accNivel6').prop( "disabled", false );   
+                $('#accName6').prop( "disabled", false );  
+                dataToSee ='' 
+            }
+            if(nivel7==a){
+                $('#accNivel7').val(dataToSee).change();
+                $('#accNivel7').prop( "disabled", false );   
+                $('#accName7').prop( "disabled", false );  
+                dataToSee ='' 
+            }
+            if(nivel8==a){
+                $('#accNivel8').val(dataToSee).change();
+                $('#accNivel8').prop( "disabled", false );   
+                $('#accName8').prop( "disabled", false );  
+                dataToSee ='' 
+            }
+            if(nivel9==a){
+                $('#accNivel9').val(dataToSee).change();
+                $('#accNivel9').prop( "disabled", false );   
+                $('#accName9').prop( "disabled", false );  
+                dataToSee ='' 
+            }
+            if(nivel10==a){
+                $('#accNivel10').val(dataToSee).change();
+                $('#accNivel10').prop( "disabled", false );   
+                $('#accName10').prop( "disabled", false );  
+                dataToSee ='' 
+            }
+            if(nivel11==a){
+                $('#accNivel11').val(dataToSee).change();
+                $('#accNivel11').prop( "disabled", false );   
+                $('#accName11').prop( "disabled", false );  
+                dataToSee ='' 
+            }
+            if(nivel12==a){
+                $('#accNivel12').val(dataToSee).change();
+                $('#accNivel12').prop( "disabled", false );   
+                $('#accName12').prop( "disabled", false );  
+                dataToSee ='' 
+            }
+	            															
+            dataToSee = dataToSee+data.charAt(a)
+        } 
+    }
+
+    function loadFile() {
+        if($('#sendNewFile').valid()){
+            var fileUpload = document.getElementById("newFile");
+            var formData = new FormData();
+            formData.append('newFile', $("#newFile")[0].files[0]);
+            $.ajax({
+                type: "POST",
+                url: "/contab/loadFile",
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                    showIsLoading("Procesando...");
+                }
+            }).done(function (data) {
+                fnOpenSusessDialog("Se ha guardado con exito");
+                $("#newFile").val("");
+                $("#modalImportFile").modal("hide");
+                //recordame que debo actualizar la tabla
+                refreshTable();                
+            }).fail(function (data) {
+                $("#modalImportFile").modal("hide");
+                hideIsLoading();
+                fnOpenErrorDialog(data.responseJSON.message);
+            }).always(function (data) {
+                hideIsLoading();
+            });
+        }
+    }
+    $('#sendNewFile').validate({
+        errorElement: 'label', //default input error message container
+        errorClass: 'help-inline', // default input error message class
+        ignore: "",
+        rules: {
+            newFile: { required: true}
+        },
+        messages: { // custom messages
+            newFile: { required: "Debe buscar y seleccionar el archivo xls." }
+        },
+        highlight: function (element) { // hightlight error inputs
+            $(element).closest('.control-group').addClass('error'); // set error class to the control group
+        },
+        success: function (label) {
+            label.closest('.control-group').removeClass('error');
+            label.remove();
+        },
+        errorPlacement: function (error, element) {
+            if (element.closest('.icon-search').size() === 1) {
+                error.addClass('help-small no-left-padding').insertAfter(element.closest('.icon-search'));
+            } else if (element.next().attr("class")){
+                error.addClass('help-small no-left-padding').insertAfter(element.next());
+            } else {
+                error.addClass('help-small no-left-padding').insertAfter(element);
+            }
+        }
+    });
 </script>

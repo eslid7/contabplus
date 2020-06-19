@@ -131,7 +131,7 @@
 
         <%} else {%>
             handleTableData();
-            fnGetCatalog();	
+            fnGetCatalog();	            
         <% }%>
     });
 	isFirtsDatatable = true;
@@ -140,7 +140,8 @@
 			height: getHeight(),
 			method: 'GET',
 			url: '/contab/listHistory/'+$('#busId').val(),
-			cache: false,
+            cache: false,
+            search: false,
 			columns: [
 				{
 					field: 'year',
@@ -183,7 +184,7 @@
         ].join('');
     }
     function refreshTable() {
-        $('.bt-table').bootstrapTable('refresh', {silent: true});
+        $('.bt-table').bootstrapTable('refresh', {url: '/contab/listHistory/'+$('#busId').val()});
     }
 	function fnSaveAssignCatalog(){
 		$.ajax({
@@ -243,10 +244,14 @@
             else{
                 $('#accIsGlobal').html('Individual')
             }
+            refreshTable()
            
         }).fail(function (data) {
             hideIsLoading();
-            fnOpenErrorDialog(data.responseJSON._error.message);
+            fnOpenErrorDialog(data.responseJSON.message);
+            $('#accIdName').html('');
+            $('#accIsGlobal').html('')
+            refreshTable()
         }).always(function (data) {
             hideIsLoading();
         });

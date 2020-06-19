@@ -86,8 +86,8 @@
 									<table id="listAsignPermit" class="bt-table"
 										data-side-pagination="server"
 										data-pagination="true"
-										data-page-size="20"
-										data-page-list="[20, 40, 60]"
+										data-page-size="10"
+										data-page-list="[10, 20, 30]"
 										data-search="true">
 									</table>
 								</div>
@@ -111,6 +111,7 @@
         <%} else {%>
             handleTableData();
             fnGetCatalog();	
+            setTimeout(function(){ $('.search input').attr('placeholder','Buscar por catálogo o usuario')   }, 100);    
         <% }%>
 	});
 	isFirtsDatatable = true;
