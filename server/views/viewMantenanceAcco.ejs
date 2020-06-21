@@ -282,7 +282,7 @@
         <!-- BEGIN SAMPLE PORTLET CONFIGURATION MODAL FORM-->
         <div id="modalImportFile" class="modal hide fade">
             <div class="modal-header">
-                <button data-dismiss="modal" class="close" type="button">X</button>
+                <button data-dismiss="modal" class="close" type="button" onclick="cleanLoadfile()">X</button>
                 <h3 id='titleCatalog'>Importar cuentas contables </h3>
             </div>
             <div class="modal-body">
@@ -300,7 +300,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn dark btn-outline" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn dark btn-outline" data-dismiss="modal" onclick="cleanLoadfile()">Cerrar</button>
                 <button type="button" class="btn green" onclick="loadFile()">Guardar</button>
             </div>
         </div>
@@ -1017,7 +1017,7 @@
             formData.append('newFile', $("#newFile")[0].files[0]);
             $.ajax({
                 type: "POST",
-                url: "/contab/loadFile",
+                url: "/contab/loadFile/"+$("#accId").val()+"?busId="+$("#busId").val(),
                 data: formData,
                 contentType: false,
                 processData: false,
@@ -1032,6 +1032,7 @@
                 refreshTable();                
             }).fail(function (data) {
                 $("#modalImportFile").modal("hide");
+                $("#newFile").val("");
                 hideIsLoading();
                 fnOpenErrorDialog(data.responseJSON.message);
             }).always(function (data) {
@@ -1066,4 +1067,8 @@
             }
         }
     });
+
+    function cleanLoadfile(){
+        $("#newFile").val("");
+    }
 </script>

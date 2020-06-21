@@ -25,8 +25,21 @@ accountingAccount.init({
   modelName: 'accountingAccount',
   tableName: 'accountingAccount'
 });
-
-
 accountingAccount.removeAttribute('id');
+
+// async function findOneModel(searchParams) {
+//   let filter = {}
+//   if (searchParams.where) {
+//     filter = searchParams
+//   } else {
+//     filter.where = searchParams
+//   }
+//   const data = await accountingAccount.findOne(filter)
+
+//   return data ? data.toJSON() : data
+// }
+
+
+
 
 module.exports = accountingAccount;

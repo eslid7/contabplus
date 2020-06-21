@@ -322,7 +322,7 @@ function login (req, res) {
 }
 
 function home(req, res){
-  if(req.headers.cookie==undefined){
+  if(controlAccess(req.headers.cookie)){
     res.redirect('/contab/sign');
   }
   else{
@@ -345,7 +345,7 @@ function home(req, res){
 }
 
 function profile(req, res){
-  if(req.headers.cookie==undefined){
+  if(controlAccess(req.headers.cookie)){
     res.redirect('/contab/sign');
   }
   else{
@@ -367,7 +367,7 @@ function profile(req, res){
 
 
 function viewUsers(req, res){
-  if(req.headers.cookie==undefined){
+  if(controlAccess(req.headers.cookie)){
     res.redirect('/contab/sign');
   }
   else{
@@ -413,7 +413,7 @@ function saveRol(req, res){
 }
 
 function changeStatus(req, res){
-  if(req.headers.cookie==undefined){
+  if(controlAccess(req.headers.cookie)){
     res.redirect('/contab/sign');
   }
   else{
@@ -427,6 +427,18 @@ function changeStatus(req, res){
       return  res.status(200).json({ message: "Se ha actualizado con exito" });
     })
   }
+}
+
+function controlAccess(dataCookie){
+  let ingresa = true
+  if(dataCookie==undefined){
+    ingresa = false
+  }
+  else if(!dataCookie.search("userData")){
+    ingresa = false
+  }
+
+  return ingresa
 }
 
 module.exports = {
@@ -447,4 +459,5 @@ module.exports = {
   viewUsers,
   saveRol,
   changeStatus,
+  controlAccess
 }

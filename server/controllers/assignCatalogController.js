@@ -6,10 +6,10 @@ const definedAccountingCatalogModel = require('../models/definedAccountingCatalo
 const sequelize = require('sequelize');
 const moment = require('moment');
 const jwt = require('jwt-simple');
-
+const usersController = require('../controllers/usersController')
 
 function viewAsignCatalog(req, res){
-    if(req.headers.cookie==undefined){
+    if(usersController.controlAccess(req.headers.cookie)){
         res.redirect('/contab/sign');
     }
     else{

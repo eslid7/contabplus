@@ -5,9 +5,10 @@ const moment = require('moment');
 const definedAccountingCatalogModel = require('../models/definedAccountingCatalog');
 const sequelize = require('sequelize');
 const jwt = require('jwt-simple');
+const usersController = require('../controllers/usersController')
 
 function viewAccountingCatalog(req, res){
-    if(req.headers.cookie==undefined){
+    if(usersController.controlAccess(req.headers.cookie)){
         res.redirect('/contab/sign');
     }
     else{
@@ -131,7 +132,7 @@ function saveAccountingCatalog(req, res){
 }
 
 function viewDefineCatalog(req, res){
-    if(req.headers.cookie==undefined){
+    if(usersController.controlAccess(req.headers.cookie)){
         res.redirect('/contab/sign');
     }
     else{
@@ -159,7 +160,7 @@ function viewDefineCatalog(req, res){
 }
 
 function viewBusiness(req, res){
-    if(req.headers.cookie==undefined){
+    if(usersController.controlAccess(req.headers.cookie)){
         res.redirect('/contab/sign');
     }
     else{
