@@ -24,6 +24,8 @@ router.route('/users/changeStatus').post(userController.changeStatus)
 
 router.route('/home').get(userController.home);
 router.route('/profile').get(userController.profile);
+router.route('/updateUser').post(userController.updateUser)
+router.route('/updatePassoword').post(userController.updatePassoword)
 router.route('/').get(userController.index);
 
 // contabController

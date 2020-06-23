@@ -31,14 +31,14 @@
 										</div>
 										<div class="portlet-body form">
 											<!-- BEGIN FORM-->
-											<form action="#" class="horizontal-form">
+											<form id="dataAcccount" name="dataAcccount" action="#" class="horizontal-form">
 												<h3 class="form-section">Información Personal</h3>
 												<div class="row-fluid">
 													<div class="span6 ">
 														<div class="control-group">
 															<label class="control-label" for="firstName">Nombre Completo</label>
 															<div class="controls">
-																<input type="text" id="firstName" class="m-wrap span12" placeholder="Nombre Completo" value="<%= userData.useName%>">
+																<input type="text" id="firstName" name="firstName" class="m-wrap span12" placeholder="Nombre Completo" value="<%= userData.useName%>">
 															</div>
 														</div>
 													</div>
@@ -47,7 +47,7 @@
 														<div class="control-group">
 															<label class="control-label" for="lastName">Teléfono</label>
 															<div class="controls">
-																<input type="text" id="lastName" class="m-wrap span12" placeholder="Teléfono" value="<%= userData.usePhone%>">
+																<input type="text" id="phone" name="phone" class="m-wrap span12" placeholder="Teléfono" value="<%= userData.usePhone%>">
 															</div>
 														</div>
 													</div>
@@ -73,7 +73,7 @@
 													<div class="span10 ">
 													</div>
 													<div class="span2">
-														<button type="submit" class="btn blue"><i class="icon-ok"></i> Guardar</button>
+														<button type="button" class="btn blue" onclick="fnSaveAccountData()"><i class="icon-ok"></i> Guardar</button>
 													</div>
 												</div>
 											</form>
@@ -94,14 +94,14 @@
 										</div>
 										<div class="portlet-body form">
 											<!-- BEGIN FORM-->
-											<form action="#" class="form-horizontal">
+											<form id="dataPassword" name="dataPassword" action="#" class="form-horizontal">
 												<h3 class="form-section">Modificar Contraseña</h3>
 												<div class="row-fluid">
 													<div class="span12 ">
 														<div class="control-group">
 															<label class="control-label span3">Contraseña actual</label>
 															<div class="controls span4	">
-																<input type="text" class="m-wrap span12" placeholder="Contraseña actual">
+																<input type="password" id="oldPassword" name="oldPassword" class="m-wrap span12" placeholder="Contraseña actual">
 															</div>
 														</div>
 													</div>
@@ -112,7 +112,7 @@
 														<div class="control-group">
 															<label class="control-label span3">Nueva Contraseña</label>
 															<div class="controls span4">
-																<input type="text" class="m-wrap span12" placeholder="Nueva Contraseña">
+																<input type="password" id="password" name="password" class="m-wrap span12" placeholder="Nueva Contraseña">
 															</div>
 														</div>
 													</div>
@@ -124,7 +124,7 @@
 														<div class="control-group">
 															<label class="control-label span3">Confirmar Nueva Contraseña</label>
 															<div class="controls span4">
-																<input type="text" class="m-wrap span12" placeholder="Confirmar Nueva Contraseña">
+																<input type="password" name="confirmPassword" id="confirmPassword" class="m-wrap span12" placeholder="Confirmar Nueva Contraseña">
 															</div>
 														</div>
 													</div>													
@@ -136,7 +136,7 @@
 													<div class="span10 ">
 													</div>
 													<div class="span2">
-														<button type="submit" class="btn blue"><i class="icon-ok"></i> Guardar</button>
+														<button type="button" class="btn blue" onclick="fnSavePassword()" ><i class="icon-ok" ></i> Guardar</button>
 													</div>
 												</div>
 											</form>
@@ -152,3 +152,106 @@
 		</div>			
 	</div>
 <% include partials/footer %>
+<script type="text/javascript">
+	$('#dataAcccount').validate({
+		errorElement: 'label', //default input error message container
+		errorClass: 'help-inline', // default input error message class
+		ignore: "",
+		rules: {
+			firstName: { required: true },
+			phone: {required: true}
+		},
+		messages: { // custom messages
+			firstName: { required: "El campo es requerido." },
+			phone: { required: "El campo es requerido." }
+		},
+		highlight: function (element) { // hightlight error inputs
+			$(element).closest('.control-group').addClass('error'); // set error class to the control group
+		},
+		success: function (label) {
+			label.closest('.control-group').removeClass('error');
+			label.remove();
+		},
+		errorPlacement: function (error, element) {
+			if (element.closest('.icon-search').size() === 1) {
+				error.addClass('help-small no-left-padding').insertAfter(element.closest('.icon-search'));
+			} else if (element.next().attr("class")){
+				error.addClass('help-small no-left-padding').insertAfter(element.next());
+			} else {
+				error.addClass('help-small no-left-padding').insertAfter(element);
+			}
+		}
+	});
+	function fnSaveAccountData(){
+		if($('#dataAcccount').valid()){
+			$.ajax({
+				type: "POST",
+				url: "/contab/updateUser/",	
+				data: $('#dataAcccount').serialize(), //se envia el form serializado	
+				beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+					showIsLoading("Procesando...");
+				}
+			}).done(function (data) {
+				window.location.href ='/contab/profile';
+			}).fail(function (data) {
+				fnOpenErrorDialog(data.responseJSON.message);
+				hideIsLoading();
+			})
+		}
+	}
+	$('#dataPassword').validate({
+		errorElement: 'label', //default input error message container
+		errorClass: 'help-inline', // default input error message class
+		rules: {
+			oldPassword: { required: true },
+			password: { required: true },
+			confirmPassword: {required: true}
+		},
+		messages: { // custom messages
+			oldPassword: { required: "El campo es requerido." },
+			password: { required: "El campo es requerido." },
+			confirmPassword: { required: "El campo es requerido." }
+		},
+		highlight: function (element) { // hightlight error inputs
+			$(element).closest('.control-group').addClass('error'); // set error class to the control group
+		},
+		success: function (label) {
+			label.closest('.control-group').removeClass('error');
+			label.remove();
+		},
+		errorPlacement: function (error, element) {
+			if (element.closest('.icon-search').size() === 1) {
+				error.addClass('help-small no-left-padding').insertAfter(element.closest('.icon-search'));
+			} else if (element.next().attr("class")){
+				error.addClass('help-small no-left-padding').insertAfter(element.next());
+			} else {
+				error.addClass('help-small no-left-padding').insertAfter(element);
+			}
+		}
+	});
+	function fnSavePassword(){
+		if($('#dataPassword').valid()){
+			if($('#password').val()!=$('#confirmPassword').val()){
+				fnOpenErrorDialog("El campo confirmar nueva contraseña no es igual a la nueva contraseña.");
+			}
+			else{
+				$.ajax({
+					type: "POST",
+					url: "/contab/updatePassoword/",	
+					data: $('#dataPassword').serialize(), //se envia el form serializado	
+					beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+						showIsLoading("Procesando...");
+					}
+				}).done(function (data) {
+					fnOpenSusessDialog("Se ha actualizado con exito");
+					$('#password').val('')
+					$('#confirmPassword').val('')
+					$('#oldPassword').val('')
+				}).fail(function (data) {
+					fnOpenErrorDialog(data.responseJSON.message);
+					hideIsLoading();
+				})	
+			}
+		}
+	}
+</script>

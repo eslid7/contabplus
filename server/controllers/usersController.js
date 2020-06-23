@@ -441,10 +441,47 @@ function controlAccess(dataCookie){
   return ingresa
 }
 
+function updateUser(req, res){  
+  if(controlAccess(req.headers.cookie)){
+    res.redirect('/contab/sign');
+  }
+  else{
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
+
+    userModel.update({useName: req.body.firstName, usePhone: req.body.phone}, {where :{'useId': token.useId}}).then(function(){
+      return  res.status(200).json({ message: "Se ha actualizado con exito" });
+    })
+  }
+}
+
+async function updatePassoword(req, res){  
+  if(controlAccess(req.headers.cookie)){
+    res.redirect('/contab/sign');
+  }
+  else{
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
+    console.log(req.body.oldPassword)
+
+    const dataUser = await userModel.findOne({where :{'useId': token.useId, 'usePassword': encrypt(req.body.oldPassword)}})
+    
+    if(dataUser!=undefined){
+      userModel.update({usePassword: encrypt(req.body.password)}, {where :{'useId': token.useId}}).then(function(){
+        return  res.status(200).json({ message: "Se ha actualizado con exito" });
+      })
+    }
+    else{
+      return  res.status(400).json({ message: "La contraseña actual es incorrecta. " });
+    }
+
+  }
+}
+
 module.exports = {
   login,
   signup,
-  // updateUser,
+  updateUser,
   validateAccount,
   resendMail,
   createAccount,
@@ -459,5 +496,6 @@ module.exports = {
   viewUsers,
   saveRol,
   changeStatus,
-  controlAccess
+  controlAccess,
+  updatePassoword
 }
