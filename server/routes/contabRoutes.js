@@ -61,6 +61,7 @@ router.route('/saveAccountingAccount').post(accountingAccountController.saveAcco
 router.route('/getAccountingAccount/:id').get(accountingAccountController.getAccountingAccount);
 router.route('/getAccountingAccountSearch/:id').get(accountingAccountController.getAccountingAccountSearch);
 router.route('/loadFile/:id').post(accountingAccountController.loadFile);
+router.route('/activeInactiveAccount/:id').post(accountingAccountController.activeInactiveAccount);
 
 
 

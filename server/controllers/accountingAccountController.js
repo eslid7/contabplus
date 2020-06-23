@@ -36,47 +36,79 @@ function viewMantenanceAcco(req, res){
     }
 }
 
-function saveAccountingAccount(req, res){
+async function saveAccountingAccount(req, res){
     let data = req.headers.cookie.split("=");
     const token =  jwt.decode(data[1],'b33dd00.@','HS512')
     //primero si el nivel es mayor a 1 validar que exista el nivel anterior
     let aacCode = req.body.aacCode
     let aacCodeToSave = req.body.aacCodeToSave
-    
-    //buscar el nivel se debe borrar +1 para buscar el nivel anterior
-    accountingAccountModel.findOne({where: {'accIdFk': req.body.accId, 'aacCode': req.body.aacNivelBefore}}).then( accountingAccountRaiz => { 
-        if(accountingAccountRaiz || req.body.aacNivelBefore == ''){
-            //verificar que no exista
-            accountingAccountModel.findOne({where: {'accIdFk': req.body.accId, 'aacCode': aacCodeToSave}}).then( accountingAccountExist => { 
-                if(accountingAccountExist){
-                    return res.status(400).json({ message: `No se puede crear, la cuenta  ${aacCodeToSave} ya existe.` });
-                }
-                else{
-                    const dataToSave = new accountingAccountModel({
-                        accIdFk: req.body.accId,
-                        busIdFk: req.body.busId,
+    console.log('req.body.aacId', req.body.aacId)
+    if(req.body.aacId!= undefined && req.body.aacId!=""){
+        //validar que la cuenta no exista        
+        const accountingAccountExist = await accountingAccountModel.findOne({where: {'accIdFk': req.body.accId, 'aacCode': aacCodeToSave}}) 
+        if(accountingAccountExist && accountingAccountExist.aacId != req.body.aacId){
+            return res.status(400).json({ message: `No se puede guardar, la cuenta  ${aacCodeToSave} ya existe.` });
+        }
+        else{
+            const accountingAccountRaiz = await accountingAccountModel.findOne({where: {'accIdFk': req.body.accId, 'aacCode': req.body.aacNivelBefore}}) 
+            if(accountingAccountRaiz || req.body.aacNivelBefore == ''){
+                accountingAccountModel.update({            
                         useIdFk: token.useId,        
-                        aacCode: aacCodeToSave,
+                        aacCode: aacCodeToSave, //??? realizar las validaciones
                         aacName: req.body.aacName,
                         aacType: req.body.aacType,
                         aacTypeBalance: req.body.aacTypeBalance,
                         aacFuncionality: req.body.aacFuncionality,
                         aacObservations: req.body.aacObservations,
-                        aacStatus: 1,
+                        aacStatus: 1, /// agregar el status al body
                         aacMoney: req.body.aacMoney,        
-                        createdAt: moment(new Date()).format('YYYY-MM-DD'),
                         updateAt: moment(new Date()).format('YYYY-MM-DD')
-                    });
-                    dataToSave.save().then(function () {
-                        return res.status(200).json({ message: "Se ha creado con exito." });
-                    })
-                }
-            })    
-        }
-        else{
-            return res.status(400).json({ message: `No se puede crear, porque no se ha registrado la cuenta padre ${req.body.aacNivelBefore}` });
-        }
-    })
+                    }, {where : {'aacId' :req.body.aacId}}).then(function () {
+                    return  res.status(200).json({ message: "Se ha actualizado con exito" });
+                })
+            }
+            else{
+                return res.status(400).json({ message: `No se puede crear, porque no se ha registrado la cuenta padre ${req.body.aacNivelBefore}` });
+            }
+        } 
+    }
+    else{
+        //buscar el nivel se debe borrar +1 para buscar el nivel anterior
+        accountingAccountModel.findOne({where: {'accIdFk': req.body.accId, 'aacCode': req.body.aacNivelBefore}}).then( accountingAccountRaiz => { 
+            if(accountingAccountRaiz || req.body.aacNivelBefore == ''){
+                //verificar que no exista
+                accountingAccountModel.findOne({where: {'accIdFk': req.body.accId, 'aacCode': aacCodeToSave}}).then( accountingAccountExist => { 
+                    if(accountingAccountExist){
+                        return res.status(400).json({ message: `No se puede crear, la cuenta  ${aacCodeToSave} ya existe.` });
+                    }
+                    else{
+                        const dataToSave = new accountingAccountModel({
+                            accIdFk: req.body.accId,
+                            busIdFk: req.body.busId,
+                            useIdFk: token.useId,        
+                            aacCode: aacCodeToSave,
+                            aacName: req.body.aacName,
+                            aacType: req.body.aacType,
+                            aacTypeBalance: req.body.aacTypeBalance,
+                            aacFuncionality: req.body.aacFuncionality,
+                            aacObservations: req.body.aacObservations,
+                            aacStatus: 1,
+                            aacMoney: req.body.aacMoney,        
+                            createdAt: moment(new Date()).format('YYYY-MM-DD'),
+                            updateAt: moment(new Date()).format('YYYY-MM-DD')
+                        });
+                        dataToSave.save().then(function () {
+                            return res.status(200).json({ message: "Se ha creado con exito." });
+                        })
+                    }
+                })    
+            }
+            else{
+                return res.status(400).json({ message: `No se puede crear, porque no se ha registrado la cuenta padre ${req.body.aacNivelBefore}` });
+            }
+        })
+    }
+    
 
 }
 
@@ -340,10 +372,20 @@ async function loadFile (req,res){
 
 }
 
-async function findOneData(accIdFk, aacCode){
-    const accountingAccount = await accountingAccountModel.findOne({where: {'accIdFk':accIdFk,'aacCode': aacCode}})
-    return accountingAccount
+function activeInactiveAccount(req, res){
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512')
+
+    accountingAccountModel.update({            
+            useIdFk: token.useId,        
+            aacStatus: req.query.status,    
+            updateAt: moment(new Date()).format('YYYY-MM-DD')
+        }, {where : {'aacId' :req.params.id}}).then(function () {
+        return  res.status(200).json({ message: "Se ha actualizado con exito" });
+    })
 }
+
+
 
 module.exports = {
     viewMantenanceAcco,
@@ -351,5 +393,5 @@ module.exports = {
     getAccountingAccount,
     getAccountingAccountSearch,
     loadFile,
-    findOneData,
+    activeInactiveAccount,
 }

@@ -153,18 +153,18 @@
                                                         </label>
                                                     </div>
                                                     <div class="control-group span2 ">
-                                                        <input type="text" name="accNivel1" id="accNivel1" class="m-wrap span12" placeholder="Dígitos" tabindex=3 position=1>										
-                                                        <input type="text" name="accNivel2" id="accNivel2" class="m-wrap span12" placeholder="Dígitos" tabindex=5 position=2>
-                                                        <input type="text" name="accNivel3" id="accNivel3" class="m-wrap span12" placeholder="Dígitos" tabindex=7 position=3>										
-                                                        <input type="text" name="accNivel4" id="accNivel4" class="m-wrap span12" placeholder="Dígitos" tabindex=9 position=4>
-                                                        <input type="text" name="accNivel5" id="accNivel5" class="m-wrap span12" placeholder="Dígitos" tabindex=11 position=5>										
-                                                        <input type="text" name="accNivel6" id="accNivel6" class="m-wrap span12" placeholder="Dígitos" tabindex=13 position=6>
-                                                        <input type="text" name="accNivel7" id="accNivel7" class="m-wrap span12" placeholder="Dígitos" tabindex=15 position=7>										
-                                                        <input type="text" name="accNivel8" id="accNivel8" class="m-wrap span12" placeholder="Dígitos" tabindex=17 position=8>
-                                                        <input type="text" name="accNivel9" id="accNivel9" class="m-wrap span12" placeholder="Dígitos" tabindex=19 position=9>										
-                                                        <input type="text" name="accNivel10" id="accNivel10" class="m-wrap span12" placeholder="Dígitos" tabindex=21 position=10>										
-                                                        <input type="text" name="accNivel11" id="accNivel11" class="m-wrap span12" placeholder="Dígitos" tabindex=23 position=11>										
-                                                        <input type="text" name="accNivel12" id="accNivel12" class="m-wrap span12" placeholder="Dígitos" tabindex=26 position=11>                                            
+                                                        <input type="text" name="accNivel1" id="accNivel1" class="m-wrap span12 numeric" placeholder="Dígitos" tabindex=3 position=1>										
+                                                        <input type="text" name="accNivel2" id="accNivel2" class="m-wrap span12 numeric" placeholder="Dígitos" tabindex=5 position=2>
+                                                        <input type="text" name="accNivel3" id="accNivel3" class="m-wrap span12 numeric" placeholder="Dígitos" tabindex=7 position=3>										
+                                                        <input type="text" name="accNivel4" id="accNivel4" class="m-wrap span12 numeric" placeholder="Dígitos" tabindex=9 position=4>
+                                                        <input type="text" name="accNivel5" id="accNivel5" class="m-wrap span12 numeric" placeholder="Dígitos" tabindex=11 position=5>										
+                                                        <input type="text" name="accNivel6" id="accNivel6" class="m-wrap span12 numeric" placeholder="Dígitos" tabindex=13 position=6>
+                                                        <input type="text" name="accNivel7" id="accNivel7" class="m-wrap span12 numeric" placeholder="Dígitos" tabindex=15 position=7>										
+                                                        <input type="text" name="accNivel8" id="accNivel8" class="m-wrap span12 numeric" placeholder="Dígitos" tabindex=17 position=8>
+                                                        <input type="text" name="accNivel9" id="accNivel9" class="m-wrap span12 numeric" placeholder="Dígitos" tabindex=19 position=9>										
+                                                        <input type="text" name="accNivel10" id="accNivel10" class="m-wrap span12 numeric" placeholder="Dígitos" tabindex=21 position=10>										
+                                                        <input type="text" name="accNivel11" id="accNivel11" class="m-wrap span12 numeric" placeholder="Dígitos" tabindex=23 position=11>										
+                                                        <input type="text" name="accNivel12" id="accNivel12" class="m-wrap span12 numeric" placeholder="Dígitos" tabindex=26 position=11>                                            
                                                     </div>
                                                     <div class="control-group span4 ">
                                                         <input type="text" id="accName1" name="accName1" class="m-wrap span12" placeholder="Nombre nivel" maxlength="30" tabindex=4>										
@@ -249,8 +249,9 @@
                                                     <div class="row-fluid">
                                                         <div class="control-group span6 "> 
                                                         </div>
-                                                        <div class="control-group span2 ">  
-                                                            <button id="inactiveButton" type="button" class="btn red span12" onclick="fnInactive()">Inactivar</button>                                                                                                 
+                                                        <div class="control-group span2 "> 
+                                                            <button id="activeButton" type="button" class="btn green span12" onclick="fnInactive(1)">Activar</button>  
+                                                            <button id="inactiveButton" type="button" class="btn red span12" onclick="fnInactive(0)">Inactivar</button>                                                                                                 
                                                         </div>
                                                         <div class="control-group span4 ">   
                                                             <button type="button" class="btn green span6" onclick="fnSaveAccountingAccount()">Guardar</button>                                               
@@ -316,6 +317,7 @@
         $('#aacMoney').select2({});   
         $('#aacDirection').select2({});
         $('#inactiveButton').hide()
+        $('#activeButton').hide()
         aacDirection()
              
         <% if(business.length != 0) { %>
@@ -376,7 +378,7 @@
     function seeData(aacId, index){
         console.log($('#listAsignPermit').bootstrapTable('getData')[index])
         console.log(aacId)
-        $('#aacDirecaacIdtion').val()
+        $('#aacId').val(aacId)
         /// catalogo ????
         $('#aacCode').val($('#listAsignPermit').bootstrapTable('getData')[index].aacCode)
         
@@ -387,7 +389,13 @@
         $('#aacMoney').val($('#listAsignPermit').bootstrapTable('getData')[index].aacMoney).trigger('change');
         $('#aacFuncionality').val($('#listAsignPermit').bootstrapTable('getData')[index].aacFuncionality)
         $('#aacObservations').val($('#listAsignPermit').bootstrapTable('getData')[index].aacObservations)
-        $('#inactiveButton').show()
+        if($('#listAsignPermit').bootstrapTable('getData')[index].aacStatus ==1){
+            $('#inactiveButton').show()
+        }
+        else{
+            $('#activeButton').show()
+        }
+        
         putMask($('#aacCode').val())
         if($('#aacDirection').val() == 1){
 
@@ -453,19 +461,19 @@
         $('.bt-table').bootstrapTable('refresh',{url: '/contab/getAccountingAccount/'+$('#accId').val()});
     }
 
-    function fnInactive(){
+    function fnInactive(status){
         //agregar un confirm??
 
         $.ajax({
-            type: "GET",
-			url: "/contab/inactiveAccountingAccount/"+$('#aacId').val(),		
+            type: "POST",
+			url: "/contab/activeInactiveAccount/"+$('#aacId').val()+"?status="+status,		
             beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
                 showIsLoading("Procesando...");
             }
         }).done(function (data) {	
             hideIsLoading();
-            clean()	
-            showData(data)
+            clean();
+            refreshTable();
         }).fail(function (data) {
             clean()	
             hideIsLoading();
@@ -667,6 +675,7 @@
         $("#accNivel10").attr('maxlength',jsonData.accNivel10);
         $("#accNivel11").attr('maxlength',jsonData.accNivel11);
         $("#accNivel12").attr('maxlength',jsonData.accNivel12);
+        $(".numeric").inputmask('Regex', {regex: "^[0-9]{1,6}$"});
     }
 
     //validar el maxlenth y la mascara al guardar
@@ -837,8 +846,10 @@
             }    		
         }  
         $('#inactiveButton').hide()
+        $('#activeButton').hide()
         $('#aacNivelFirst').val('')
         $('#aacType').attr('disabled',false).trigger('change');
+        $('#aacId').val('')
     }
     ////// vertical
     function fnSearchVertical(data, level){
@@ -878,9 +889,17 @@
                     if($('#levelToSave').val()>1){                        
                         $('#aacType').prop( "disabled", true );
                     } 
-                    if($('#aacId')==''){
+                    if($('#aacId').val()==''){
                         $('#accNivel'+level).prop( "disabled", false );
-                        $('#accName'+level).prop( "disabled", false );          
+                        $('#accName'+level).prop( "disabled", false );  
+                        for(var a=level;  a<13; a++){																	
+                            $('#accNivel'+a).val('')
+                            $('#accName'+a).val('')	 
+                            if(a>level){
+                                $('#accNivel'+a).prop( "disabled", true );  	
+                                $('#accName'+a).prop( "disabled", true );  	
+                            }
+                        }         
                     }
                          
                 }
