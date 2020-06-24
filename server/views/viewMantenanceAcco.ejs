@@ -752,8 +752,7 @@
 
     function createAccount(newAccount, accNivel, previousLevel){
         dataVal = newAccount
-        diference= newAccount.length - previousLevel
-        console.log('diference',diference)
+        diference= accNivel - newAccount.length
         if(previousLevel>0){
             dataVal = ''
             ultimo=''
