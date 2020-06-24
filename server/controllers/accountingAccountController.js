@@ -51,11 +51,11 @@ async function saveAccountingAccount(req, res){
         }
         else{
             const accountingAccountRaiz = await accountingAccountModel.findOne({where: {'accIdFk': req.body.accId, 'aacCode': req.body.aacNivelBefore}}) 
-            if(accountingAccountRaiz || req.body.aacNivelBefore == ''){
+            if(accountingAccountRaiz || req.body.aacNivelBefore == '' || req.body.levelToSave == 1){
                 accountingAccountModel.update({            
                         useIdFk: token.useId,        
                         aacCode: aacCodeToSave, //??? realizar las validaciones
-                        aacName: req.body.aacName,
+                        aacName: req.body.aacName.toUpperCase(),
                         aacType: req.body.aacType,
                         aacTypeBalance: req.body.aacTypeBalance,
                         aacFuncionality: req.body.aacFuncionality,
@@ -75,7 +75,7 @@ async function saveAccountingAccount(req, res){
     else{
         //buscar el nivel se debe borrar +1 para buscar el nivel anterior
         accountingAccountModel.findOne({where: {'accIdFk': req.body.accId, 'aacCode': req.body.aacNivelBefore}}).then( accountingAccountRaiz => { 
-            if(accountingAccountRaiz || req.body.aacNivelBefore == ''){
+            if(accountingAccountRaiz || req.body.aacNivelBefore == '' || req.body.levelToSave == 1){
                 //verificar que no exista
                 accountingAccountModel.findOne({where: {'accIdFk': req.body.accId, 'aacCode': aacCodeToSave}}).then( accountingAccountExist => { 
                     if(accountingAccountExist){
@@ -87,7 +87,7 @@ async function saveAccountingAccount(req, res){
                             busIdFk: req.body.busId,
                             useIdFk: token.useId,        
                             aacCode: aacCodeToSave,
-                            aacName: req.body.aacName,
+                            aacName: req.body.aacName.toUpperCase(),
                             aacType: req.body.aacType,
                             aacTypeBalance: req.body.aacTypeBalance,
                             aacFuncionality: req.body.aacFuncionality,
@@ -124,7 +124,19 @@ function getAccountingAccount(req, res){
         limitData = req.query.limit
     }
     if(typeof(req.query.search) !== "undefined" && req.query.search !== ''){
-        likeData=[{'aacName': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'aacCode': {[sequelize.Op.like]: `%${req.query.search}%`}}]
+        dataToSearch = req.query.search
+        dataToSearch = dataToSearch.replace('*','')
+        console.log(req.query.search.charAt(req.query.search.length))    
+        if(req.query.search.charAt((req.query.search.length-1))=='*'){
+            console.log(req.query.search.charAt(req.query.search.length))            
+            likeData=[{'aacName': {[sequelize.Op.like]: `${dataToSearch}%`}}, {'aacCode': {[sequelize.Op.like]: `${dataToSearch}%`}}]
+        }
+        else if(req.query.search.charAt(0)=='*'){
+            likeData=[{'aacName': {[sequelize.Op.like]: `%${dataToSearch}`}}, {'aacCode': {[sequelize.Op.like]: `%${dataToSearch}`}}]
+        }
+        else{
+            likeData=[{'aacName': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'aacCode': {[sequelize.Op.like]: `%${req.query.search}%`}}]
+        }        
     }
 
 

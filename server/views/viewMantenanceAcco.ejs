@@ -35,7 +35,7 @@
                                                             <% if(business.length == 0) { %>   
                                                                 No hay empresas disponibles
                                                             <%} else {%>
-                                                            <select id="busId" name="busId" class="span12" tabindex=1>   
+                                                            <select id="busId" name="busId" class="span12 select2" tabindex=1>   
                                                                 <% for(var j = 0; j < business.length; j++) { %>   
                                                                     <option value="<%=business[j].busId%>"> <%=business[j].busName%></option>
                                                                 <% }%>
@@ -69,7 +69,7 @@
                                                             Tipo de ingreso
                                                         </label>
                                                         <div class="controls" > 
-                                                            <select id="aacDirection" name="aacDirection" class="span10" tabindex=2>    
+                                                            <select id="aacDirection" name="aacDirection" class="span10 select2" tabindex=2>    
                                                                 <option value="1">Horizontal</option>                                                    
                                                                 <option value="2">Vertical</option>                                                        
                                                             </select>                                                       
@@ -89,7 +89,7 @@
                                                             Codigo de cuenta
                                                         </label>
                                                         <div class="controls"> 
-                                                            <input type="text" name="aacCode" id="aacCode" class="span11" />                                                
+                                                            <input type="text" name="aacCode" id="aacCode" class="span11"  />                                                
                                                         </div>
                                                     </div>	
                                                 </div>
@@ -99,7 +99,7 @@
                                                             Nombre de la cuenta
                                                         </label>
                                                         <div class="controls" >  
-                                                            <input type="text" name="aacName" id="aacName" class="span11" />                                                  
+                                                            <input type="text" name="aacName" id="aacName" class="span11" style="text-transform: uppercase" />                                                  
                                                         </div>
                                                     </div>							
                                                 </div>
@@ -114,7 +114,7 @@
                                                     </div>							
                                                 </div>
                                                 <div class="row-fluid" id="vertical2">
-                                                    <div class="control-group span5 ">
+                                                    <div class="control-group span4 ">
                                                         <label class="span12 labelTextNivel" style="padding-left: 13px;" id="labelTextNivel1">
                                                             Nivel 1
                                                         </label>
@@ -166,19 +166,19 @@
                                                         <input type="text" name="accNivel11" id="accNivel11" class="m-wrap span12 numeric" placeholder="Dígitos" tabindex=23 position=11>										
                                                         <input type="text" name="accNivel12" id="accNivel12" class="m-wrap span12 numeric" placeholder="Dígitos" tabindex=26 position=11>                                            
                                                     </div>
-                                                    <div class="control-group span4 ">
-                                                        <input type="text" id="accName1" name="accName1" class="m-wrap span12" placeholder="Nombre nivel" maxlength="30" tabindex=4>										
-                                                        <input type="text" id="accName2" name="accName2" class="m-wrap span12" placeholder="Nombre nivel" maxlength="30" tabindex=6>
-                                                        <input type="text" id="accName3" name="accName3" class="m-wrap span12" placeholder="Nombre nivel" maxlength="30" tabindex=8>										
-                                                        <input type="text" id="accName4" name="accName4" class="m-wrap span12" placeholder="Nombre nivel" maxlength="30" tabindex=10>	
-                                                        <input type="text" id="accName5" name="accName5" class="m-wrap span12" placeholder="Nombre nivel" maxlength="30" tabindex=12>										
-                                                        <input type="text" id="accName6" name="accName6" class="m-wrap span12" placeholder="Nombre nivel" maxlength="30" tabindex=14>	
-                                                        <input type="text" id="accName7" name="accName7" class="m-wrap span12" placeholder="Nombre nivel" maxlength="30" tabindex=16>										
-                                                        <input type="text" id="accName8" name="accName8" class="m-wrap span12" placeholder="Nombre nivel" maxlength="30" tabindex=18>	
-                                                        <input type="text" id="accName9" name="accName9" class="m-wrap span12" placeholder="Nombre nivel" maxlength="30" tabindex=20>										
-                                                        <input type="text" id="accName10" name="accName10" class="m-wrap span12" placeholder="Nombre nivel" maxlength="30" tabindex=22>	
-                                                        <input type="text" id="accName11" name="accName11" class="m-wrap span12" placeholder="Nombre nivel" maxlength="30" tabindex=24>										
-                                                        <input type="text" id="accName12" name="accName12" class="m-wrap span12" placeholder="Nombre nivel" maxlength="30" tabindex=26>											
+                                                    <div class="control-group span6 ">
+                                                        <input type="text" id="accName1" name="accName1" class="m-wrap span12" maxlength="30" style="text-transform: uppercase" tabindex=4>										
+                                                        <input type="text" id="accName2" name="accName2" class="m-wrap span12" maxlength="30" style="text-transform: uppercase" tabindex=6>
+                                                        <input type="text" id="accName3" name="accName3" class="m-wrap span12" maxlength="30" style="text-transform: uppercase" tabindex=8>										
+                                                        <input type="text" id="accName4" name="accName4" class="m-wrap span12" maxlength="30" style="text-transform: uppercase" tabindex=10>	
+                                                        <input type="text" id="accName5" name="accName5" class="m-wrap span12" maxlength="30" style="text-transform: uppercase" tabindex=12>										
+                                                        <input type="text" id="accName6" name="accName6" class="m-wrap span12" maxlength="30" style="text-transform: uppercase" tabindex=14>	
+                                                        <input type="text" id="accName7" name="accName7" class="m-wrap span12" maxlength="30" style="text-transform: uppercase" tabindex=16>										
+                                                        <input type="text" id="accName8" name="accName8" class="m-wrap span12" maxlength="30" style="text-transform: uppercase" tabindex=18>	
+                                                        <input type="text" id="accName9" name="accName9" class="m-wrap span12" maxlength="30" style="text-transform: uppercase" tabindex=20>										
+                                                        <input type="text" id="accName10" name="accName10" class="m-wrap span12" maxlength="30" style="text-transform: uppercase" tabindex=22>	
+                                                        <input type="text" id="accName11" name="accName11" class="m-wrap span12" maxlength="30" style="text-transform: uppercase" tabindex=24>										
+                                                        <input type="text" id="accName12" name="accName12" class="m-wrap span12" maxlength="30" style="text-transform: uppercase" tabindex=26>											
                                                     </div>								
                                                 </div>
                                                 <div class="row-fluid">
@@ -187,7 +187,7 @@
                                                             Tipo cuenta
                                                         </label>
                                                         <div class="controls" >  
-                                                            <select id="aacType" name="aacType" class="span10">
+                                                            <select id="aacType" name="aacType" class="span10 select2">
                                                                 <option value="1">Activo</option>
                                                                 <option value="2">Pasivo</option>
                                                                 <option value="3">Patrimonio</option>
@@ -203,7 +203,7 @@
                                                         Tipo Saldo
                                                         </label>
                                                         <div class="controls" >  
-                                                            <select id="aacTypeBalance" name="aacTypeBalance" class="span7">
+                                                            <select id="aacTypeBalance" name="aacTypeBalance" class="span7 select2">
                                                                 <option value="1">Deudor</option>
                                                                 <option value="2">Acreedor</option>
                                                             </select>                                                  
@@ -215,7 +215,7 @@
                                                                 Moneda
                                                             </label>
                                                             <div class="controls" >  
-                                                                <select id="aacMoney" name="aacMoney" class="span10">
+                                                                <select id="aacMoney" name="aacMoney" class="span10 select2">
                                                                     <option value="1">Colón</option>
                                                                     <option value="2">Dolar</option>
                                                                 </select>                                               
@@ -316,6 +316,9 @@
         $('#aacTypeBalance').select2({});
         $('#aacMoney').select2({});   
         $('#aacDirection').select2({});
+        $("#busId, #aacType, #aacTypeBalance, #aacMoney, #aacDirection").on("select2-opening", function() {
+			$('.select2').select2("close");
+		});
         $('#inactiveButton').hide()
         $('#activeButton').hide()
         aacDirection()
@@ -458,7 +461,8 @@
     }
 
     function refreshTable() {
-        $('.bt-table').bootstrapTable('refresh',{url: '/contab/getAccountingAccount/'+$('#accId').val()});
+        //$('#listAsignPermit').bootstrapTable('refresh',{url: '/contab/getAccountingAccount/'+$('#accId').val()});
+        $('#listAsignPermit').bootstrapTable('refreshOptions', {url: '/contab/getAccountingAccount/'+$('#accId').val()});
     }
 
     function fnInactive(status){
@@ -735,23 +739,53 @@
     }
 
     $( "#aacCode" ).on( "keydown", function(event) {
-        if(event.which == 13){
+        if(event.which == 13 && $('#aacCode').val().length > 0){
             fnSearch($('#aacCode').val())
         }         
     });
     
     $('#aacCode').change(function (){
-        fnSearch($('#aacCode').val())
+        if($('#aacCode').val().length > 0){
+            fnSearch($('#aacCode').val())
+        }        
     })
+
+    function createAccount(newAccount, accNivel, previousLevel){
+        dataVal = newAccount
+        diference= newAccount.length - previousLevel
+        console.log('diference',diference)
+        if(previousLevel>0){
+            dataVal = ''
+            ultimo=''
+            countDiference =0
+            for(a=0; a<accNivel; a++){
+                if(previousLevel> a){
+                    dataVal =dataVal + newAccount.charAt(a)
+                }
+                else{
+                    ultimo = ultimo + newAccount.charAt(a)
+                    if(countDiference <diference){
+                        dataVal = dataVal +'0'
+                        countDiference =countDiference +1
+                    }                    
+                }               
+            }
+            dataVal = dataVal +ultimo
+
+        }
+        else{
+            for(a=newAccount.length; a<accNivel; a++){
+                dataVal = '0'+dataVal
+            }
+        }        
+        $('#aacCode').val(dataVal)
+        return dataVal
+    }
 
     function fnSearch(){
         console.log($('#aacCode').val())
         newAccount = $('#aacCode').val();
         search =false;
-        //si es solo el primer nivel hago searh
-        if(newAccount.length==jsonData.accNivel1){
-            search =true;
-        }
         nivel2= jsonData.accNivel1*1+jsonData.accNivel2*1
         nivel3= nivel2+jsonData.accNivel3*1
         nivel4= nivel3+jsonData.accNivel4*1
@@ -763,10 +797,72 @@
         nivel10= nivel9+jsonData.accNivel10*1
         nivel11= nivel10+jsonData.accNivel11*1
         nivel12= nivel11+jsonData.accNivel12*1
-        if( newAccount.length== nivel2 || newAccount.length==nivel3 || newAccount.length==nivel4 || newAccount.length==nivel5 || 
+        if(newAccount.length<jsonData.accNivel1){
+            newAccount = createAccount(newAccount, jsonData.accNivel1, 0)
+            search =true; 
+        }
+        if( newAccount.length== jsonData.accNivel1 || newAccount.length== nivel2 || newAccount.length==nivel3 || newAccount.length==nivel4 || newAccount.length==nivel5 || 
             newAccount.length== nivel6 || newAccount.length==nivel7 || newAccount.length==nivel8 || newAccount.length==nivel9 || newAccount.length== nivel10 || newAccount.length==nivel11 || newAccount.length==nivel12){
             newAccount=putMask(newAccount)
             search =true;            
+        }
+        else{
+           
+            if(newAccount.length<nivel2){
+                newAccount =  createAccount(newAccount, nivel2, jsonData.accNivel1)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel3){
+                newAccount =  createAccount(newAccount, nivel3, nivel2)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<jsonData.accNivel4){
+                newAccount =  createAccount(newAccount, nivel4, nivel3)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<jsonData.accNivel5){
+                newAccount =  createAccount(newAccount, nivel5, nivel4)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<jsonData.accNivel6){
+                newAccount =  createAccount(newAccount, nivel6, nivel5)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<jsonData.accNivel7){
+                newAccount =  createAccount(newAccount, nivel7, nivel6)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<jsonData.accNivel8){
+                newAccount =  createAccount(newAccount, nivel8, nivel7)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<jsonData.accNivel9){
+                newAccount =  createAccount(newAccount, nivel9, nivel8)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<jsonData.accNivel10){
+                newAccount =  createAccount(newAccount, nivel10, nivel9)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<jsonData.accNivel11){
+                newAccount =  createAccount(newAccount, nivel11, nivel10)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<jsonData.accNivel12){
+                newAccount =  createAccount(newAccount, nivel12, nivel11)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
         }
         if(search){
             //obtener el nombre del nivel si existe
@@ -778,6 +874,7 @@
                 }
             }).done(function (data) {  
                 console.log(data)
+                $('.search input').val(newAccount+"*").trigger('keyup');
                 $('#aacCodeToSave').val(newAccount)
                 if(data.accountingAccount!=null){
                     $('#aacName').val(data.accountingAccount.aacName);
@@ -788,6 +885,9 @@
                 if($('#levelToSave').val()>1 &&  data.accountingAccountRaiz!=null){
                     $('#aacType').val(data.accountingAccountRaiz.aacType).trigger('change');
                     $('#aacType').prop( "disabled", true );
+                }
+                else if($('#levelToSave').val()>1) {
+                    fnOpenErrorDialog("La cuenta digitada, no se ha registrado la cuenta padre "+$('#aacNivelFirst').val());
                 }
 
                 hideIsLoading();                                         
@@ -927,13 +1027,30 @@
             if(event.which == 13||event.which == 9){
                 if($(this).attr('maxlength') == $(this).val().length){
                     fnSearchVertical($(this).val(), $(this).attr('position'))
+                }
+                if($(this).val().length>0){
+                    dataVal = $(this).val()
+                    for(a=$(this).val().length; a<$(this).attr('maxlength'); a++){
+                        dataVal = '0'+dataVal
+                    }
+                    $(this).val(dataVal)
+                    fnSearchVertical(dataVal, $(this).attr('position'))
                 }                
             }         
         });
         
         $('#accNivel'+aIndex).change(function (aIndex){
-            if($(this).attr('maxlength') == $(this).val().length)
+            if($(this).attr('maxlength') == $(this).val().length){
                 fnSearchVertical($(this).val(), $(this).attr('position'))
+            }                
+            if($(this).val().length>0){
+                dataVal = $(this).val()
+                for(a=$(this).val().length; a<$(this).attr('maxlength'); a++){
+                    dataVal = '0'+dataVal
+                }
+                $(this).val(dataVal)
+                fnSearchVertical(dataVal, $(this).attr('position'))
+            } 
         })
     }
 

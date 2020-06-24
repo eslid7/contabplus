@@ -71,7 +71,7 @@
 									<% if(business.length == 0) { %>   
 										No hay empresas disponibles
 									<%} else {%>
-									<select id="busId" name="busId" class="span10">
+									<select id="busId" name="busId" class="span10 select2">
 										<% for(var j = 0; j < business.length; j++) { %>   
 											<option value="<%=business[j].busId%>"> <%=business[j].busName%></option>
 										<% }%>
@@ -89,7 +89,7 @@
 									<% if(accountingCatalog.length == 0) { %>   
 										No hay catálogos disponibles
 									<%} else {%>
-									<select id="accId" name="accId" class="span10">
+									<select id="accId" name="accId" class="span10 select2">
 										<% for(var j = 0; j < accountingCatalog.length; j++) { %>   
 											<option value="<%=accountingCatalog[j].accId%>"> <%=accountingCatalog[j].accName%></option>
 										<% } %>
@@ -121,7 +121,10 @@
 <script type="text/javascript">
 	$(document).ready(function(){
 		$('#accId').select2({});
-        $('#busId').select2({});
+		$('#busId').select2({});
+		$("#accId, #busId").on("select2-opening", function() {
+			$('.select2').select2("close");
+		});
 		handleTableData();	
 	});
 	isFirtsDatatable = true;

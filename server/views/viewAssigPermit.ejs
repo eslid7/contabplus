@@ -28,7 +28,7 @@
                                                     <% if(business.length == 0) { %>   
                                                         No hay empresas disponibles
                                                     <%} else {%>
-                                                    <select id="busId" name="busId" class="span6">   
+                                                    <select id="busId" name="busId" class="span6 select2">   
                                                         <% for(var j = 0; j < business.length; j++) { %>   
                                                             <option value="<%=business[j].busId%>"> <%=business[j].busName%></option>
                                                         <% }%>
@@ -41,7 +41,7 @@
                                                    Usuario
                                                 </label>
                                                 <div class="controls">        
-                                                    <select id="useId" name="useId" class="span6">   
+                                                    <select id="useId" name="useId" class="span6 select2">   
                                                         <% for(var b = 0; b < users.length; b++) { %>   
                                                             <option value="<%=users[b].useId%>"> <%=users[b].useName%></option>
                                                         <% }%>
@@ -53,7 +53,7 @@
                                                    Permiso
                                                 </label>
                                                 <div class="controls">        
-                                                    <select id="permitId" name="permitId" class="span6">                                                       
+                                                    <select id="permitId" name="permitId" class="span6 select2">                                                       
                                                         <option value="1"> Consultar</option>
                                                         <option value="2"> Modificar</option>
                                                     </select>                                            
@@ -106,6 +106,9 @@
         $('#useId').select2({});
         $('#busId').select2({});
         $('#permitId').select2({});
+        $("#busId, #permitId, #useId").on("select2-opening", function() {
+			$('.select2').select2("close");
+		});
         <% if(business.length == 0) { %>
 
         <%} else {%>
