@@ -50,7 +50,7 @@ async function saveAccountingAccount(req, res){
             return res.status(400).json({ message: `No se puede guardar, la cuenta  ${aacCodeToSave} ya existe.` });
         }
         else{
-            const accountingAccountRaiz = await accountingAccountModel.findOne({where: {'accIdFk': req.body.accId, 'aacCode': req.body.aacNivelBefore}}) 
+            const accountingAccountRaiz = await accountingAccountModel.findOne({where: {'accIdFk': req.body.accId, 'aacCode': req.body.aacNivelBefore}})             
             if(accountingAccountRaiz || req.body.aacNivelBefore == '' || req.body.levelToSave == 1){
                 accountingAccountModel.update({            
                         useIdFk: token.useId,        
@@ -162,19 +162,19 @@ function getAccountingAccount(req, res){
 
 
 }
-function getAccountingAccountSearch(req, res){
-    accountingAccountModel.findOne({where: {'accIdFk': req.params.id,'aacCode': req.query.aacCode}}).then( accountingAccount => { 
-        // necesito si es un nivel 2 devolver el data de nivel 1
-        if(req.query.levelToSave!= undefined&& req.query.levelToSave>1){
-            accountingAccountModel.findOne({attributes:['aacType'],where: {'accIdFk': req.params.id,'aacCode': req.query.aacNivelFirst}}).then( accountingAccountRaiz => { 
-                return res.status(200).json({accountingAccount, accountingAccountRaiz});
-            })
-        }
-        else{
-            return res.status(200).json({accountingAccount, accountingAccountRaiz: null});
-        }
+async function getAccountingAccountSearch(req, res){
+    const accountingAccount  = await accountingAccountModel.findOne({where: {'accIdFk': req.params.id,'aacCode': req.query.aacCode}})    
+    // necesito si es un nivel 2 devolver el data de nivel 1
+    if(req.query.levelToSave!= undefined&& req.query.levelToSave>1){
+        const accountingAccountRaizPrevios = await accountingAccountModel.findOne({attributes:['aacType'], where: {'accIdFk': req.params.id, 'aacCode': req.query.aacNivelBefore}}) 
+        accountingAccountModel.findOne({attributes:['aacType'],where: {'accIdFk': req.params.id,'aacCode': req.query.aacNivelFirst}}).then( accountingAccountRaiz => {                 
+            return res.status(200).json({accountingAccount, accountingAccountRaiz, accountingAccountRaizPrevios});
+        })
+    }
+    else{
+        return res.status(200).json({accountingAccount, accountingAccountRaiz: null, accountingAccountRaizPrevios: null});
+    }
         
-    })
 }
 
 async function loadFile (req,res){

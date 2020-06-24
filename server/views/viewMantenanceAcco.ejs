@@ -867,7 +867,7 @@
             //obtener el nombre del nivel si existe
             $.ajax({
                 type: "GET",
-                url: "/contab/getAccountingAccountSearch/"+$('#accId').val()+"?aacCode="+newAccount+"&aacNivelFirst="+$('#aacNivelFirst').val()+"&levelToSave="+$('#levelToSave').val(),       
+                url: "/contab/getAccountingAccountSearch/"+$('#accId').val()+"?aacCode="+newAccount+"&aacNivelFirst="+$('#aacNivelFirst').val()+"&levelToSave="+$('#levelToSave').val()+"&aacNivelBefore="+$('#aacNivelBefore').val(),       
                 beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
                     showIsLoading("Procesando...");
                 }
@@ -881,12 +881,14 @@
                 else{
                     $('#aacName').val('');
                 }
+                console.log(data.accountingAccountRaiz)
                 if($('#levelToSave').val()>1 &&  data.accountingAccountRaiz!=null){
                     $('#aacType').val(data.accountingAccountRaiz.aacType).trigger('change');
                     $('#aacType').prop( "disabled", true );
                 }
-                else if($('#levelToSave').val()>1) {
-                    fnOpenErrorDialog("La cuenta digitada, no se ha registrado la cuenta padre "+$('#aacNivelFirst').val());
+                //aacNivelBefore
+                if($('#levelToSave').val()>1 && data.accountingAccountRaizPrevios==null) {
+                    fnOpenErrorDialog("La cuenta digitada, no se ha registrado la cuenta padre "+$('#aacNivelBefore').val());
                 }
 
                 hideIsLoading();                                         
@@ -929,7 +931,6 @@
 
     function clean(){
         $('#aacCodeToSave').val('')
-        $('#aacNivelBefore').val('')
         $('#aacNivelBefore').val('')
         $('#aacName').val('')
         $('#aacCode').val('')
