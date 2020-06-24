@@ -112,7 +112,7 @@
 									Teléfono
 								</label>
 								<div class="controls">                                    
-                                    <input type="text" name="busPhone" id="busPhone" class="m-wrap span12" placeholder="Teléfono" maxlength="60">
+                                    <input type="text" name="busPhone" id="busPhone" class="m-wrap span12" placeholder="Teléfono" maxlength="11">
 								</div>
 							</div>
 						</div>							
@@ -128,6 +128,7 @@
 <script type="text/javascript">
 	$(document).ready(function(){
 		$('#busMoney').select2({});
+		$("#busPhone").inputmask("mask", {"mask": "99999999", "clearIncomplete": false});
 		handleTableData();
 	});
 	isFirtsDatatable = true;
@@ -189,14 +190,14 @@
 		ignore: "",
 		rules: {
 			busName: { required: true },
-            busEmail: {required: true},
+            busEmail: {required: true, email: true },
 			busPhone : {required: true},
 			busJuriricalId: {required: true},
 			busNameFantasy: {required: true}
 		},
 		messages: { // custom messages
 			busName: { required: "El campo es requerido." },
-            busEmail: { required: "El campo es requerido." },
+            busEmail: { required: "El campo es requerido." , email: "Digite un correo electr&oacute;nico valido"},
 			busPhone: { required: "El campo es requerido." },
 			busJuriricalId: {required: "El campo es requerido." },
 			busNameFantasy: {required: "El campo es requerido." }
