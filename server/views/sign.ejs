@@ -125,7 +125,9 @@
 					showIsLoading("Procesando...");
 				}
 			}).done(function (data) {	
-				document.cookie ="userData="+data.token //+"; Expires="+new Date().addHours(4)
+				var now = new Date().addHours(4)
+				// console.log(now.toString())
+				document.cookie ="userData="+data.token+";expires="+now.toGMTString()+";"
 				window.location.href ='/contab/home';
 			}).fail(function (data) {
 				console.log(data.responseJSON.message);
