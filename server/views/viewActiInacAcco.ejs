@@ -1,0 +1,217 @@
+<% include partials/header %>
+	<!-- BEGIN PAGE -->
+	<div class="page-content">
+        <!-- BEGIN PAGE CONTAINER-->
+        <div class="container-fluid">
+            <!-- BEGIN PAGE HEADER-->
+            <div class="row-fluid">
+                <div class="span12">
+                    <h3>Activar o Inactivar cuentas contables</h3>
+                </div>
+            </div>
+
+            <div class="row-fluid">
+                    <div class="span12">
+                        <!-- BEGIN EXAMPLE TABLE PORTLET-->
+                        <div class="portlet box light-grey">
+                            <div class="portlet-title">
+                                
+                            </div>
+                            <div class="portlet-body">									
+                                <form name="sendNewFile" id="sendNewFile"  enctype="multipart/form-data" >                                                                 
+                                    <div class="row-fluid">
+                                        <div class="control-group span12 ">
+                                            <div class="row-fluid">
+                                                <div class="control-group span3 ">
+                                                    <label for="accCode">
+                                                        Empresa
+                                                    </label>
+                                                    <div class="controls">
+                                                        <% if(business.length == 0) { %>   
+                                                            No hay empresas disponibles
+                                                        <%} else {%>
+                                                        <select id="busId" name="busId" class="span12 select2" tabindex=1>   
+                                                            <% for(var j = 0; j < business.length; j++) { %>   
+                                                                <option value="<%=business[j].busId%>"> <%=business[j].busName%></option>
+                                                            <% }%>
+                                                        </select>
+                                                        <% }%>
+                                                    </div>
+                                                </div> 
+                                                <div class="control-group span4 ">
+                                                    <input type="hidden" value="" name="accId" id="accId">
+                                                    <label for="accCode">
+                                                        Catálogo contable
+                                                    </label>
+                                                    <div class="controls" id="accIdName">                                                    
+                                                    </div>
+                                                </div>	
+                                                <div class="control-group span2 ">
+                                                    <label for="accCode">
+                                                        Tipo de catálogo
+                                                    </label>
+                                                    <div class="controls" id="accIsGlobal">                                                    
+                                                    </div>
+                                                </div>						
+                                            </div>
+                                            <div class="row-fluid">
+                                                <div class="control-group span2 ">
+                                                    <label for="accCode">
+                                                        Estado 
+                                                    </label>
+                                                    <div class="controls" > 
+                                                        <select id="aacStatus" name="aacStatus" class="span10 select2" tabindex=2>    
+                                                            <option value="1">Activar</option>                                                    
+                                                            <option value="0">Inactivar</option>                                                        
+                                                        </select>                                                       
+                                                    </div>                                              
+                                                </div>
+                                                <div class="control-group span6 ">
+                                                    <label for="accCode">
+                                                        Seleccione el archivo por importar
+                                                    </label>
+                                                    <div class="controls">
+                                                        <input id="newFile" name="newFile" class="file" type="file" accept=".xls, .xsls" data-initial-Caption="Archivo XLS">
+                                                    </div>
+                                                </div>
+	
+                                            </div>
+                                            <div class="row-fluid">
+                                                <div class="control-group span7 ">    
+                                                </div>
+                                                <div class="control-group span4 ">                                                    
+                                                    <a href="/static/Activar_Cuentas.xls" class="btn blue span6" target="_blank" >Descargar plantilla</a>                                                     
+                                                    <button type="button" class="btn green span4" onclick="fnLoadFile()">Guardar</button>                                               
+                                                </div>
+                                            </div> 
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+
+        </div>
+    </div>
+<% include partials/footer %>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#busId').select2({});
+        $('#aacStatus').select2({});
+        $("#busId, #aacStatus").on("select2-opening", function() {
+			$('.select2').select2("close");
+		});
+             
+        <% if(business.length != 0) { %>
+            fnGetCatalog();	             
+        <% }%>
+    });
+    function fnGetCatalog(){
+		$.ajax({
+            type: "GET",
+			url: "/contab/getCatalog/"+$('#busId').val(),		
+            beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                showIsLoading("Procesando...");
+            }
+        }).done(function (data) {	           
+            $('#accId').val(data.accountCatalog.accId);
+            $('#accIdName').html(data.accountCatalog.accName);
+            if(data.accountCatalog.accIsGlobal==1){
+                $('#accIsGlobal').html('Global')
+            }
+            else{
+                $('#accIsGlobal').html('Individual')
+            }
+        }).fail(function (data) {
+            clean()	
+            hideIsLoading();
+            fnOpenErrorDialog(data.responseJSON.message);
+        }).always(function (data) {
+            hideIsLoading();
+        });
+    }
+
+    function fnLoadFile(){
+        if($('#sendNewFile').valid()){
+            var fileUpload = document.getElementById("newFile");
+            var formData = new FormData();
+            formData.append('newFile', $("#newFile")[0].files[0]);
+            $.ajax({
+                type: "POST",
+                url: "/contab/loadFileActiveInactive/"+$("#accId").val()+"?busId="+$("#busId").val()+"&aacStatus="+$("#aacStatus").val(),
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                    showIsLoading("Procesando...");
+                }
+            }).done(function (data) {
+                fnOpenSusessDialog("Se ha guardado con exito");
+                $("#newFile").val("");  
+                hideIsLoading();             
+                //recordame que debo actualizar la tabla                    
+            }).fail(function (data) {             
+                $("#newFile").val("");
+                hideIsLoading();
+                fnOpenErrorDialog(data.responseJSON.message);
+            }).always(function (data) {
+                hideIsLoading();
+            });
+        }
+    }
+    $('#sendNewFile').validate({
+        errorElement: 'label', //default input error message container
+        errorClass: 'help-inline', // default input error message class
+        ignore: "",
+        rules: {
+            newFile: { required: true}
+        },
+        messages: { // custom messages
+            newFile: { required: "Debe buscar y seleccionar el archivo xls." }
+        },
+        highlight: function (element) { // hightlight error inputs
+            $(element).closest('.control-group').addClass('error'); // set error class to the control group
+        },
+        success: function (label) {
+            label.closest('.control-group').removeClass('error');
+            label.remove();
+        },
+        errorPlacement: function (error, element) {
+            if (element.closest('.icon-search').size() === 1) {
+                error.addClass('help-small no-left-padding').insertAfter(element.closest('.icon-search'));
+            } else if (element.next().attr("class")){
+                error.addClass('help-small no-left-padding').insertAfter(element.next());
+            } else {
+                error.addClass('help-small no-left-padding').insertAfter(element);
+            }
+        }
+    });
+
+    $('#busId').change(function (){
+        $.ajax({
+            type: "GET",
+			url: "/contab/getCatalog/"+$('#busId').val(),			
+            beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                showIsLoading("Procesando...");
+            }
+        }).done(function (data) {
+            $('#accId').val(data.accountCatalog.accId);
+            $('#accIdName').html(data.accountCatalog.accName);
+            $("#newFile").val("");
+            if(data.accountCatalog.accIsGlobal==1){
+                $('#accIsGlobal').html('Global')
+            }
+            else{
+                $('#accIsGlobal').html('Individual')
+            }
+        }).fail(function (data) {
+            hideIsLoading();
+            fnOpenErrorDialog(data.responseJSON.message);
+            //deberia inhabilitar todos los campos
+        }).always(function (data) {
+            hideIsLoading();
+        });
+    })
+
+</script>

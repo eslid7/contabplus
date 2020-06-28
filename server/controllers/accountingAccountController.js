@@ -392,12 +392,104 @@ function activeInactiveAccount(req, res){
             useIdFk: token.useId,        
             aacStatus: req.query.status,    
             updateAt: moment(new Date()).format('YYYY-MM-DD')
-        }, {where : {'aacId' :req.params.id}}).then(function () {
+        }, {where : {'aacCode': {[sequelize.Op.like]: `${req.query.aacCode}%`}}}).then(function () {
         return  res.status(200).json({ message: "Se ha actualizado con exito" });
     })
 }
 
+function viewActiInacAcco(req, res){
+    if(usersController.controlAccess(req.headers.cookie)){
+        res.redirect('/contab/sign');
+    }
+    else{
+        let data = req.headers.cookie.split("=");
+        const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
+        businessModel.findAll({where:{'useIdFK': token.useId}}).then( business => {
+            usersModel.findAll().then(function (usersData){
+                return res.render('viewActiInacAcco' ,{
+                    userData: token,
+                    active : -1,
+                    titlePage : 'Activar o Inactivar cuentas',
+                    business : business,
+                    users : usersData,
+                    processes : token.processes,
+                    menu : token.menu
+                })
+            })        
+        })    
+          
+    }
+}
 
+async function loadFileActiveInactive(req,res){
+    var d = new Date();
+    console.log(d.getTime())
+    newFileName= d.getTime()
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512')
+
+    try {
+        let haveGeneralError= false
+        let errorText =''
+        let quantitiProcess =0
+        const storage = multer.diskStorage({
+            destination: 'server/public/filesUpload/',
+            filename(req, file, cb) {
+              cb(null, newFileName+file.originalname)
+            },
+        });
+        const upload = pify(multer({ storage }).single('newFile'))
+        const appDir = path.dirname(require.main.filename);
+    
+        await upload(req, res)
+    
+        console.log("result2")
+        var newpath = appDir+'/server/public/filesUpload/'+newFileName+req.file.originalname
+        console.log(newpath)
+        const result = excelToJson({
+            source: fs.readFileSync(newpath)  
+        });
+        console.log("result2")  
+        for(a=1; a<result.Hoja1.length; a++){
+            let haveError= false
+            linea = a+1
+            console.log(result.Hoja1[a].A) //  2 validar que tenga papa si es el caso 
+            if(result.Hoja1[a].A== undefined){
+                haveError= true
+                errorText =errorText +'El código de la cuenta en la linea '+linea+' es requerido <br> '
+            }
+            ///codigo cuenta 1 validar que no existe,
+            const  accountingAccount = await accountingAccountModel.findOne({where: {'accIdFk':req.params.id,'aacCode': result.Hoja1[a].A}})                          
+            if(accountingAccount==undefined){
+                haveError= true
+                errorText =errorText +'El código de la cuenta '+result.Hoja1[a].A+' en la linea '+linea+' no existe <br> '
+            }
+            
+            if(!haveError){
+                accountingAccountModel.update({            
+                        useIdFk: token.useId,        
+                        aacStatus: req.query.aacStatus,    
+                        updateAt: moment(new Date()).format('YYYY-MM-DD')
+                    }, {where : {'aacCode': {[sequelize.Op.like]: `${result.Hoja1[a].A}%`}}}).then(function () {
+                    quantitiProcess =quantitiProcess+1
+                })
+            }
+            else{
+                haveGeneralError = true 
+            }
+        }
+
+        if(haveGeneralError){
+            return res.status(400).json({ message: errorText });   
+        }
+        else{
+            return res.status(200).json({ message: "Se ha procesado con exito." });
+        }
+    }
+    catch (error){
+        return res.status(400).json({ message: error.message });
+    }
+}
 
 module.exports = {
     viewMantenanceAcco,
@@ -406,4 +498,6 @@ module.exports = {
     getAccountingAccountSearch,
     loadFile,
     activeInactiveAccount,
+    viewActiInacAcco,
+    loadFileActiveInactive,
 }

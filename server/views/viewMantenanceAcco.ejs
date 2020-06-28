@@ -384,6 +384,7 @@
         $('#aacId').val(aacId)
         /// catalogo ????
         $('#aacCode').val($('#listAsignPermit').bootstrapTable('getData')[index].aacCode)
+        $('#aacCodeToSave').val($('#listAsignPermit').bootstrapTable('getData')[index].aacCode)
         
         $('#aacName').val($('#listAsignPermit').bootstrapTable('getData')[index].aacName)
         console.log($('#listAsignPermit').bootstrapTable('getData')[index].aacType)
@@ -470,7 +471,7 @@
 
         $.ajax({
             type: "POST",
-			url: "/contab/activeInactiveAccount/"+$('#aacId').val()+"?status="+status,		
+			url: "/contab/activeInactiveAccount/"+$('#aacId').val()+"?status="+status+"&aacCode="+$('#aacCodeToSave').val(),		
             beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
                 showIsLoading("Procesando...");
             }
