@@ -179,14 +179,15 @@ async function getAccountingAccountSearch(req, res){
 
 async function loadFile (req,res){
     var d = new Date();
-    console.log(d.getTime())
     newFileName= d.getTime()
     let data = req.headers.cookie.split("=");
     const token =  jwt.decode(data[1],'b33dd00.@','HS512')
 
     try {
         let haveGeneralError= false
+        let haveExito = false
         let errorText =''
+        let messageText = ''
         const storage = multer.diskStorage({
             destination: 'server/public/filesUpload/',
             filename(req, file, cb) {
@@ -198,19 +199,15 @@ async function loadFile (req,res){
     
         await upload(req, res)
     
-        console.log("result2")
         var newpath = appDir+'/server/public/filesUpload/'+newFileName+req.file.originalname
-        console.log(newpath)
         const result = excelToJson({
             source: fs.readFileSync(newpath)  
         });
-        console.log("result2")
-        console.log(result)
         // busco el catalogo
         const accountCatalog = await accountingCatalogModel.findOne({where: {'accId': req.params.id}}) 
 
         const jsonData = JSON.parse(accountCatalog.accNivels)
-
+        let nivel1= jsonData.accNivel1*1
         let nivel2= jsonData.accNivel1*1+jsonData.accNivel2*1
         let nivel3= nivel2+jsonData.accNivel3*1
         let nivel4= nivel3+jsonData.accNivel4*1
@@ -225,9 +222,9 @@ async function loadFile (req,res){
             
         // console.log(jsonData)
         for(a=1; a<result.Hoja1.length; a++){
-            let haveError= false
+            let haveError= false            
             linea = a+1
-            console.log(result.Hoja1[a].A) //  2 validar que tenga papa si es el caso 
+            //console.log(result.Hoja1[a].A) //  2 validar que tenga papa si es el caso 
             if(result.Hoja1[a].A== undefined){
                 haveError= true
                 errorText =errorText +'El código de la cuenta en la linea '+linea+' es requerido <br> '
@@ -239,27 +236,37 @@ async function loadFile (req,res){
             let aacNivelFirst=''
             let aacNivelBefore =''
             let dataMask= result.Hoja1[a].A
-            dataMask = dataMask.replace(accountCatalog.accSeparator,'','all');
+             //validar que el separador sea el indicado
+            let haveSeparator = false
+            if(dataMask.includes(accountCatalog.accSeparator) ){
+                haveSeparator= true
+            }
+            dataMask = dataMask.replace(new RegExp(accountCatalog.accSeparator, 'g'),'')                   
+            // console.log('dataMask', dataMask)
             for(var c=0;  c<dataMask.length; c++){	
-                if(accountCatalog.accNivel1==c||nivel2==c||nivel3==c||nivel4==c||nivel5==c||nivel6==c||nivel7==c||nivel8==c||nivel9==c||nivel10==c||nivel11==c||nivel12==c){
-                    aacNivelBefore= newDataWithMask
+                if(nivel1==(c+1)||nivel2==(c+1)||nivel3==(c+1)||nivel4==(c+1)||nivel5==(c+1)||nivel6==(c+1)||nivel7==(c+1)||nivel8==(c+1)||nivel9==(c+1)||nivel10==(c+1)||nivel11==(c+1)||nivel12==(c+1)){                    
+                    newDataWithMask = newDataWithMask+dataMask.charAt(c)	
                     if(accountCatalog.accNivel1==c){
                         aacNivelFirst= newDataWithMask
                     }
                     levelToSave = levelToSave+1
-                    
-                    if(dataMask.charAt(c+1)!=accountCatalog.accSeparator){
-                        // error no contiene los separadores
-                        newDataWithMask =newDataWithMask+accountCatalog.accSeparator
-                    }
-                    else{
-                        //
-                        console.log('si tiene separador')
-                    }
+                    if(c<(dataMask.length-1)){
+                        aacNivelBefore= newDataWithMask
+                        newDataWithMask =newDataWithMask+accountCatalog.accSeparator 
+                    }                            
+                }
+                else{
+                    newDataWithMask = newDataWithMask+dataMask.charAt(c)		
                 }	            															
-                newDataWithMask = newDataWithMask+dataMask.charAt(c)		
+                
             }
-            console.log('newDataWithMask',newDataWithMask)
+            // console.log('newDataWithMask',newDataWithMask)
+            // console.log('aacNivelBefore',aacNivelBefore)
+            if(!haveSeparator && levelToSave >1){
+                haveError= true
+                errorText =errorText +'El separador del código de la cuenta en la linea '+linea+' no es el indicado a usar. <br> '
+            } 
+          
             if(
                 (levelToSave == 1 && jsonData.accNivel1!=dataMask.length) 
                 || (levelToSave == 2 && nivel2!=dataMask.length)|| (levelToSave == 3 && nivel3!=dataMask.length)|| (levelToSave == 4 && nivel4!=dataMask.length)
@@ -268,13 +275,11 @@ async function loadFile (req,res){
                 || (levelToSave == 11 && nivel11!=dataMask.length)|| (levelToSave == 12 && nivel12!=dataMask.length)
                 ){
                 console.log('dataMask.length',dataMask.length)
-                console.log('nivel3',nivel3)
+                console.log('levelToSave',levelToSave)
                 
                 haveError= true
                 errorText =errorText +'El tamaño del código de la cuenta en la linea '+linea+' no tiene la longitud requerida <br> '
             }
-            console.log('arriba',result.Hoja1[a].A)
-            console.log('aarriba',a)
             ///codigo cuenta 1 validar que no existe,
             const  accountingAccount = await accountingAccountModel.findOne({where: {'accIdFk':req.params.id,'aacCode': result.Hoja1[a].A}})                          
             if(accountingAccount!=undefined){
@@ -284,22 +289,19 @@ async function loadFile (req,res){
 
             // verificar la cuenta padre
             if(levelToSave>1){
-                console.log("aacNivelBefore",aacNivelBefore)
+                // console.log("aacNivelBefore",aacNivelBefore)
                 const accountingAccountRaiz = await accountingAccountModel.findOne({where: {'accIdFk': req.params.id,'aacCode': aacNivelBefore}})
-                console.log('accountingAccountRaiz', accountingAccountRaiz)
-                if(accountingAccountRaiz.length==0){
+                if(accountingAccountRaiz==undefined){
                     haveError= true
                     errorText =errorText +'El código de la cuenta '+result.Hoja1[a].A+' en la linea '+linea+', la cuenta raiz no existe <br> '
                 }
             }
-
-            console.log('a',a)
-            console.log(result.Hoja1[a].B) //nombre
+            // console.log(result.Hoja1[a].B) //nombre
             if(result.Hoja1[a].B== undefined){
                 haveError= true
                 errorText =errorText +'El nombre de la cuenta en la linea '+linea+' es requerido <br> '
             }
-            console.log(result.Hoja1[a].C) // Tipo de cuenta
+            // console.log(result.Hoja1[a].C) // Tipo de cuenta
             if(result.Hoja1[a].C== undefined){
                 haveError= true
                 errorText =errorText +'El tipo de la cuenta en la linea '+linea+' es requerido <br> '
@@ -315,7 +317,7 @@ async function loadFile (req,res){
             // 5=Costos Ventas 
             // 6=Gastos
             // 7=Gastos Produccion
-            console.log(result.Hoja1[a].D) // Tipo de saldo 1=Deudor 2= Acreedor
+            // console.log(result.Hoja1[a].D) // Tipo de saldo 1=Deudor 2= Acreedor
             if(result.Hoja1[a].D== undefined){
                 haveError= true
                 errorText =errorText +'El tipo de saldo de la cuenta en la linea '+linea+' es requerido <br> '
@@ -324,7 +326,7 @@ async function loadFile (req,res){
                 haveError= true
                 errorText =errorText +'El valor tipo de saldo de la cuenta en la linea '+linea+' es invalido <br> '
             }
-            console.log(result.Hoja1[a].E) // Moneda 1= Colon 2= Dolar
+            // console.log(result.Hoja1[a].E) // Moneda 1= Colon 2= Dolar
             if(result.Hoja1[a].E== undefined){
                 haveError= true
                 errorText =errorText +'El tipo de moneda de la cuenta en la linea '+linea+' es requerido <br> '
@@ -357,13 +359,12 @@ async function loadFile (req,res){
                     createdAt: moment(new Date()).format('YYYY-MM-DD'),
                     updateAt: moment(new Date()).format('YYYY-MM-DD')
                 });
-                dataToSave.save().then(function (error) {
-                    if(error){
-                        haveError= true                
-                        errorText =errorText +'Error al guardar la linea '+linea+' razon'+error.message+' <br> '
-                    }
-                    
-                })
+
+                const letDataToSave = await dataToSave.save()                
+                if(letDataToSave!=undefined){
+                    haveExito= true                
+                    messageText =messageText +'La linea '+linea+' se guardo exitosamente. <br> '
+                }
             }
             else{
                 haveGeneralError = true
@@ -371,10 +372,13 @@ async function loadFile (req,res){
         }
 
         if(haveGeneralError){
+            if(haveExito){
+                errorText = errorText+messageText
+            }
             return res.status(400).json({ message: errorText });   
         }
         else{
-            return res.status(200).json({ message: "Se ha procesado con exito." });
+            return res.status(200).json({ message: messageText });
         }
         
     } catch (error) {
@@ -443,17 +447,15 @@ async function loadFileActiveInactive(req,res){
     
         await upload(req, res)
     
-        console.log("result2")
         var newpath = appDir+'/server/public/filesUpload/'+newFileName+req.file.originalname
-        console.log(newpath)
+        // console.log(newpath)
         const result = excelToJson({
             source: fs.readFileSync(newpath)  
         });
-        console.log("result2")  
         for(a=1; a<result.Hoja1.length; a++){
             let haveError= false
             linea = a+1
-            console.log(result.Hoja1[a].A) //  2 validar que tenga papa si es el caso 
+            //console.log(result.Hoja1[a].A) //  2 validar que tenga papa si es el caso 
             if(result.Hoja1[a].A== undefined){
                 haveError= true
                 errorText =errorText +'El código de la cuenta en la linea '+linea+' es requerido <br> '
