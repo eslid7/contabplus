@@ -260,16 +260,19 @@ function definedAccountingCatalog(req, res){
     }
 }
 
-function saveDefinedAccountingCatalog(req, res){   
+async function saveDefinedAccountingCatalog(req, res){   
     let data = req.headers.cookie.split("=");
     const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
 
     //agregar validacion de solo un catalogo
-    definedAccountingCatalogModel.findAll({where:{accIdFk: req.body.accId, busIdFk: req.body.busId}}).then(definedAccountingCatalog=>{
-        if(definedAccountingCatalog.length > 0){
-            res.status(400).json({ message: "Ya existe un catálogo definido para la empresa." });
-        }
-        else{
+    const definedAccountingCatalog = await definedAccountingCatalogModel.findAll({where:{accIdFk: req.body.accId, busIdFk: req.body.busId}})
+    if(definedAccountingCatalog.length > 0){
+        res.status(400).json({ message: "Ya existe un catálogo definido para la empresa." });
+    }
+    else{
+        //validar que si es un catalogo individual no tenga ya una asignacion
+        const accountCatalog = await accountingCatalogModel.findOne({where: {'accId': req.body.accId}})  
+        if(accountCatalog.accIsGlobal){
             const dataToSave = new definedAccountingCatalogModel({
                 accIdFk: req.body.accId,
                 useIdFk: token.useId,
@@ -281,8 +284,15 @@ function saveDefinedAccountingCatalog(req, res){
                 res.status(200).json({ message: "Se ha creado con exito" });
             })
         }
+        else{
+            const definedAccountingCatalogOtherB = await definedAccountingCatalogModel.findAll({where:{accIdFk: req.body.accId}})
+            if(definedAccountingCatalogOtherB.length > 0){
+                res.status(400).json({ message: "El catálogo individual solo puede asignarse a una empresa." });
+            }
+        }
+    }
 
-    })    
+    
 }
 
 module.exports = {

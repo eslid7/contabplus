@@ -64,6 +64,7 @@ router.route('/getAccountingAccount/:id').get(accountingAccountController.getAcc
 router.route('/getAccountingAccountSearch/:id').get(accountingAccountController.getAccountingAccountSearch);
 router.route('/loadFile/:id').post(accountingAccountController.loadFile);
 router.route('/activeInactiveAccount/:id').post(accountingAccountController.activeInactiveAccount);
+router.route('/deleteAccount/:id').post(accountingAccountController.deleteAccount);
 router.route('/viewActiInacAcco').get(accountingAccountController.viewActiInacAcco);
 router.route('/loadFileActiveInactive/:id').post(accountingAccountController.loadFileActiveInactive);
 

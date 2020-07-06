@@ -1,5 +1,6 @@
 const businessModel = require('../models/business')
 const usersModel = require('../models/users')
+const deleteAccountingAccountModel = require('../models/deleteAccountingAccount');
 const accountingAccountModel = require('../models/accountingAccount')
 const accountingCatalogModel = require('../models/accountingCatalog');
 const moment = require('moment')
@@ -203,171 +204,186 @@ async function loadFile (req,res){
         const result = excelToJson({
             source: fs.readFileSync(newpath)  
         });
-        // busco el catalogo
-        const accountCatalog = await accountingCatalogModel.findOne({where: {'accId': req.params.id}}) 
 
-        const jsonData = JSON.parse(accountCatalog.accNivels)
-        let nivel1= jsonData.accNivel1*1
-        let nivel2= jsonData.accNivel1*1+jsonData.accNivel2*1
-        let nivel3= nivel2+jsonData.accNivel3*1
-        let nivel4= nivel3+jsonData.accNivel4*1
-        let nivel5= nivel4+jsonData.accNivel5*1
-        let nivel6= nivel5+jsonData.accNivel6*1
-        let nivel7= nivel6+jsonData.accNivel7*1
-        let nivel8= nivel7+jsonData.accNivel8*1
-        let nivel9= nivel8+jsonData.accNivel9*1
-        let nivel10= nivel9+jsonData.accNivel10*1
-        let nivel11= nivel10+jsonData.accNivel11*1
-        let nivel12= nivel11+jsonData.accNivel12*1
-            
-        // console.log(jsonData)
-        for(a=1; a<result.Hoja1.length; a++){
-            let haveError= false            
-            linea = a+1
-            //console.log(result.Hoja1[a].A) //  2 validar que tenga papa si es el caso 
-            if(result.Hoja1[a].A== undefined){
-                haveError= true
-                errorText =errorText +'El código de la cuenta en la linea '+linea+' es requerido <br> '
-            }
-            //validar el tamaño de la cuenta con respecto al nivel
-            // buscar que nivel y si el nivel es padre 
-            let newDataWithMask=''
-            let levelToSave = 0
-            let aacNivelFirst=''
-            let aacNivelBefore =''
-            let dataMask= result.Hoja1[a].A
-             //validar que el separador sea el indicado
-            let haveSeparator = false
-            if(dataMask.includes(accountCatalog.accSeparator) ){
-                haveSeparator= true
-            }
-            dataMask = dataMask.replace(new RegExp(accountCatalog.accSeparator, 'g'),'')                   
-            // console.log('dataMask', dataMask)
-            for(var c=0;  c<dataMask.length; c++){	
-                if(nivel1==(c+1)||nivel2==(c+1)||nivel3==(c+1)||nivel4==(c+1)||nivel5==(c+1)||nivel6==(c+1)||nivel7==(c+1)||nivel8==(c+1)||nivel9==(c+1)||nivel10==(c+1)||nivel11==(c+1)||nivel12==(c+1)){                    
-                    newDataWithMask = newDataWithMask+dataMask.charAt(c)	
-                    if(accountCatalog.accNivel1==c){
-                        aacNivelFirst= newDataWithMask
+        if(result.Hoja1==undefined){
+            haveGeneralError= true
+            errorText =errorText +'El nombre de la hoja es distinto, debe llamarse Hoja1 <br> ' 
+        }
+        else{
+                
+            // busco el catalogo
+            const accountCatalog = await accountingCatalogModel.findOne({where: {'accId': req.params.id}}) 
+
+            const jsonData = JSON.parse(accountCatalog.accNivels)
+            let nivel1= jsonData.accNivel1*1
+            let nivel2= jsonData.accNivel1*1+jsonData.accNivel2*1
+            let nivel3= nivel2+jsonData.accNivel3*1
+            let nivel4= nivel3+jsonData.accNivel4*1
+            let nivel5= nivel4+jsonData.accNivel5*1
+            let nivel6= nivel5+jsonData.accNivel6*1
+            let nivel7= nivel6+jsonData.accNivel7*1
+            let nivel8= nivel7+jsonData.accNivel8*1
+            let nivel9= nivel8+jsonData.accNivel9*1
+            let nivel10= nivel9+jsonData.accNivel10*1
+            let nivel11= nivel10+jsonData.accNivel11*1
+            let nivel12= nivel11+jsonData.accNivel12*1
+                
+            // console.log(jsonData)
+            for(a=1; a<result.Hoja1.length; a++){
+                let haveError= false            
+                linea = a+1
+                //console.log(result.Hoja1[a].A) //  2 validar que tenga papa si es el caso 
+                if(result.Hoja1[a].A== undefined){
+                    haveError= true
+                    errorText =errorText +'El código de la cuenta en la linea '+linea+' es requerido <br> '
+                }
+                //validar el tamaño de la cuenta con respecto al nivel
+                // buscar que nivel y si el nivel es padre 
+                let newDataWithMask=''
+                let levelToSave = 0
+                let aacNivelFirst=''
+                let aacNivelBefore =''
+                let dataMask= result.Hoja1[a].A
+                //validar que el separador sea el indicado
+                let haveSeparator = false
+                if(dataMask.includes(accountCatalog.accSeparator) ){
+                    haveSeparator= true
+                }
+                dataMask = dataMask.replace(new RegExp(accountCatalog.accSeparator, 'g'),'')                   
+                // console.log('dataMask', dataMask)
+                for(var c=0;  c<dataMask.length; c++){	
+                    if(nivel1==(c+1)||nivel2==(c+1)||nivel3==(c+1)||nivel4==(c+1)||nivel5==(c+1)||nivel6==(c+1)||nivel7==(c+1)||nivel8==(c+1)||nivel9==(c+1)||nivel10==(c+1)||nivel11==(c+1)||nivel12==(c+1)){                    
+                        newDataWithMask = newDataWithMask+dataMask.charAt(c)	
+                        if(nivel1==(c+1)){
+                            aacNivelFirst= newDataWithMask
+                        }
+                        levelToSave = levelToSave+1
+                        if(c<(dataMask.length-1)){
+                            aacNivelBefore= newDataWithMask
+                            newDataWithMask =newDataWithMask+accountCatalog.accSeparator 
+                        }                            
                     }
-                    levelToSave = levelToSave+1
-                    if(c<(dataMask.length-1)){
-                        aacNivelBefore= newDataWithMask
-                        newDataWithMask =newDataWithMask+accountCatalog.accSeparator 
-                    }                            
+                    else{
+                        newDataWithMask = newDataWithMask+dataMask.charAt(c)		
+                    }	            															                                        
+                }
+                // console.log('newDataWithMask',newDataWithMask)
+                // console.log('aacNivelBefore',aacNivelBefore)
+                if(!haveSeparator && levelToSave >1){
+                    haveError= true
+                    errorText =errorText +'El separador del código de la cuenta en la linea '+linea+' no es el indicado a usar. <br> '
+                } 
+            
+                if(
+                    (levelToSave == 1 && jsonData.accNivel1!=dataMask.length) 
+                    || (levelToSave == 2 && nivel2!=dataMask.length)|| (levelToSave == 3 && nivel3!=dataMask.length)|| (levelToSave == 4 && nivel4!=dataMask.length)
+                    || (levelToSave == 5 && nivel5!=dataMask.length)|| (levelToSave == 6 && nivel6!=dataMask.length)|| (levelToSave == 7 && nivel7!=dataMask.length)
+                    || (levelToSave == 8 && nivel8!=dataMask.length)|| (levelToSave == 9 && nivel9!=dataMask.length)|| (levelToSave == 10 && nivel10!=dataMask.length)
+                    || (levelToSave == 11 && nivel11!=dataMask.length)|| (levelToSave == 12 && nivel12!=dataMask.length)
+                    ){
+                    console.log('dataMask.length',dataMask.length)
+                    console.log('levelToSave',levelToSave)
+                    
+                    haveError= true
+                    errorText =errorText +'El tamaño del código de la cuenta en la linea '+linea+' no tiene la longitud requerida <br> '
+                }
+                ///codigo cuenta 1 validar que no existe,
+                const  accountingAccount = await accountingAccountModel.findOne({where: {'accIdFk':req.params.id,'aacCode': result.Hoja1[a].A}})                          
+                if(accountingAccount!=undefined){
+                    haveError= true
+                    errorText =errorText +'El código de la cuenta '+result.Hoja1[a].A+' en la linea '+linea+' ya existe <br> '
+                }
+
+                // verificar la cuenta padre
+                if(levelToSave>1){
+                    // console.log("aacNivelBefore",aacNivelBefore)
+                    let accountingAccountRaiz = await accountingAccountModel.findOne({where: {'accIdFk': req.params.id,'aacCode': aacNivelBefore}})
+                    if(accountingAccountRaiz==undefined){
+                        haveError= true
+                        errorText =errorText +'El código de la cuenta '+result.Hoja1[a].A+' en la linea '+linea+', la cuenta raiz no existe <br> '
+                    }
+                }
+                // console.log(result.Hoja1[a].B) //nombre
+                if(result.Hoja1[a].B== undefined){
+                    haveError= true
+                    errorText =errorText +'El nombre de la cuenta en la linea '+linea+' es requerido <br> '
+                }
+                // console.log(result.Hoja1[a].C) // Tipo de cuenta
+                if(result.Hoja1[a].C== undefined){
+                    haveError= true
+                    errorText =errorText +'El tipo de la cuenta en la linea '+linea+' es requerido <br> '
+                }
+                // valida que el tipo de cuenta no sea diferente                
+                if(levelToSave>1){
+                    let accountingAccountMother = await accountingAccountModel.findOne({where: {'accIdFk': req.params.id,'aacCode': aacNivelFirst}})
+                    if(accountingAccountMother!=undefined && accountingAccountMother.aacType!=result.Hoja1[a].C){
+                        haveError= true
+                        errorText =errorText +'El tipo de cuenta en la linea '+linea+', la cuenta raiz tiene un tipo de cuenta distinto al ingresado, favor revisar. <br> '
+                    }
+                }
+                if(result.Hoja1[a].C!= 1&&result.Hoja1[a].C!= 2&&result.Hoja1[a].C!= 3&&result.Hoja1[a].C!= 4&&result.Hoja1[a].C!= 5&&result.Hoja1[a].C!= 6 && result.Hoja1[a].C!= 7){
+                    haveError= true
+                    errorText =errorText +'El valor del tipo de la cuenta en la linea '+linea+' es invalido <br> '
+                }
+                // 1=Activo
+                // 2=Pasivo
+                // 3=Patrimonio
+                // 4=Ingresos
+                // 5=Costos Ventas 
+                // 6=Gastos
+                // 7=Gastos Produccion
+                // console.log(result.Hoja1[a].D) // Tipo de saldo 1=Deudor 2= Acreedor
+                if(result.Hoja1[a].D== undefined){
+                    haveError= true
+                    errorText =errorText +'El tipo de saldo de la cuenta en la linea '+linea+' es requerido <br> '
+                }
+                if(result.Hoja1[a].D!= 1&&result.Hoja1[a].D!= 2){
+                    haveError= true
+                    errorText =errorText +'El valor tipo de saldo de la cuenta en la linea '+linea+' es invalido <br> '
+                }
+                // console.log(result.Hoja1[a].E) // Moneda 1= Colon 2= Dolar
+                if(result.Hoja1[a].E== undefined){
+                    haveError= true
+                    errorText =errorText +'El tipo de moneda de la cuenta en la linea '+linea+' es requerido <br> '
+                }
+                if(result.Hoja1[a].E!= 1&&result.Hoja1[a].E!= 2){
+                    haveError= true                
+                    errorText =errorText +'El valor tipo de moneda de la cuenta en la linea '+linea+' es invalido <br> '
+                }
+                let aacFuncionality =''
+                if(result.Hoja1[a].F != undefined){
+                    aacFuncionality=result.Hoja1[a].F
+                }
+                let aacObservations =''
+                if(result.Hoja1[a].G != undefined){
+                    aacObservations=result.Hoja1[a].G
+                }
+                if(!haveError){
+                    const dataToSave = new accountingAccountModel({
+                        accIdFk: req.params.id,
+                        busIdFk: req.query.busId,
+                        useIdFk: token.useId,        
+                        aacCode: result.Hoja1[a].A,
+                        aacName: result.Hoja1[a].B,
+                        aacType: result.Hoja1[a].C,
+                        aacTypeBalance: result.Hoja1[a].D,
+                        aacFuncionality: aacFuncionality,
+                        aacObservations: aacObservations,
+                        aacStatus: 1,
+                        aacMoney: result.Hoja1[a].E,        
+                        createdAt: moment(new Date()).format('YYYY-MM-DD'),
+                        updateAt: moment(new Date()).format('YYYY-MM-DD')
+                    });
+
+                    const letDataToSave = await dataToSave.save()                
+                    if(letDataToSave!=undefined){
+                        haveExito= true                
+                        messageText =messageText +'La linea '+linea+' se guardo exitosamente. <br> '
+                    }
                 }
                 else{
-                    newDataWithMask = newDataWithMask+dataMask.charAt(c)		
-                }	            															
-                
-            }
-            // console.log('newDataWithMask',newDataWithMask)
-            // console.log('aacNivelBefore',aacNivelBefore)
-            if(!haveSeparator && levelToSave >1){
-                haveError= true
-                errorText =errorText +'El separador del código de la cuenta en la linea '+linea+' no es el indicado a usar. <br> '
-            } 
-          
-            if(
-                (levelToSave == 1 && jsonData.accNivel1!=dataMask.length) 
-                || (levelToSave == 2 && nivel2!=dataMask.length)|| (levelToSave == 3 && nivel3!=dataMask.length)|| (levelToSave == 4 && nivel4!=dataMask.length)
-                || (levelToSave == 5 && nivel5!=dataMask.length)|| (levelToSave == 6 && nivel6!=dataMask.length)|| (levelToSave == 7 && nivel7!=dataMask.length)
-                || (levelToSave == 8 && nivel8!=dataMask.length)|| (levelToSave == 9 && nivel9!=dataMask.length)|| (levelToSave == 10 && nivel10!=dataMask.length)
-                || (levelToSave == 11 && nivel11!=dataMask.length)|| (levelToSave == 12 && nivel12!=dataMask.length)
-                ){
-                console.log('dataMask.length',dataMask.length)
-                console.log('levelToSave',levelToSave)
-                
-                haveError= true
-                errorText =errorText +'El tamaño del código de la cuenta en la linea '+linea+' no tiene la longitud requerida <br> '
-            }
-            ///codigo cuenta 1 validar que no existe,
-            const  accountingAccount = await accountingAccountModel.findOne({where: {'accIdFk':req.params.id,'aacCode': result.Hoja1[a].A}})                          
-            if(accountingAccount!=undefined){
-                haveError= true
-                errorText =errorText +'El código de la cuenta '+result.Hoja1[a].A+' en la linea '+linea+' ya existe <br> '
-            }
-
-            // verificar la cuenta padre
-            if(levelToSave>1){
-                // console.log("aacNivelBefore",aacNivelBefore)
-                const accountingAccountRaiz = await accountingAccountModel.findOne({where: {'accIdFk': req.params.id,'aacCode': aacNivelBefore}})
-                if(accountingAccountRaiz==undefined){
-                    haveError= true
-                    errorText =errorText +'El código de la cuenta '+result.Hoja1[a].A+' en la linea '+linea+', la cuenta raiz no existe <br> '
+                    haveGeneralError = true
                 }
-            }
-            // console.log(result.Hoja1[a].B) //nombre
-            if(result.Hoja1[a].B== undefined){
-                haveError= true
-                errorText =errorText +'El nombre de la cuenta en la linea '+linea+' es requerido <br> '
-            }
-            // console.log(result.Hoja1[a].C) // Tipo de cuenta
-            if(result.Hoja1[a].C== undefined){
-                haveError= true
-                errorText =errorText +'El tipo de la cuenta en la linea '+linea+' es requerido <br> '
-            }
-            if(result.Hoja1[a].C!= 1&&result.Hoja1[a].C!= 2&&result.Hoja1[a].C!= 3&&result.Hoja1[a].C!= 4&&result.Hoja1[a].C!= 5&&result.Hoja1[a].C!= 6 && result.Hoja1[a].C!= 7){
-                haveError= true
-                errorText =errorText +'El valor del tipo de la cuenta en la linea '+linea+' es invalido <br> '
-            }
-            // 1=Activo
-            // 2=Pasivo
-            // 3=Patrimonio
-            // 4=Ingresos
-            // 5=Costos Ventas 
-            // 6=Gastos
-            // 7=Gastos Produccion
-            // console.log(result.Hoja1[a].D) // Tipo de saldo 1=Deudor 2= Acreedor
-            if(result.Hoja1[a].D== undefined){
-                haveError= true
-                errorText =errorText +'El tipo de saldo de la cuenta en la linea '+linea+' es requerido <br> '
-            }
-            if(result.Hoja1[a].D!= 1&&result.Hoja1[a].D!= 2){
-                haveError= true
-                errorText =errorText +'El valor tipo de saldo de la cuenta en la linea '+linea+' es invalido <br> '
-            }
-            // console.log(result.Hoja1[a].E) // Moneda 1= Colon 2= Dolar
-            if(result.Hoja1[a].E== undefined){
-                haveError= true
-                errorText =errorText +'El tipo de moneda de la cuenta en la linea '+linea+' es requerido <br> '
-            }
-            if(result.Hoja1[a].E!= 1&&result.Hoja1[a].E!= 2){
-                haveError= true                
-                errorText =errorText +'El valor tipo de moneda de la cuenta en la linea '+linea+' es invalido <br> '
-            }
-            let aacFuncionality =''
-            if(result.Hoja1[a].F != undefined){
-                aacFuncionality=result.Hoja1[a].F
-            }
-            let aacObservations =''
-            if(result.Hoja1[a].G != undefined){
-                aacObservations=result.Hoja1[a].G
-            }
-            if(!haveError){
-                const dataToSave = new accountingAccountModel({
-                    accIdFk: req.params.id,
-                    busIdFk: req.query.busId,
-                    useIdFk: token.useId,        
-                    aacCode: result.Hoja1[a].A,
-                    aacName: result.Hoja1[a].B,
-                    aacType: result.Hoja1[a].C,
-                    aacTypeBalance: result.Hoja1[a].D,
-                    aacFuncionality: aacFuncionality,
-                    aacObservations: aacObservations,
-                    aacStatus: 1,
-                    aacMoney: result.Hoja1[a].E,        
-                    createdAt: moment(new Date()).format('YYYY-MM-DD'),
-                    updateAt: moment(new Date()).format('YYYY-MM-DD')
-                });
-
-                const letDataToSave = await dataToSave.save()                
-                if(letDataToSave!=undefined){
-                    haveExito= true                
-                    messageText =messageText +'La linea '+linea+' se guardo exitosamente. <br> '
-                }
-            }
-            else{
-                haveGeneralError = true
             }
         }
 
@@ -388,17 +404,43 @@ async function loadFile (req,res){
 
 }
 
-function activeInactiveAccount(req, res){
+async function activeInactiveAccount(req, res){
     let data = req.headers.cookie.split("=");
     const token =  jwt.decode(data[1],'b33dd00.@','HS512')
-
-    accountingAccountModel.update({            
-            useIdFk: token.useId,        
-            aacStatus: req.query.status,    
-            updateAt: moment(new Date()).format('YYYY-MM-DD')
-        }, {where : {'aacCode': {[sequelize.Op.like]: `${req.query.aacCode}%`}}}).then(function () {
-        return  res.status(200).json({ message: "Se ha actualizado con exito" });
-    })
+    // Buscar el catalogo
+    const accountCatalog = await accountingCatalogModel.findOne({where: {'accId': req.params.id}}) 
+    let accountRaiz =''
+    let haveErrorRaizInative = false
+    if(req.query.status==1 && accountCatalog.accSeparator){
+        let dataArray = req.query.aacCode.split(accountCatalog.accSeparator)
+        for(i=0; i<(dataArray.length-1); i++ ){
+            if(i==0){
+                accountRaiz = dataArray[i]
+            }
+            else{
+                accountRaiz = accountRaiz+accountCatalog.accSeparator+dataArray[i]
+            }
+            console.log('accountRaiz', accountRaiz)
+            let  accountingAccountRaiz = await accountingAccountModel.findOne({where: {'accIdFk':req.params.id,'aacCode': accountRaiz}})                          
+            if(accountingAccountRaiz.aacStatus==0){
+                haveErrorRaizInative= true   
+                break                                             
+            }
+        }
+        if(haveErrorRaizInative){
+            errorText = 'La cuenta '+req.query.aacCode+' la raiz '+accountRaiz+' esta inactiva. Se debe activar la raíz. <br> '
+            return  res.status(400).json({ message: errorText });
+        }
+    }
+    if(!haveErrorRaizInative){
+        accountingAccountModel.update({            
+                useIdFk: token.useId,        
+                aacStatus: req.query.status,    
+                updateAt: moment(new Date()).format('YYYY-MM-DD')
+            }, {where : {'accIdFk': req.params.id, 'aacCode': {[sequelize.Op.like]: `${req.query.aacCode}%`}}}).then(function () {
+            return  res.status(200).json({ message: "Se ha actualizado con exito" });
+        })
+    }
 }
 
 function viewActiInacAcco(req, res){
@@ -452,35 +494,76 @@ async function loadFileActiveInactive(req,res){
         const result = excelToJson({
             source: fs.readFileSync(newpath)  
         });
-        for(a=1; a<result.Hoja1.length; a++){
-            let haveError= false
-            linea = a+1
-            //console.log(result.Hoja1[a].A) //  2 validar que tenga papa si es el caso 
-            if(result.Hoja1[a].A== undefined){
-                haveError= true
-                errorText =errorText +'El código de la cuenta en la linea '+linea+' es requerido <br> '
+
+        if(result.Hoja1==undefined){
+            haveGeneralError= true
+            errorText =errorText +'El nombre de la hoja es distinto, debe llamarse Hoja1 <br> ' 
+        }
+        else{
+            if(result.Hoja1.length==1){
+                haveGeneralError= true
+                errorText =errorText +'No hay datos por guardar <br> ' 
             }
-            ///codigo cuenta 1 validar que no existe,
-            const  accountingAccount = await accountingAccountModel.findOne({where: {'accIdFk':req.params.id,'aacCode': result.Hoja1[a].A}})                          
-            if(accountingAccount==undefined){
-                haveError= true
-                errorText =errorText +'El código de la cuenta '+result.Hoja1[a].A+' en la linea '+linea+' no existe <br> '
-            }
-            
-            if(!haveError){
-                accountingAccountModel.update({            
-                        useIdFk: token.useId,        
-                        aacStatus: req.query.aacStatus,    
-                        updateAt: moment(new Date()).format('YYYY-MM-DD')
-                    }, {where : {'aacCode': {[sequelize.Op.like]: `${result.Hoja1[a].A}%`}}}).then(function () {
-                    quantitiProcess =quantitiProcess+1
-                })
-            }
-            else{
-                haveGeneralError = true 
+            // Buscar el catalogo
+            const accountCatalog = await accountingCatalogModel.findOne({where: {'accId': req.params.id}}) 
+
+            for(a=1; a<result.Hoja1.length; a++){
+                let haveError= false
+                linea = a+1
+                //console.log(result.Hoja1[a].A) //  2 validar que tenga papa si es el caso 
+                if(result.Hoja1[a].A== undefined){
+                    haveError= true
+                    errorText =errorText +'El código de la cuenta en la linea '+linea+' es requerido <br> '
+                }
+                ///codigo cuenta 1 validar que no existe,
+                const  accountingAccount = await accountingAccountModel.findOne({where: {'accIdFk':req.params.id,'aacCode': result.Hoja1[a].A}})                          
+                if(accountingAccount==undefined){
+                    haveError= true
+                    errorText =errorText +'El código de la cuenta '+result.Hoja1[a].A+' en la linea '+linea+' no existe <br> '
+                }
+                // si se va activar debo revisar antes que no haya una madre inactiva
+                // 001-002-002 no deben estar inactivar 001  y 001-002
+                // hacer un split del caracter separador si aplica sino....
+
+                if(req.query.aacStatus==1 && accountCatalog.accSeparator){
+                    let dataArray = result.Hoja1[a].A.split(accountCatalog.accSeparator)
+                    console.log(dataArray)
+                    let accountRaiz =''
+                    let haveErrorRaizInative = false
+                    for(i=0; i<(dataArray.length-1); i++ ){
+                        if(i==0){
+                            accountRaiz = dataArray[i]
+                        }
+                        else{
+                            accountRaiz = accountRaiz+accountCatalog.accSeparator+dataArray[i]
+                        }
+                        
+                        let  accountingAccountRaiz = await accountingAccountModel.findOne({where: {'accIdFk':req.params.id,'aacCode': accountRaiz}})                          
+                        if(accountingAccountRaiz.aacStatus==0){
+                            haveErrorRaizInative= true   
+                            break                                             
+                        }
+                    }
+                    if(haveErrorRaizInative){
+                        haveError= true
+                        errorText =errorText +'La cuenta '+result.Hoja1[a].A+' en la linea '+linea+' la raiz esta inactiva. <br> '
+                    }
+                }
+                if(!haveError){
+                    accountingAccountModel.update({            
+                            useIdFk: token.useId,        
+                            aacStatus: req.query.aacStatus,    
+                            updateAt: moment(new Date()).format('YYYY-MM-DD')
+                        }, {where : {'aacCode': {[sequelize.Op.like]: `${result.Hoja1[a].A}%`}}}).then(function () {
+                        quantitiProcess =quantitiProcess+1
+                    })
+                }
+                else{
+                    haveGeneralError = true 
+                }
             }
         }
-
+        
         if(haveGeneralError){
             return res.status(400).json({ message: errorText });   
         }
@@ -493,6 +576,39 @@ async function loadFileActiveInactive(req,res){
     }
 }
 
+async function deleteAccount(req,res){
+    //validar que no tenga movimientos registrados///////
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
+    
+    let  accountingAccount = await accountingAccountModel.findOne({where: {'aacId':req.params.id}})                          
+
+    //validar que no tenga hijas
+    let  accountingAccountOthers = await accountingAccountModel.findAll({where: {'accIdFk':accountingAccount.accIdFk,'aacCode': {[sequelize.Op.like]: `${accountingAccount.aacCode}%`}}})                          
+
+    if(accountingAccountOthers.length>1){        
+        errorText = 'La cuenta '+accountingAccount.aacCode+' tiene subcuentas asignadas, no se puede eliminar. <br> '
+        return  res.status(400).json({ message: errorText });
+    }
+    else{
+        
+        const dataToSave = new deleteAccountingAccountModel({
+            accIdFk: accountingAccount.accIdFk,
+            busIdFk: accountingAccount.busIdFk,
+            useIdFk: token.useId,        
+            aacCode: accountingAccount.aacCode,
+            aacName: accountingAccount.aacName,      
+            createdAt: moment(new Date()).format('YYYY-MM-DD'),
+            updateAt: moment(new Date()).format('YYYY-MM-DD')
+        });
+        dataToSave.save().then(function () {
+            accountingAccountModel.destroy({where: {'aacId':req.params.id}}).then(function(){
+                return res.status(200).json({ message: "Se ha eliminar con exito." });
+            })
+        })
+    }        
+}
+
 module.exports = {
     viewMantenanceAcco,
     saveAccountingAccount,
@@ -502,4 +618,5 @@ module.exports = {
     activeInactiveAccount,
     viewActiInacAcco,
     loadFileActiveInactive,
+    deleteAccount,
 }

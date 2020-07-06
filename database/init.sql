@@ -163,3 +163,14 @@ CREATE TABLE accountingAccount(
 	createdAt  TIMESTAMP,
 	updatedAt TIMESTAMP
 );
+
+CREATE TABLE deleteAccountingAccount(
+	daaId INT AUTO_INCREMENT PRIMARY KEY,
+	accIdFk INT NOT NULL,
+	busIdFk INT NOT NULL,
+	useIdFk INT NOT NULL,
+	aacCode VARCHAR(255) NOT NULL,
+	aacName VARCHAR(255) NOT NULL,
+	createdAt  TIMESTAMP,
+	updatedAt TIMESTAMP
+);

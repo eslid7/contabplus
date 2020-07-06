@@ -88,3 +88,8 @@
 		$("#correct_dialog").html(msn); // coloca el mensaje recibido
 		$(".correct_dialog").dialog("open"); //abre el dialogo con el mensaje
 	}
+	
+	function fnOpenConfirmDialog(msn) {
+		$("#confirm_message").html(msn);
+		$(".confirm_dialog").dialog("open");//llama a un modal de confirm
+	}
