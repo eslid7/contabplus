@@ -15,14 +15,7 @@
 						<div class="span12">
 							<!-- BEGIN EXAMPLE TABLE PORTLET-->
 							<div class="portlet box light-grey">
-								<div class="portlet-title">
-									
-									<div class="tools">
-										<a href="javascript:;" class="collapse"></a>
-										<a href="#portlet-config" data-toggle="modal" class="config"></a>
-										<a href="javascript:;" class="reload"></a>
-										<a href="javascript:;" class="remove"></a>
-									</div>
+								<div class="portlet-title">								
 								</div>
 								<div class="portlet-body">
 									<div class="table-toolbar">
@@ -41,7 +34,7 @@
 											</ul> -->
 										</div>
 									</div>
-									<table id="listAccountingCatalog" class="bt-table"
+									<table id="listAccountingCatalog" class="bt-table table-striped"
 										data-side-pagination="server"
 										data-pagination="true"
 										data-page-size="20"
@@ -297,10 +290,16 @@
 					sortable: true,
 					width: '5%'
 				}, {
+					field: 'accIsGlobal',
+					title: 'Tipo',
+					sortable: true,
+					width: '7%',
+					formatter: operateFormatterGlobal
+				}, {
 					field: 'accStatus',
 					title: 'Editar',
-					sortable: true,
-					width: '15%',
+					sortable: false,
+					width: '10%',
 					formatter: operateFormatterState
 				}
 			]
@@ -316,7 +315,13 @@
             "<i class='icon-pencil'></i> Editar ",
             "</button>"
         ].join('');
-    }
+	}
+	
+	function operateFormatterGlobal(value, row, index) {
+		return [
+			((row.accIsGlobal==1) ? 'Global': 'Individual')
+        ].join('');
+	}
 	//make catalog
 	$('#accountingCatalog').validate({
 		errorElement: 'label', //default input error message container

@@ -41,7 +41,7 @@
 											</ul> -->
 										</div>
 									</div>
-									<table id="listUsers" class="bt-table"
+									<table id="listUsers" class="bt-table table-striped"
 										data-side-pagination="server"
 										data-pagination="true"
 										data-page-size="20"
@@ -184,7 +184,7 @@
 					field: 'useName',
 					title: 'Nombre',
 					sortable: true,
-					width: '10%'
+					width: '20%'
 				}, {
 					field: 'useLogin',
 					title: 'Email',
@@ -194,7 +194,7 @@
 					field: 'usePhone',
 					title: 'Teléfono',
 					sortable: true,
-					width: '15%'
+					width: '10%'
 				}, {
 					field: 'usersRole.role.rolName',
 					title: 'Rol',
@@ -204,14 +204,14 @@
 					field: 'usersRole.role.rolName',
 					title: 'Editar Rol',
 					sortable: false,
-                    width: '15%',
+                    width: '11%',
                     // events: operateEvents,
 					formatter: operateFormatter
 				}, {
 					field: 'useStatus',
 					title: 'Estado',
 					sortable: false,
-                    width: '15%',
+                    width: '11%',
                     events: operateEvents2,
 					formatter: operateFormatter2
                 }

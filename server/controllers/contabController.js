@@ -30,11 +30,15 @@ function accountingCatalog(req, res){
     let data = req.headers.cookie.split("=");
     const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
     let likeData = []
+    let orderBy =[['accName','asc']]
+    if(typeof(req.query.sort) !== "undefined" && req.query.sort !== ''){
+        orderBy =[[`${req.query.sort}`,`${req.query.order}`]]
+    }
     if(typeof(req.query.search) !== "undefined" && req.query.search !== ''){
         likeData=[{'accName': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'accCode': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'accQuantityNivels': {[sequelize.Op.like]: `%${req.query.search}%`}} ]
     }
     if (typeof(req.params.id) !== "undefined") {
-        accountingCatalogModel.findAll({where:{'useIdFK': token.useId, "accId" : req.params.id}}).then( accountingCatalog => {
+        accountingCatalogModel.findAll({where:{'useIdFK': token.useId, "accId" : req.params.id}, order : orderBy}).then( accountingCatalog => {
             return res.status(200).json({accountingCatalog :accountingCatalog[0]});
         })
     }
@@ -44,7 +48,7 @@ function accountingCatalog(req, res){
                 where:{
                     'useIdFK': token.useId,
                     [sequelize.Op.or]: likeData
-                }}).then( accountingCatalog => {
+                }, order : orderBy}).then( accountingCatalog => {
                 return res.status(200).json({rows: accountingCatalog, total:accountingCatalog.length});
             })
         }
@@ -52,7 +56,7 @@ function accountingCatalog(req, res){
             accountingCatalogModel.findAll({
                 where:{
                     'useIdFK': token.useId
-                }}).then( accountingCatalog => {
+                }, order : orderBy}).then( accountingCatalog => {
                 return res.status(200).json({rows: accountingCatalog, total:accountingCatalog.length});
             })
         }    
@@ -181,17 +185,22 @@ function business(req, res){
     let data = req.headers.cookie.split("=");
     const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
     let likeData = []
+    let orderBy =[['busName','asc']]
+    if(typeof(req.query.sort) !== "undefined" && req.query.sort !== ''){
+        orderBy =[[`${req.query.sort}`,`${req.query.order}`]]
+    }
+
     if(typeof(req.query.search) !== "undefined" && req.query.search !== ''){
         likeData=[{'busName': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'busEmail': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'busPhone': {[sequelize.Op.like]: `%${req.query.search}%`}}, {'busJuriricalId': {[sequelize.Op.like]: `%${req.query.search}%`}} ]
         businessModel.findAll({
             where:{'useIdFK': token.useId,
-            [sequelize.Op.or]: likeData
-        }}).then( business => {
+            [sequelize.Op.or]: likeData            
+        }, order : orderBy}).then( business => {
             return res.status(200).json({rows: business, total:business.length});
         })
     }
     else{
-        businessModel.findAll({where:{'useIdFK': token.useId}}).then( business => {
+        businessModel.findAll({where:{'useIdFK': token.useId}, order : orderBy}).then( business => {
             return res.status(200).json({rows: business, total:business.length});
         })
     }
@@ -201,34 +210,59 @@ function business(req, res){
 function saveBusiness(req, res){
     let data = req.headers.cookie.split("=");
     const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
-    const dataToSave = new businessModel({
-        busName: req.body.busName,
-        useIdFk: token.useId,
-        busStatus: 1,
-        busJuriricalId: req.body.busJuriricalId,
-        busNameFantasy: req.body.busNameFantasy,
-        busMoney: req.body.busMoney,
-        busEmail: req.body.busEmail,
-        busPhone: req.body.busPhone,
-        createdAt: moment(new Date()).format('YYYY-MM-DD'),
-        updateAt: moment(new Date()).format('YYYY-MM-DD')
-      });
-      //se devuelve el usuaurio
-      return dataToSave.save().then(function (businessSaved) {
-        res.status(200).json({ message: "Se ha creado con exito" });
-      })
 
+    if(req.body.busId > 0){
+        businessModel.update({
+            busName: req.body.busName,
+            useIdFk: token.useId,
+            busStatus: 1,
+            busJuriricalId: req.body.busJuriricalId,
+            busNameFantasy: req.body.busNameFantasy,
+            busMoney: req.body.busMoney,
+            busEmail: req.body.busEmail,
+            busPhone: req.body.busPhone,
+            updateAt: moment(new Date()).format('YYYY-MM-DD')
+            }, {where : {'busId': req.body.busId}}).then(function () {
+            return  res.status(200).json({ message: "Se ha actualizado con exito" });
+        })
+    }
+    else{
+        const dataToSave = new businessModel({
+            busName: req.body.busName,
+            useIdFk: token.useId,
+            busStatus: 1,
+            busJuriricalId: req.body.busJuriricalId,
+            busNameFantasy: req.body.busNameFantasy,
+            busMoney: req.body.busMoney,
+            busEmail: req.body.busEmail,
+            busPhone: req.body.busPhone,
+            createdAt: moment(new Date()).format('YYYY-MM-DD'),
+            updateAt: moment(new Date()).format('YYYY-MM-DD')
+        });
+        //se devuelve el usuaurio
+        return dataToSave.save().then(function (businessSaved) {
+        res.status(200).json({ message: "Se ha creado con exito" });
+        })
+    }
 }
 
 function definedAccountingCatalog(req, res){
     let data = req.headers.cookie.split("=");
     const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
+    let orderBy =[['business','busName','ASC']]  
+    if(typeof(req.query.sort) !== "undefined" && req.query.sort !== 'busName'){
+        orderBy =[[`business`,`busName`,`${req.query.order}`]]
+    }
+    else if(typeof(req.query.sort) !== "undefined" && req.query.sort !== 'accName'){
+        orderBy =[[`accountingCatalog`,`accName`,`${req.query.order}`]]
+    }
 
     definedAccountingCatalogModel.hasOne(businessModel,{foreignKey:'busId',sourceKey: 'busIdFk'});
     definedAccountingCatalogModel.hasOne(accountingCatalogModel,{foreignKey:'accId',sourceKey: 'accIdFk'});
     
     if(typeof(req.query.search) !== "undefined" && req.query.search !== ''){      
         let likeData =  [{'$accountingCatalog.accName$': {[sequelize.Op.like]: `%${req.query.search}%`}},{'$business.busName$': {[sequelize.Op.like]: `%${req.query.search}%`}}]  
+        
         definedAccountingCatalogModel.findAll({ 
             where:{'useIdFK': token.useId,
             [sequelize.Op.or]: likeData
@@ -239,21 +273,23 @@ function definedAccountingCatalog(req, res){
             }, {  
                 model: accountingCatalogModel,
                 required: true,
-            }]
+            }] 
+            , order: orderBy    
         }).then(definedAccountingCatalog =>{        
             return res.status(200).json({rows: definedAccountingCatalog, total:definedAccountingCatalog.length});
         })
     }
     else{
-
         definedAccountingCatalogModel.findAll({where:{'useIdFK': token.useId},
             include: [{
                 model: businessModel,
-                require : true
+                require : true,
+                as: 'business'
             }, {  
                 model: accountingCatalogModel,
                 required: true
             }]
+            , order: orderBy
         }).then(definedAccountingCatalog =>{        
             return res.status(200).json({rows: definedAccountingCatalog, total:definedAccountingCatalog.length});
         })

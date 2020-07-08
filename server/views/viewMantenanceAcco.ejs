@@ -268,7 +268,7 @@
                                                 </div>
                                             </div>
                                             <div class="control-group span7 " style="height: 420px;">
-                                                   <table id="listAsignPermit" class="bt-table" 
+                                                   <table id="listAsignPermit" class="bt-table table-striped" 
                                                         data-side-pagination="server"
                                                         data-pagination="true"
                                                         data-page-size="10"
@@ -371,7 +371,7 @@
 				}, {
 					field: 'aacId',
 					title: 'Editar',
-					sortable: true,
+					sortable: false,
 					width: '5%',
 					formatter: operateFormatterEdit
 				}
@@ -388,7 +388,7 @@
         ].join('');
     }
     function seeData(aacId, index){
-        console.log($('#listAsignPermit').bootstrapTable('getData')[index])
+        // console.log($('#listAsignPermit').bootstrapTable('getData')[index])
         console.log(aacId)
         $('#aacId').val(aacId)
         /// catalogo ????

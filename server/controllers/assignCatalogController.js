@@ -65,7 +65,11 @@ function getCatalogs(req, res){
 
 function listHistory(req, res){
     definedAccCatMonthModel.hasOne(accountingCatalogModel,{foreignKey:'accId',sourceKey: 'accIdFk'});
-    definedAccCatMonthModel.findAll({where: {'busIdFk': req.params.id}, order : [['updatedAt','DESC']],
+    let orderBy =[['updatedAt','DESC']]
+    if(typeof(req.query.sort) !== "undefined" && req.query.sort !== ''){
+        orderBy =[[`${req.query.sort}`,`${req.query.order}`]]
+    }
+    definedAccCatMonthModel.findAll({where: {'busIdFk': req.params.id}, order : orderBy,
         include: [{
             model: accountingCatalogModel,
             require : true

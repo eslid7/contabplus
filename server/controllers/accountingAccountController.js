@@ -117,6 +117,11 @@ function getAccountingAccount(req, res){
     let likeData = []
     let offsetData =0
     let limitData =10
+
+    let orderBy =[['aacCode','ASC']]
+    if(typeof(req.query.sort) !== "undefined" && req.query.sort !== ''){
+        orderBy =[[`${req.query.sort}`,`${req.query.order}`]]
+    }
     
     if(typeof(req.query.offset) !== "undefined" && req.query.offset !== ''){
         offsetData = req.query.offset
@@ -147,7 +152,7 @@ function getAccountingAccount(req, res){
                 [sequelize.Op.or]: likeData
             },
             offset: (offsetData*1),
-            limit : (limitData*1), order :[['aacCode','ASC']]}).then( accountingAccount => { 
+            limit : (limitData*1), order :orderBy}).then( accountingAccount => { 
                 return res.status(200).json({rows: accountingAccount, total:accountingAccountTotal.length});
             })
         })
@@ -155,7 +160,7 @@ function getAccountingAccount(req, res){
     }
     else{
         accountingAccountModel.findAll({where: {'accIdFk': req.params.id}}).then( accountingAccountTotal => { 
-            accountingAccountModel.findAll({where: {'accIdFk': req.params.id},  offset: (offsetData*1),limit : (limitData*1) , order :[['aacCode','ASC']]}).then( accountingAccount => { 
+            accountingAccountModel.findAll({where: {'accIdFk': req.params.id},  offset: (offsetData*1),limit : (limitData*1) , order :orderBy}).then( accountingAccount => { 
                 return res.status(200).json({rows: accountingAccount, total:accountingAccountTotal.length});
             })
         })

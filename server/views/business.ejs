@@ -14,26 +14,19 @@
                     <div class="span12">
                         <!-- BEGIN EXAMPLE TABLE PORTLET-->
                         <div class="portlet box light-grey">
-                            <div class="portlet-title">
-                                
-                                <div class="tools">
-                                    <a href="javascript:;" class="collapse"></a>
-                                    <a href="#portlet-config" data-toggle="modal" class="config"></a>
-                                    <a href="javascript:;" class="reload"></a>
-                                    <a href="javascript:;" class="remove"></a>
-                                </div>
+                            <div class="portlet-title">								
                             </div>
                             <div class="portlet-body">
                                 <div class="table-toolbar">
                                     <div class="btn-group">
-                                        <button id="newBusiness" class="btn green" onclick="$('#modalBusiness').modal('show')">
+                                        <button id="newBusiness" class="btn green" onclick="cleanForm();$('#modalBusiness').modal('show')">
                                         Empresa <i class="icon-plus"></i>
                                         </button>
                                     </div>
                                     <div class="btn-group pull-right">
                                     </div>
                                 </div>
-                                <table id="listBusiness" class="bt-table"
+                                <table id="listBusiness" class="bt-table table-striped"
                                     data-side-pagination="server"
                                     data-pagination="true"
                                     data-page-size="20"
@@ -128,7 +121,7 @@
 <script type="text/javascript">
 	$(document).ready(function(){
 		$('#busMoney').select2({});
-		$("#busPhone").inputmask("mask", {"mask": "99999999", "clearIncomplete": false});
+		$("#busPhone").inputmask("mask", {"mask": "99999999",'removeMaskOnSubmit': true,'autoUnmask': true, "clearIncomplete": false});
 		handleTableData();
 	});
 	isFirtsDatatable = true;
@@ -143,13 +136,13 @@
 					field: 'busJuriricalId',
 					title: 'Cedula jurídica',
 					sortable: true,
-					width: '15%'
+					width: '10%'
 				},
 				{
 					field: 'busName',
 					title: 'Nombre',
 					sortable: true,
-					width: '10%'
+					width: '20%'
 				}, {
 					field: 'busEmail',
 					title: 'Email',
@@ -162,16 +155,35 @@
 					width: '5%'
 				}, {
 					field: 'busStatus',
-					title: 'Estado',
-					sortable: true,
-					width: '15%',
-					formatter: operateFormatterState
+					title: 'Editar',
+					sortable: false,
+					width: '10%',
+					formatter: operateFormatterEdit
 				}
 			]
 		});
 	};
 	function getHeight() {
 		return $(window).height();
+	}
+	function operateFormatterEdit(value, row, index) {
+        return [
+            "<button type='button' class='btn green' ",
+            " onclick='seeData("+row.busId+", "+index+")'>",
+            "<i class='icon-pencil'></i> Editar ",
+            "</button>"
+        ].join('');
+	}
+	function seeData(busId, index){
+		console.log($('#listBusiness').bootstrapTable('getData')[index])
+		$('#busId').val(busId)
+		$('#busJuriricalId').val($('#listBusiness').bootstrapTable('getData')[index].busJuriricalId)
+		$('#busName').val($('#listBusiness').bootstrapTable('getData')[index].busName)
+		$('#busNameFantasy').val($('#listBusiness').bootstrapTable('getData')[index].busNameFantasy)
+		$('#busEmail').val($('#listBusiness').bootstrapTable('getData')[index].busEmail)
+		$('#busPhone').val($('#listBusiness').bootstrapTable('getData')[index].busPhone)
+		$('#busMoney').val($('#listBusiness').bootstrapTable('getData')[index].busMoney).trigger('change');
+		$('#modalBusiness').modal('show')
 	}
 	function operateFormatterState(value, row, index) {
         return [
@@ -250,6 +262,8 @@
 	function cleanForm(){
 		$('#busName').val('');
 		$('#busPhone').val('');
-		$('#busEmail').val('')	
+		$('#busEmail').val('');	
+		$('#busJuriricalId').val('');
+		$('#busNameFantasy').val('');
 	}
 </script>
