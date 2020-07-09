@@ -367,35 +367,45 @@
 					field: 'aacCode',
 					title: 'Código cuenta',
 					sortable: true,
-					width: '20%'
+					width: '22%'
 				}, {
 					field: 'aacName',
 					title: 'Nombre',
 					sortable: true,
-					width: '15%'
+                    width: '17%',
+                    // formatter: operateFormatterAacName
 				}, {
 					field: 'aacType',
-					title: 'Tipo cuenta',
+					title: 'Tipo',
 					sortable: false,
-                    width: '5%',
+                    width: '3%',
 					formatter: operateFormatter
 				}, {
 					field: 'aacTypeBalance',
 					title: 'Tipo saldo',
 					sortable: false,
-                    width: '5%',
+                    width: '2%',
                     formatter: operateFormatter2
 				}, {
 					field: 'aacId',
 					title: 'Editar',
 					sortable: false,
-					width: '5%',
+					width: '4%',
 					formatter: operateFormatterEdit
 				}
                 
             ]
 		});
     };
+    function operateFormatterAacName(value, row, index) {
+        data = row.aacName.substring(0, 18  );
+        if(row.aacName.length> 18){
+            data = data +'...'
+        }
+        return [
+            data
+        ].join('');
+    }
     function operateFormatterEdit(value, row, index) {
         return [
             "<button type='button' class='btn green' ",
@@ -755,11 +765,12 @@
                         showIsLoading("Procesando...");
                     }
                 }).done(function (data) {  
+                    clean()
                     fnOpenSusessDialog(data.message)          
-                    hideIsLoading();   
-                    clean()                      
-                    setTimeout(function(){ refreshTable(); }, 300);                    
+                    hideIsLoading();                                             
+                    //refreshTable();             
                 }).fail(function (data) {
+                    clean()
                     hideIsLoading();
                     fnOpenErrorDialog(data.responseJSON.message);
                 })
@@ -1019,12 +1030,20 @@
                     $('#aacType').val(data.accountingAccount.aacType).trigger('change');
                     $('#aacTypeBalance').val(data.accountingAccount.aacTypeBalance).trigger('change'); 
                     $('#aacMoney').val(data.accountingAccount.aacMoney).trigger('change'); 
-                    $('#accName'+level).prop( "disabled", true );
+                    if($('#aacId').val()==''){
+                        $('#accName'+level).prop( "disabled", true );
+                    }
+                    else if(level>1){
+                        for(a=1; a<level;a++){
+                            $('#accName'+a).prop( "disabled", true );
+                        }
+                    }
+                    else {
+                        $('#accName'+level).prop( "disabled", false );
+                    }                    
 
                     //enable next level
-                    level=level+1
-                    console.log('moviendto',level)
-                    
+                    level=level+1                    
                     $('#levelToSave').val(level)
                     if($('#levelToSave').val()>1){                        
                         $('#aacType').prop( "disabled", true );
