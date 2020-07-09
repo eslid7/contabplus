@@ -255,12 +255,12 @@
                                                     <div class="row-fluid">
                                                         <!-- <div class="control-group span2 "> 
                                                         </div> -->
-                                                        <div class="control-group span5 "> 
+                                                        <div class="control-group span6 "> 
                                                             <button id="deleteButton"  type="button" class="btn red span6" onclick="fnDeleteConfirm()"><i class="icon-off" style="padding-right: 7px;"></i>Eliminar</button>   
                                                             <button id="activeButton" type="button" class="btn green span6" onclick="fnInactive(1)"><i class="icon-ok-circle" style="padding-right: 7px;"></i>Activar</button>  
                                                             <button id="inactiveButton" type="button" class="btn red span6" onclick="fnInactive(0)"><i class="icon-ban-circle" style="padding-right: 7px;"></i>Inactivar</button>                                                                                                 
                                                         </div>
-                                                        <div class="control-group span5 ">   
+                                                        <div class="control-group span6 ">   
                                                             <button type="button" class="btn green span6" onclick="fnSaveAccountingAccount()"><i class="icon-ok" style="padding-right: 7px;"></i>Guardar</button>                                               
                                                             <button type="button" class="btn span6" onclick="clean()"><i class="icon-refresh" style="padding-right: 7px;"></i>Cancelar</button>                                               
                                                         </div>
@@ -268,7 +268,16 @@
                                                 </div>
                                             </div>
                                             <div class="control-group span7 " style="height: 420px;">
-                                                   <table id="listAsignPermit" class="bt-table table-striped" 
+                                                <div class="btn-group  span2">
+                                                    <button id="exporttable" type="button" class="btn ">Exportar a Excel <i class="icon-angle-down"></i>
+                                                    </button>
+                                                    <!-- <ul class="dropdown-menu pull-right">
+                                                        <li><a href="#">Print</a></li>
+                                                        <li><a href="#">Save as PDF</a></li>
+                                                        <li><a href="#">Export to Excel</a></li>
+                                                    </ul> -->
+                                                </div>
+                                                   <table id="listAsignPermit" class="table table-striped" 
                                                         data-side-pagination="server"
                                                         data-pagination="true"
                                                         data-page-size="10"
@@ -331,20 +340,28 @@
         $('#deleteButton').hide()        
         $('#divStatus').hide()
         aacDirection()
+        
              
         <% if(business.length != 0) { %>
             fnGetCatalog();	
-            setTimeout(function(){ handleTableData(); }, 300);   
+            setTimeout(function(){ handleTableData(); $("#listAsignPermit").removeClass('table-hover');}, 300);   
             setTimeout(function(){ $('.search input').attr('placeholder','Buscar por código o nombre')   }, 500);      
         <% }%>
 	});
-	isFirtsDatatable = true;
+    isFirtsDatatable = true;
+    $("#exporttable").click(function(e){
+        var table = $("#listAsignPermit");
+        table.tableExport()
+    });
 	function handleTableData() {
 		$('#listAsignPermit').bootstrapTable({
 			height: 645,
 			method: 'GET',
 			url: '/contab/getAccountingAccount/'+$('#accId').val(),
-			cache: false,
+            cache: false,
+            showExport: true,
+            // exportDataType: $(this).val(),
+            exportTypes: ['json', 'csv', 'excel'],
 			columns: [
 				{
 					field: 'aacCode',
