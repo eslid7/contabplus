@@ -140,7 +140,9 @@ CREATE TABLE definedAccCatMonth (
 	month INT NOT NULL,
 	year INT NOT NULL,
 	createdAt  TIMESTAMP,
-	updatedAt TIMESTAMP
+	updatedAt TIMESTAMP,
+	total FLOAT(12,2),
+	isClose INT
 );
 
 --- accType 1 Activo, 2 Pasivo, 3 Patrimonio, 4 Ingresos, 5 Costos Ventas, 6 Gastos, 7 Costos Producción   
@@ -161,7 +163,8 @@ CREATE TABLE accountingAccount(
 	aacMoney INT NOT NULL,
 	aacNivels VARCHAR(500), 
 	createdAt  TIMESTAMP,
-	updatedAt TIMESTAMP
+	updatedAt TIMESTAMP,
+	aacActualBalance FLOAT(12,2) ,
 );
 
 CREATE TABLE deleteAccountingAccount(
@@ -171,6 +174,73 @@ CREATE TABLE deleteAccountingAccount(
 	useIdFk INT NOT NULL,
 	aacCode VARCHAR(255) NOT NULL,
 	aacName VARCHAR(255) NOT NULL,
+	createdAt  TIMESTAMP,
+	updatedAt TIMESTAMP
+);
+
+CREATE TABLE moneyTypes(
+	monId INT AUTO_INCREMENT PRIMARY KEY,
+	busIdFk INT NOT NULL,
+	useIdFk INT NOT NULL,
+	monCode INT NOT NULL,
+	monName VARCHAR(45) NOT NULL,
+	createdAt  TIMESTAMP,
+	updatedAt TIMESTAMP
+);
+
+CREATE TABLE documentTypes(
+	docId INT AUTO_INCREMENT PRIMARY KEY,
+	busIdFk INT NOT NULL,
+	useIdFk INT NOT NULL,
+	docCode INT NOT NULL,
+	docName VARCHAR(65) NOT NULL,
+	createdAt  TIMESTAMP,
+	updatedAt TIMESTAMP
+);
+
+CREATE TABLE changeTypes(
+	chaId INT AUTO_INCREMENT PRIMARY KEY,
+	monId INT NOT NULL,
+	busIdFk INT NOT NULL,
+	useIdFk INT NOT NULL,
+	chaSaleValue DECIMAL(5,2) NOT NULL,
+	chaPurchaseValue DECIMAL(5,2) NOT NULL,
+	chaSaleValuationValue DECIMAL(5,2) NOT NULL,
+	chaPurchaseValuationValue DECIMAL(5,2) NOT NULL,
+	createdAt  TIMESTAMP,
+	updatedAt TIMESTAMP
+);
+
+
+CREATE TABLE accountingAccountSeat(
+	aasId INT AUTO_INCREMENT PRIMARY KEY,
+	accIdFk INT NOT NULL,
+	busIdFk INT NOT NULL,
+	useIdFk INT NOT NULL,
+	aasMonth INT NOT NULL,
+	aasYear INT NOT NULL,
+	aasDateSeat DATE,
+	aasNumberSeat VARCHAR(10) NOT NULL,
+	aasIsPreSeat INT NOT NULL,
+	aasNameSeat VARCHAR(65) NOT NULL,
+	aasOrigin INT NOT NULL, --- App origen 1 Contabilidad
+	createdAt  TIMESTAMP,
+	updatedAt TIMESTAMP,
+	aasdDebitTotal FLOAT(12,2) NOT NULL,
+	aasdCreditTotal FLOAT(12,2) NOT NULL
+);
+
+
+CREATE TABLE accountingAccountSeatDetail(
+	aasdId INT AUTO_INCREMENT PRIMARY KEY,
+	docIdFK INT NOT NULL,
+	aacIdFK INT NOT NULL,
+	chaIdFk INT NOT NULL,
+	aasdNumberDoc VARCHAR(25) NOT NULL,	
+	aasdDescription VARCHAR(100) NOT NULL,	
+	aasdChangeValue FLOAT(5,2) NOT NULL,
+	aasdDebit FLOAT(12,2) NOT NULL,
+	aasdCredit FLOAT(12,2) NOT NULL,
 	createdAt  TIMESTAMP,
 	updatedAt TIMESTAMP
 );

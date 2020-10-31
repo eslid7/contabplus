@@ -5,8 +5,11 @@ const appContabController = require('../controllers/contabController');
 const userController = require('../controllers/usersController')
 const assignCatalogController = require('../controllers/assignCatalogController')
 const assignPermitCatalogController = require('../controllers/assignPermitCatalogController')
-const accountingAccountController = require('../controllers/accountingAccountController')
-
+const accountingAccountController = require('../controllers/accountingAccountController');
+const documentTypesController = require('../controllers/documentTypesController');
+const moneyTypesController = require('../controllers/moneyTypesController');
+const viewChangeTypesController = require('../controllers/viewChangeTypesController');
+const seatController = require('../controllers/seatController');
 const router = express.Router()
 
 router.route('/users').get(userController.getUsers);
@@ -47,6 +50,7 @@ router.route('/viewAsignCatalog').get(assignCatalogController.viewAsignCatalog);
 router.route('/getCatalog/:id').get(assignCatalogController.getCatalog);
 // una empresa puede tener N catalogos
 router.route('/getCatalogs/:id').get(assignCatalogController.getCatalogs);
+router.route('/getCatalogByPeriodo/:id').get(assignCatalogController.getCatalogByPeriodo);
 
 router.route('/listHistory/:id').get(assignCatalogController.listHistory);
 router.route('/saveAsignCatalog').post(assignCatalogController.saveAsignCatalog);
@@ -67,5 +71,27 @@ router.route('/activeInactiveAccount/:id').post(accountingAccountController.acti
 router.route('/deleteAccount/:id').post(accountingAccountController.deleteAccount);
 router.route('/viewActiInacAcco').get(accountingAccountController.viewActiInacAcco);
 router.route('/loadFileActiveInactive/:id').post(accountingAccountController.loadFileActiveInactive);
+
+//viewTypesDocuments
+router.route('/viewTypesDocuments').get(documentTypesController.viewTypesDocuments);
+router.route('/getListTypesDocuments').get(documentTypesController.getListTypesDocuments);
+router.route('/saveDocumentType').post(documentTypesController.saveDocumentType);
+router.route('/getListTypesDocumentsByBussines/:id').get(documentTypesController.getListTypesDocumentsByBussines);
+
+//viewMoneyTypes
+router.route('/viewMoneyTypes').get(moneyTypesController.viewMoneyTypes);
+router.route('/getListMoneyTypes').get(moneyTypesController.getListMoneyTypes);
+router.route('/saveMoneyTypes').post(moneyTypesController.saveMoneyTypes);
+
+//viewChangeTypes
+router.route('/viewChangeTypes').get(viewChangeTypesController.viewChangeTypes);
+router.route('/getListChangeTypes').get(viewChangeTypesController.getListChangeTypes);
+router.route('/saveChangeTypes').post(viewChangeTypesController.saveChangeTypes);
+
+//viewSeat
+router.route('/viewSeat').get(seatController.viewSeat);
+router.route('/getListSeat').get(seatController.getListSeat);
+router.route('/saveSeat').post(seatController.saveSeat);
+
 
 module.exports = router;

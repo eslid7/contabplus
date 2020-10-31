@@ -126,10 +126,23 @@ function saveAsignCatalog(req, res){
 
 }
 
+function getCatalogByPeriodo(req, res){ 
+    definedAccCatMonthModel.hasOne(accountingCatalogModel,{foreignKey:'accId',sourceKey: 'accIdFk'});
+    definedAccCatMonthModel.findAll({where:{ busIdFk: req.params.id, month: req.query.month, year: req.query.year}, 
+        include: [{
+            model: accountingCatalogModel,
+            require : true
+        }]
+    }).then(definedAccCatMonth=>{
+        return res.status(200).json({ definedAccCatMonth: definedAccCatMonth });    
+    })
+}
+
 module.exports = {
     viewAsignCatalog,
     getCatalog,
     listHistory,
     saveAsignCatalog,
     getCatalogs,
+    getCatalogByPeriodo
 }
