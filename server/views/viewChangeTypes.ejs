@@ -1,0 +1,296 @@
+<% include partials/header %>
+	<!-- BEGIN PAGE -->
+	<div class="page-content">
+			<!-- BEGIN PAGE CONTAINER-->
+			<div class="container-fluid">
+				<!-- BEGIN PAGE HEADER-->
+				<div class="row-fluid">
+					<div class="span12">
+						<h3>Tipos de Cambio</h3>
+					</div>
+				</div>
+
+				<div class="row-fluid">
+						<div class="span12">
+							<!-- BEGIN EXAMPLE TABLE PORTLET-->
+							<div class="portlet box light-grey">
+								<div class="portlet-title">
+								</div>
+								<div class="portlet-body">									
+                                    <form id="moneyTypeChange" name="moneyTypeChange" action="#">
+                                        <input type="hidden" name="chaId" id="chaId">
+                                        <div class="row-fluid">
+                                            <div class="control-group span6 ">
+                                                <label for="accCode">
+                                                    Empresa
+                                                </label>
+                                                <div class="controls">
+                                                    <% if(business.length == 0) { %>   
+                                                        No hay empresas disponibles
+                                                    <%} else {%>
+                                                    <select id="busId" name="busId" class="span7 select2">
+                                                        <% for(var j = 0; j < business.length; j++) { %>   
+                                                            <option value="<%=business[j].busId%>"> <%=business[j].busName%></option>
+                                                        <% }%>
+                                                    </select>
+                                                    <% }%>
+                                                </div>
+                                            </div>
+                                            <div class="control-group span6 ">
+                                                <label for="accCode">
+                                                    Moneda
+                                                </label>
+                                                <div class="controls">
+                                                    <% if(moneyTypess.length == 0) { %>   
+                                                        No hay monedas disponibles
+                                                    <%} else {%>
+                                                    <select id="monId" name="monId" class="span4 select2">
+                                                        <% for(var j = 0; j < moneyTypess.length; j++) { %>   
+                                                            <option value="<%=moneyTypess[j].monId%>"> <%=moneyTypess[j].monName%></option>
+                                                        <% }%>
+                                                    </select>
+                                                    <% }%>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row-fluid">
+                                            <div class="control-group span6 ">                                               
+                                                <label for="accCode">
+                                                    Tipos Cambio Banco Central País
+                                                </label>
+                                            </div>
+                                            <div class="control-group span6 ">                                               
+                                                <label for="accCode">
+                                                    Tipos Cambio de Valuación
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="row-fluid">    	
+                                            <div class="control-group span6">
+                                                <label for="accCode" class="span4">
+                                                    Tipo Cambio Compra 
+                                                </label>
+                                                <div class="controls" class="span3">
+                                                    <input type="text" name="chaPurchaseValue" id="chaPurchaseValue" class="span2" style="text-transform: uppercase" maxlength="6">         
+                                                </div>
+                                            </div>
+                                            <div class="control-group span6 ">                                                
+                                                <label for="accCode" class="span4">
+                                                    Tipo Cambio Compra    
+                                                </label>
+                                                <div class="controls" class="span3">   
+                                                    <input type="text" name="chaPurchaseValuationValue" id="chaPurchaseValuationValue" class="span2" style="text-transform: uppercase" maxlength="6">         
+                                                </div>   
+                                            </div>						
+                                        </div>
+                                        <div class="row-fluid">    	
+                                            <div class="control-group span6">
+                                                <label for="accCode" class="span4">
+                                                    Tipo Cambio Venta
+                                                </label>
+                                                <div class="controls" class="span3">   
+                                                    <input type="text" name="chaSaleValue" id="chaSaleValue" class="span2" style="text-transform: uppercase" maxlength="6">         
+                                                </div>
+                                            </div>
+                                            <div class="control-group span6">
+                                                <label for="accCode" class="span4">
+                                                    Tipo Cambio Venta
+                                                </label>
+                                                <div class="controls" class="span3">   
+                                                    <input type="text" name="chaSaleValuationValue" id="chaSaleValuationValue" class="span2" style="text-transform: uppercase" maxlength="6">         
+                                                </div>
+                                            </div>						
+                                        </div>
+                                        <div class="row-fluid">    	
+                                            <div class="control-group span9">
+                                                
+                                            </div>
+                                            <div class="control-group span3 ">
+                                                <button id="addTypeDocu" type="button"  class="btn green" onclick="fnSaveMonType()">
+                                                    Guardar <i class="icon-plus"></i>
+                                                </button>
+                                                <button id="cancelMonTypeChange" type="button"  class="btn " onclick="clean()">
+                                                    Cancelar <i class="icon-plus"></i>
+                                                </button>     
+                                            </div>						
+                                        </div>
+                                    </form>
+									<table id="listMonTypesChanges" class="bt-table table-striped"
+										data-side-pagination="server"
+										data-pagination="true"
+										data-page-size="20"
+										data-page-list="[20, 40, 60]"
+										data-search="true">
+									</table>
+								</div>
+							</div>
+							<!-- END EXAMPLE TABLE PORTLET-->
+						</div>
+					</div>
+			</div>
+			
+	</div>	
+
+
+<% include partials/footer %>
+<script type="text/javascript">
+	$(document).ready(function(){
+        $('#busId').select2({});
+        $('#monId').select2({});
+        
+        $('#cancelMonTypeChange').hide();
+        // $("#chaSaleValue").inputmask("mask", {"mask": '999,99', "clearIncomplete": false, 'removeMaskOnSubmit': true,  });
+        // $("#chaPurchaseValue").inputmask("mask", {"mask": '999,99', "clearIncomplete": false, 'removeMaskOnSubmit': true, });
+        // $("#chaSaleValuationValue").inputmask("mask", {"mask": '999,99', "clearIncomplete": false, 'removeMaskOnSubmit': true,  });
+        // $("#chaPurchaseValuationValue").inputmask("mask", {"mask": '999,99', "clearIncomplete": false, 'removeMaskOnSubmit': true, });                
+        <% if(business.length == 0 || moneyTypess.length == 0) { %>
+
+        <%} else {%>
+            handleTableData();           
+        <% }%>
+    });
+    $.validator.addMethod('decimal', function(value, element) {
+        return this.optional(element) || /^[0-9]+\,\d{1,2}$/.test(value);
+    }, "Ingrese un formato valido 000,00");
+
+    $('#moneyTypeChange').validate({
+        errorElement: 'label', //default input error message container
+        errorClass: 'help-inline', // default input error message class
+        ignore: "",
+        rules: {
+            busId: { required: true},
+            chaSaleValue: { required: true, decimal: true },
+            chaPurchaseValue: { required: true, decimal: true},
+            chaSaleValuationValue: { required: true, decimal: true},
+            chaPurchaseValuationValue: { required: true, decimal: true}
+        },
+        messages: { // custom messages
+            busId: { required: "Seleccione la empresa." },
+            chaSaleValue: { required: "El campo es requerido.", number:"Decimal Numbers Only" },
+            chaPurchaseValue: { required: "El campo es requerido." },
+            chaSaleValuationValue: { required: "El campo es requerido." },
+            chaPurchaseValuationValue: { required: "El campo es requerido." }
+        },
+        highlight: function (element) { // hightlight error inputs
+            $(element).closest('.control-group').addClass('error'); // set error class to the control group
+        },
+        success: function (label) {
+            label.closest('.control-group').removeClass('error');
+            label.remove();
+        },
+        errorPlacement: function (error, element) {
+            if (element.closest('.icon-search').size() === 1) {
+                error.addClass('help-small no-left-padding').insertAfter(element.closest('.icon-search'));
+            } else if (element.next().attr("class")){
+                error.addClass('help-small no-left-padding').insertAfter(element.next());
+            } else {
+                error.addClass('help-small no-left-padding').insertAfter(element);
+            }
+        }
+    });
+	isFirtsDatatable = true;
+	function handleTableData () {
+		$('#listMonTypesChanges').bootstrapTable({
+			height: getHeight(),
+			method: 'GET',
+			url: '/contab/getListChangeTypes/',
+            cache: false,
+            search: true,
+			columns: [
+				{
+					field: 'chaPurchaseValue',
+					title: 'Tipo Compra Pais',
+					sortable: false,
+                    width: '7%',
+                    formatter: operateFormatterchaPurchaseValue
+				}, {
+					field: 'chaSaleValue',
+					title: 'Tipo Venta Pais',
+					sortable: false,
+                    width: '15%',
+                    formatter: operateFormatterchaSaleValue
+				}, {
+					field: 'business.busName',
+					title: 'Empresa',
+					sortable: false,
+					width: '15%'
+				}, {
+					field: 'moneyType.monName',
+					title: 'Moneda',
+					sortable: false,
+					width: '15%'
+				},{
+					field: 'monId',
+					title: 'Editar',
+					sortable: false,
+					width: '10%',
+					formatter: operateFormatter
+				}                
+			]
+		});
+    };
+    function operateFormatterchaPurchaseValue(value, row, index) {
+        return [
+             row.chaPurchaseValue.replace(".", ",")
+        ].join('');
+    }
+    function operateFormatterchaSaleValue(value, row, index) {
+        return [
+             row.chaSaleValue.replace(".", ",")
+        ].join('');
+    }
+	function getHeight() {
+		return $(window).height();
+    }
+    
+	function operateFormatter(value, row, index) {
+        return [
+            "<button type='button' class='btn green' ",
+            " onclick='editData("+row.chaId+","+index+")'>",
+            "<i class='icon-pencil'></i> Editar ",
+            "</button>"
+        ].join('');
+    }
+    function editData(chaId, index){
+        $('#chaId').val(chaId)
+        $('#busId').val($('#listMonTypesChanges').bootstrapTable('getData')[index].busIdFk).trigger('change');
+        $('#monId').val($('#listMonTypesChanges').bootstrapTable('getData')[index].monId).trigger('change');
+
+        $('#chaSaleValue').val($('#listMonTypesChanges').bootstrapTable('getData')[index].chaSaleValue.replace('.',','))
+        $('#chaPurchaseValue').val($('#listMonTypesChanges').bootstrapTable('getData')[index].chaPurchaseValue.replace('.',','))
+        $('#chaSaleValuationValue').val($('#listMonTypesChanges').bootstrapTable('getData')[index].chaSaleValuationValue.replace('.',','))
+        $('#chaPurchaseValuationValue').val($('#listMonTypesChanges').bootstrapTable('getData')[index].chaPurchaseValuationValue.replace('.',','))
+        $('#cancelMonTypeChange').show();        
+    }
+    function refreshTable() {
+        $('.bt-table').bootstrapTable('refresh');
+    }
+	function fnSaveMonType(){
+        if($('#moneyTypeChange').valid()){
+            $.ajax({
+                type: "POST",
+                url: "/contab/saveChangeTypes",
+                data: $('#moneyTypeChange').serialize(), //se envia el form serializado          
+                beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                    showIsLoading("Procesando...");
+                }
+            }).done(function (data) {            
+                hideIsLoading(); 
+                fnOpenSusessDialog(data.message)
+                refreshTable();
+                clean()
+            }).fail(function (data) {
+                hideIsLoading();            
+                fnOpenErrorDialog(data.responseJSON.message)
+            })
+        }
+	}
+    function clean(){        
+        $('#chaId').val('')
+        $('#chaSaleValue').val('')
+        $('#chaPurchaseValue').val('')
+        $('#chaSaleValuationValue').val('')
+        $('#chaPurchaseValuationValue').val('')
+        $('#cancelMonTypeChange').hide();
+    }
+</script>

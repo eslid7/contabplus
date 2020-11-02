@@ -164,7 +164,7 @@ CREATE TABLE accountingAccount(
 	aacNivels VARCHAR(500), 
 	createdAt  TIMESTAMP,
 	updatedAt TIMESTAMP,
-	aacActualBalance FLOAT(12,2) ,
+	aacActualBalance FLOAT(12,2)
 );
 
 CREATE TABLE deleteAccountingAccount(

@@ -1,0 +1,744 @@
+<% include partials/header %>
+    <style>
+        .noMarginLeft{
+            margin-left: 3px !important;
+        }
+        .amounts{
+            width: 140px;
+            float: left;
+        }
+    </style>
+	<!-- BEGIN PAGE -->
+	<div class="page-content">
+			<!-- BEGIN PAGE CONTAINER-->
+			<div class="container-fluid">
+				<!-- BEGIN PAGE HEADER-->
+				<div class="row-fluid">
+					<div class="span12">
+						<h3>Registro Asientos</h3>
+					</div>
+				</div>
+
+				<div class="row-fluid">
+						<div class="span12">
+							<!-- BEGIN EXAMPLE TABLE PORTLET-->
+							<div class="portlet box light-grey">
+								<div class="portlet-title">
+								</div>
+								<div class="portlet-body">									
+                                    <form id="seat" name="seat" action="#">
+                                        <input type="hidden" name="monId" id="monId">
+                                        <input type="hidden" name="accId" id="accId">                                        
+                                        <div class="row-fluid">
+                                            <div class="control-group span4 ">
+                                                <label for="accCode">
+                                                    Empresa
+                                                </label>
+                                                <div class="controls">
+                                                    <% if(business.length == 0) { %>   
+                                                        No hay empresas disponibles
+                                                    <%} else {%>
+                                                    <select id="busId" name="busId" class="span8 select2">
+                                                        <% for(var j = 0; j < business.length; j++) { %>   
+                                                            <option value="<%=business[j].busId%>"> <%=business[j].busName%></option>
+                                                        <% }%>
+                                                    </select>
+                                                    <% }%>
+                                                </div>
+                                            </div>
+                                            <div class="control-group span2 ">                                               
+                                                <label for="accCode">
+                                                   Año 
+                                                </label>
+                                                <div class="controls"  > 
+                                                    <input type="text" name="aasYear" id="aasYear" class="span8" maxlength="4">                                                   
+                                                </div>
+                                            </div>	
+                                            <div class="control-group span4">
+                                                <label for="accCode">
+                                                    Mes
+                                                </label>
+                                                <div class="controls">
+                                                    <!-- style="text-transform: uppercase"    -->
+                                                    <input type="text" name="aasMonth" id="aasMonth" class="span5"  maxlength="2">         
+                                                </div>
+                                            </div>                                        					
+                                        </div>
+                                        <div class="row-fluid">                                            
+                                            <div class="control-group span2">
+                                                <label for="accCode">
+                                                    N Preasiento
+                                                </label>
+                                                <div class="controls">   
+                                                    <input type="text" name="aasPreSeat" id="aasPreSeat" class="span10" maxlength="10">         
+                                                </div>
+                                            </div>
+                                            <div class="control-group span2 ">                                               
+                                                <label for="accCode">
+                                                   N Asiento
+                                                </label>
+                                                <div class="controls"  > 
+                                                    <input type="text" name="aasNumberSeat" id="aasNumberSeat" class="span8" maxlength="10">                                                   
+                                                </div>
+                                            </div>	
+                                            <div class="control-group span2 ">
+                                                <button id="searchSeat" type="button"  class="btn " onclick="clean()" style="margin-top:25px;">
+                                                    Buscar Asiento <i class="icon-search"></i>
+                                                </button>    
+                                            </div>
+                                        </div>
+                                        <div class="row-fluid">
+                                            <div class="control-group span2 ">                                               
+                                                <label for="accCode">
+                                                   Fecha Asiento 
+                                                </label>
+                                                <div class="controls"  > 
+                                                    <input type="text" name="aasDateSeat" id="aasDateSeat" class="span8" maxlength="10">                                                   
+                                                </div>
+                                            </div>
+                                            <div class="control-group span5">
+                                                <label for="accCode">
+                                                    Nombre del Asiento
+                                                 </label>
+                                                 <div class="controls"  > 
+                                                     <input type="text" name="aasNameSeat" id="aasNameSeat" class="span10" maxlength="65">                                                   
+                                                 </div>
+                                            </div>
+                                        </div>
+                                        <div class="row-fluid">
+                                            <div class="control-group span2 ">
+                                                <button id="downloadFile" type="button"  class="btn " onclick="clean()">
+                                                    Descargar plantilla <i class="icon-download-alt"></i>
+                                                </button>  
+                                            </div>
+                                            <div class="control-group span2 ">
+                                                <button id="importFile" type="button"  class="btn green" onclick="clean()">
+                                                   Importar plantilla <i class="icon-upload-alt"></i>
+                                                </button>  
+                                            </div>
+                                            <div class="control-group span2 ">
+                                                <button id="searchAccount" type="button"  class="btn " onclick="clean()">
+                                                   Consultar Cuentas <i class="icon-search"></i>
+                                                </button>  
+                                            </div>
+                                            <div class="control-group span4 ">
+
+                                            </div>
+                                            <div class="control-group span2 ">
+                                                <button id="searchAccount" type="button"  class="btn green" onclick="clean()">
+                                                    Agregar lineas <i class="icon-plus"></i>
+                                                 </button> 
+                                            </div>    
+                                        </div>                                        
+                                        <div class="row-fluid" style="overflow-x: hidden;">
+                                            <div style="width: 107%;">
+                                                <div class="noMarginLeft span2 ">
+                                                    <label>
+                                                        Tipo Documento
+                                                    </label> 
+                                                </div>
+                                                <div class="noMarginLeft span2   ">
+                                                    <label>
+                                                       N Documento
+                                                    </label> 
+                                                </div> 
+                                                <div class="noMarginLeft span2 ">
+                                                    <label>
+                                                        Código Cuenta
+                                                    </label>  
+                                                </div> 
+                                                <div class="noMarginLeft span2 ">
+                                                    <label>
+                                                        Detalle Registro
+                                                    </label>  
+                                                </div> 
+                                                <div class="noMarginLeft span1 ">
+                                                    <label>
+                                                        Moneda
+                                                    </label>    
+                                                </div> 
+                                                <div class="noMarginLeft span1 ">
+                                                    <label>
+                                                        Tipo Cambio
+                                                    </label>    
+                                                </div> 
+                                                <div class="noMarginLeft amounts ">
+                                                    <label>
+                                                        Debito
+                                                    </label>  
+                                                </div>
+                                                <div class="noMarginLeft amounts ">
+                                                    <label>
+                                                        Credito
+                                                    </label>   
+                                                </div> 
+                                            </div>                                                
+                                        </div> 
+                                        <div  id="rows" style="height: 220px; overflow-y: scroll; ">
+                                            <div class="row-fluid" style="width: 108%;">
+                                                <div class="noMarginLeft span2 ">
+                                                    <select id="docId" name="docId" class="span12 select2 selectorDoc">
+                                                            <option value=""></option>
+                                                    </select>
+                                                </div>
+                                                <div class="noMarginLeft span2">
+                                                    <input type="text" name="aasdNumberDoc" id="aasdNumberDoc" class="span12" maxlength="25">                                                    
+                                                </div> 
+                                                <div class="noMarginLeft span2 ">
+                                                    <input type="text" name="accountId" id="accountId" class="span12 numeric accountId" maxlength="25">                                                   
+                                                </div> 
+                                                <div class="noMarginLeft span2 ">
+                                                    <input type="text" name="aasdDescription" id="aasdDescription" class="span12" maxlength="100">                                                     
+                                                </div> 
+                                                <div class="noMarginLeft span1 ">
+                                                    <input type="text" name="aasdChangeValue" id="aasdChangeValue" class="span12">                                                    
+                                                </div> 
+                                                <div class="noMarginLeft span1 ">
+                                                    <input type="text" name="aasdChangeValue" id="aasdChangeValue" class="span12" data-inputmask="'alias': 'numeric'">                                                   
+                                                </div> 
+                                                <div class="noMarginLeft amounts ">
+                                                    <input type="text" name="aasdDebit" id="aasdDebit" class="span12" maxlength="16"  data-inputmask="'alias': 'numeric'">                                                   
+                                                </div>
+                                                <div class="noMarginLeft amounts ">
+                                                    <input type="text" name="aasdCredit" id="aasdCredit" class="span12" maxlength="16" data-inputmask="'alias': 'numeric'">                                                     
+                                                </div>
+                                            </div> 
+                                            <div class="row-fluid" style="width: 108%;">
+                                                <div class="noMarginLeft span2 ">
+                                                    <select id="docId" name="docId" class="span12 select2 selectorDoc">
+                                                            <option value=""></option>
+                                                    </select>
+                                                </div>
+                                                <div class="noMarginLeft span2">
+                                                    <input type="text" name="aasdNumberDoc" id="aasdNumberDoc" class="span12" maxlength="25">                                                    
+                                                </div> 
+                                                <div class="noMarginLeft span2 ">
+                                                    <input type="text" name="accountId" id="accountId" class="span12 numeric accountId" maxlength="25">                                                   
+                                                </div> 
+                                                <div class="noMarginLeft span2 ">
+                                                    <input type="text" name="aasdDescription" id="aasdDescription" class="span12" maxlength="100">                                                     
+                                                </div> 
+                                                <div class="noMarginLeft span1 ">
+                                                    <input type="text" name="aasdChangeValue" id="aasdChangeValue" class="span12">                                                    
+                                                </div> 
+                                                <div class="noMarginLeft span1 ">
+                                                    <input type="text" name="aasdChangeValue" id="aasdChangeValue" class="span12" data-inputmask="'alias': 'numeric'">                                                   
+                                                </div> 
+                                                <div class="noMarginLeft amounts ">
+                                                    <input type="text" name="aasdDebit" id="aasdDebit" class="span12" maxlength="16"  data-inputmask="'alias': 'numeric'">                                                   
+                                                </div>
+                                                <div class="noMarginLeft amounts " ">
+                                                    <input type="text" name="aasdCredit" id="aasdCredit" class="span12" maxlength="16" data-inputmask="'alias': 'numeric'">                                                     
+                                                </div>
+                                            </div>     
+                                           
+                                                                                         
+                                        </div>
+                                        <div class="row-fluid">
+                                            <div class="control-group span8 "></div>
+                                            <div class="control-group span3 ">
+                                                <div class="span2"><b>Totales</b>   </div>
+                                                <div id="totalDebit" class="span5" style="text-align: right;">12.789,30</div> 
+                                                <div id="totalCredit" class="span5" style="text-align: right;">12.789,30</div>
+                                            </div>    
+                                        </div>
+                                        <div class="row-fluid">
+                                            <div class="control-group span9 "></div>
+                                            <div class="control-group span3 ">
+                                                <button id="addTypeDocu" type="button"  class="btn green" onclick="fnSaveSeat()">
+                                                    Guardar <i class="icon-plus"></i>
+                                                </button>
+                                                <button id="cancelSeat" type="button"  class="btn " onclick="clean()">
+                                                    Cancelar <i class="icon-plus"></i>
+                                                </button>     
+                                            </div>    
+                                        </div>
+                                    </form>
+								</div>
+							</div>
+							<!-- END EXAMPLE TABLE PORTLET-->
+						</div>
+					</div>
+			</div>
+			
+	</div>	
+
+
+<% include partials/footer %>
+<script type="text/javascript">
+    var actualCatalog = 0;
+    var jsonData ='';
+	$(document).ready(function(){
+        $('#busId').select2({});
+        $('.selectorDoc').select2({});
+        $('#cancelSeat').hide();
+        $('#aasDateSeat').datepicker({
+			language: 'es-ES',
+			format: "dd/mm/yyyy",
+			autoclose: true,
+			weekStart: 1,
+			todayHighlight: true
+		}).on('changeDate', function(ev) {
+			if ($('#aasDateSeat').valid()) {
+				$('#aasDateSeat').removeClass('invalid').addClass('success');
+			}
+        });
+        $("#aasDateSeat").inputmask("mask", {"mask": '99/99/9999', "clearIncomplete": false });
+        $("#aasMonth").inputmask("mask", {"mask": 99, "clearIncomplete": true });
+        $("#aasYear").inputmask("mask", {"mask": 9999, "clearIncomplete": true });
+        // $("#aasdDebit").inputmask("#.##0,00", {reverse: true});
+        // $("#aasdCredit").inputmask("#.##0,00", {reverse: true});
+        getTypesDocument()
+        $('#busId').change(function() {
+			getTypesDocument();			
+		});
+        
+        $("#aasYear").change(function() {
+			getCatalog();			
+        });
+        $("#aasMonth").change(function() {
+			getCatalog();			
+        });
+        $(".accountId" ).on( "keydown", function(event) {
+            if(event.which == 13 && $(this).val().length > 0){
+                fnSearch($(this))
+            }         
+        });
+        
+        // $("#monCode").inputmask("mask", {"mask": 99, "clearIncomplete": false, 'removeMaskOnSubmit': true,'autoUnmask': true, });
+        <% if(business.length == 0) { %>
+
+        <%} else {%>
+            getTypesDocument()
+        <% }%>
+    });
+    $('#seat').validate({
+        errorElement: 'label', //default input error message container
+        errorClass: 'help-inline', // default input error message class
+        ignore: "",
+        rules: {
+            busId: { required: true},
+            aasMonth: { required: true},
+            aasYear: { required: true},
+            aasDateSeat: {required: true},
+            aasNameSeat: {required: true}
+        },
+        messages: { // custom messages
+            busId: { required: "Seleccione el catalogo." },
+            aasMonth: { required: "Digite el mes." },
+            aasYear: { required: "Digite el año." },
+            aasDateSeat: {required: "Digite la fecha."},
+            aasNameSeat: {required: "Digite el nombre del asiento."}
+        },
+        highlight: function (element) { // hightlight error inputs
+            $(element).closest('.control-group').addClass('error'); // set error class to the control group
+        },
+        success: function (label) {
+            label.closest('.control-group').removeClass('error');
+            label.remove();
+        },
+        errorPlacement: function (error, element) {
+            if (element.closest('.icon-search').size() === 1) {
+                error.addClass('help-small no-left-padding').insertAfter(element.closest('.icon-search'));
+            } else if (element.next().attr("class")){
+                error.addClass('help-small no-left-padding').insertAfter(element.next());
+            } else {
+                error.addClass('help-small no-left-padding').insertAfter(element);
+            }
+        }
+    });
+	
+	function fnSaveSeat(){
+        if($('#seat').valid()){
+            $.ajax({
+                type: "POST",
+                url: "/contab/saveSeat",
+                data: $('#seat').serialize(), //se envia el form serializado          
+                beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                    showIsLoading("Procesando...");
+                }
+            }).done(function (data) {            
+                hideIsLoading(); 
+                fnOpenSusessDialog(data.message)
+                refreshTable();
+                clean()
+            }).fail(function (data) {
+                hideIsLoading();            
+                fnOpenErrorDialog(data.responseJSON.message)
+            })
+        }
+	}
+    function clean(){
+        $('#monName').val('')
+        $('#monCode').val('')
+        $('#monId').val('')
+        $('#cancelMonType').hide();
+    }
+
+    function getTypesDocument(){
+        //cargar tipo documentos
+        $.ajax({
+                type: "GET",
+                url: "/contab/getListTypesDocumentsByBussines/"+$('#busId').val()+"?month="+$('#aasMonth').val()+"&year="+$('#aasYear').val(),
+                beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                    showIsLoading("Procesando...");
+                }
+            }).done(function (result) {            
+                hideIsLoading(); 
+                var data=[]
+                data=[]
+                $('.selectorDoc.select2-offscreen').empty().trigger('change');
+                for(i=0; i<result.documentTypesCatalog.length; i++ ){
+                    console.log(result.documentTypesCatalog.length)
+                    var newOption = new Option(result.documentTypesCatalog[i].docName,result.documentTypesCatalog[i].docId, true, true);
+                    $('.selectorDoc.select2-offscreen').append(newOption).trigger('change')
+                }
+            }).fail(function (data) {
+                hideIsLoading();            
+            })
+    }
+
+
+
+    // JQuery.Inputmask example.
+    var customInputmask = (function() {
+    var config = {
+        extendDefaults: {
+            showMaskOnHover: false,
+                showMaskOnFocus: false
+                },
+            extendDefinitions: {},
+            extendAliases: {
+                'numeric': {
+                radixPoint: ',',
+                groupSeparator: '.',
+                autoGroup: true,
+                placeholder: ''
+            },
+            'currency': {
+                alias: 'numeric',
+                digits: '*',
+                digitsOptional: true,
+                radixPoint: ',',
+                groupSeparator: '.',
+                autoGroup: true,
+                placeholder: ''
+            },
+                'euro': {
+                alias: 'currency',
+                prefix: '',
+                suffix: ' €',
+                radixPoint: ',',
+                groupSeparator: '',
+                autoGroup: false,
+            },
+                'euroComplex': {
+                alias: 'currency',
+                prefix: '',
+                suffix: ' €',
+            }
+        }
+
+
+
+    };
+
+        var init = function() {
+            Inputmask.extendDefaults(config.extendDefaults);
+            Inputmask.extendDefinitions(config.extendDefinitions);
+            Inputmask.extendAliases(config.extendAliases);
+            $('[data-inputmask]').inputmask();
+        };
+    
+    return {
+        init: init
+    };
+    }());
+
+    customInputmask.init();
+
+    function getCatalog(){
+        if($("#aasYear").val()!='' && $("#aasMonth").val()!=''){
+            $.ajax({
+                type: "GET",
+                url: "/contab/getCatalogByPeriodo/"+$('#busId').val()+"?month="+$('#aasMonth').val()+"&year="+$('#aasYear').val(),
+                beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                    showIsLoading("Procesando...");
+                }
+            }).done(function (result) {            
+                hideIsLoading(); 
+                console.log(result)
+                if(result.definedAccCatMonth.length >0){
+                    actualCatalog = result.definedAccCatMonth[0].accIdFk;
+                    //ahora definir lo de la mascara de la cuenta
+                    showData(result.definedAccCatMonth[0].accountingCatalog)
+                }
+                else{
+                    fnOpenErrorDialog("Para este periodo no se ha definido un catalogo contable.")
+                }
+            }).fail(function (data) {
+                hideIsLoading();            
+            })
+        }
+    }
+
+    function showData(accountCatalog){
+        $('#accId').val(accountCatalog.accId);
+        jsonData = JSON.parse(accountCatalog.accNivels)
+        accSeparator = accountCatalog.accSeparator        
+        // queda pendiente lo de nombre de la cuenta??? y el length
+        //crear la mascara
+        dataMask = ''
+        for(var a=1;  a<=jsonData.accNivel1; a++){																	
+            dataMask = dataMask+'9'		
+        }
+        if(jsonData.accNivel2){
+            dataMask = dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel2; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel3){
+            dataMask=dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel3; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel4){
+            dataMask=dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel4; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel5){
+            dataMask=dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel5; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel6){
+            dataMask = dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel6; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel7){
+            dataMask=dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel7; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel8){
+            dataMask=dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel8; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel9){
+            dataMask=dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel9; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel10){
+            dataMask=dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel10; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel11){
+            dataMask=dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel11; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel12){
+            dataMask=dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel12; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        console.log('defnidia la mascara',dataMask)
+        $(".accountId").inputmask("mask", {"mask": dataMask, "clearIncomplete": false ,'removeMaskOnSubmit': true, 'autoUnmask': true});
+    }
+
+    function fnSearch(data){
+        console.log(data.val())
+        newAccount = data.val();
+        search =false;
+        nivel2= jsonData.accNivel1*1+jsonData.accNivel2*1
+        nivel3= nivel2+jsonData.accNivel3*1
+        nivel4= nivel3+jsonData.accNivel4*1
+        nivel5= nivel4+jsonData.accNivel5*1
+        nivel6= nivel5+jsonData.accNivel6*1
+        nivel7= nivel6+jsonData.accNivel7*1
+        nivel8= nivel7+jsonData.accNivel8*1
+        nivel9= nivel8+jsonData.accNivel9*1
+        nivel10= nivel9+jsonData.accNivel10*1
+        nivel11= nivel10+jsonData.accNivel11*1
+        nivel12= nivel11+jsonData.accNivel12*1
+        if(newAccount.length<jsonData.accNivel1){
+            newAccount = createAccount(newAccount, jsonData.accNivel1, 0)
+            search =true; 
+        }
+        if( newAccount.length== jsonData.accNivel1 || newAccount.length== nivel2 || newAccount.length==nivel3 || newAccount.length==nivel4 || newAccount.length==nivel5 || 
+            newAccount.length== nivel6 || newAccount.length==nivel7 || newAccount.length==nivel8 || newAccount.length==nivel9 || newAccount.length== nivel10 || newAccount.length==nivel11 || newAccount.length==nivel12){
+            newAccount=putMask(newAccount)
+            search =true;            
+        }
+        else{
+           
+            if(newAccount.length<nivel2){
+                newAccount =  createAccount(newAccount, nivel2, jsonData.accNivel1)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel3){
+                newAccount =  createAccount(newAccount, nivel3, nivel2)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel4){
+                newAccount =  createAccount(newAccount, nivel4, nivel3)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel5){
+                newAccount =  createAccount(newAccount, nivel5, nivel4)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel6){
+                newAccount =  createAccount(newAccount, nivel6, nivel5)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel7){
+                newAccount =  createAccount(newAccount, nivel7, nivel6)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel8){
+                newAccount =  createAccount(newAccount, nivel8, nivel7)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel9){
+                newAccount =  createAccount(newAccount, nivel9, nivel8)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel10){
+                newAccount =  createAccount(newAccount, nivel10, nivel9)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel11){
+                newAccount =  createAccount(newAccount, nivel11, nivel10)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel12){
+                newAccount =  createAccount(newAccount, nivel12, nivel11)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+        }
+        if(search){
+            //obtener el nombre del nivel si existe
+            $.ajax({
+                type: "GET",
+                url: "/contab/getAccountingAccountSearch/"+$('#accId').val()+"?aacCode="+newAccount+"&aacNivelFirst="+$('#aacNivelFirst').val()+"&levelToSave="+$('#levelToSave').val()+"&aacNivelBefore="+$('#aacNivelBefore').val(),       
+                beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                    showIsLoading("Procesando...");
+                }
+            }).done(function (result) {  
+                console.log(result)
+                console.log(newAccount)
+                data.val(newAccount)
+                if(result.accountingAccount!=null){
+                    console.log(result.accountingAccount.aacName)
+                    $('#aacName').val(result.accountingAccount.aacName);
+                }
+                else{
+                    $('#aacName').val('');
+                }
+                console.log(result.accountingAccountRaiz)
+                if($('#levelToSave').val()>1 &&  result.accountingAccountRaiz!=null){
+                    $('#aacType').val(result.accountingAccountRaiz.aacType).trigger('change');
+                    $('#aacType').prop( "disabled", true );
+                }
+                //aacNivelBefore
+                if($('#levelToSave').val()>1 && result.accountingAccountRaizPrevios==null) {
+                    fnOpenErrorDialog("La cuenta digitada, no se ha registrado la cuenta padre "+$('#aacNivelBefore').val());
+                }
+
+                hideIsLoading();                                         
+            }).fail(function (data) {
+                hideIsLoading();
+                fnOpenErrorDialog(data.responseJSON.message);
+            })
+        }
+    }
+
+    function createAccount(newAccount, accNivel, previousLevel){
+        dataVal = newAccount
+        diference= accNivel - newAccount.length
+        if(previousLevel>0){
+            dataVal = ''
+            ultimo=''
+            countDiference =0
+            for(a=0; a<accNivel; a++){
+                if(previousLevel> a){
+                    dataVal =dataVal + newAccount.charAt(a)
+                }
+                else{
+                    ultimo = ultimo + newAccount.charAt(a)
+                    if(countDiference <diference){
+                        dataVal = dataVal +'0'
+                        countDiference =countDiference +1
+                    }                    
+                }               
+            }
+            dataVal = dataVal +ultimo
+
+        }
+        else{
+            for(a=newAccount.length; a<accNivel; a++){
+                dataVal = '0'+dataVal
+            }
+        }        
+        // $('#aacCode').val(dataVal)
+        return dataVal
+    }
+
+    function putMask(dataMask){
+        newDataWithMask =''
+        nivel2= jsonData.accNivel1*1+jsonData.accNivel2*1
+        nivel3= nivel2+jsonData.accNivel3*1
+        nivel4= nivel3+jsonData.accNivel4*1
+        nivel5= nivel4+jsonData.accNivel5*1
+        nivel6= nivel5+jsonData.accNivel6*1
+        nivel7= nivel6+jsonData.accNivel7*1
+        nivel8= nivel7+jsonData.accNivel8*1
+        nivel9= nivel8+jsonData.accNivel9*1
+        nivel10= nivel9+jsonData.accNivel10*1
+        nivel11= nivel10+jsonData.accNivel11*1
+        nivel12= nivel11+jsonData.accNivel12*1
+        levelToSave = 1
+        for(var a=0;  a<dataMask.length; a++){	
+            if(jsonData.accNivel1==a||nivel2==a||nivel3==a||nivel4==a||nivel5==a||nivel6==a||nivel7==a||nivel8==a||nivel9==a||nivel10==a||nivel11==a||nivel12==a){
+                // $('#aacNivelBefore').val(newDataWithMask)
+                if(jsonData.accNivel1==a){
+                    // $('#aacNivelFirst').val(newDataWithMask)
+                }
+                levelToSave = levelToSave+1
+                newDataWithMask = newDataWithMask+accSeparator
+            }	            															
+            newDataWithMask = newDataWithMask+dataMask.charAt(a)		
+        }   
+        // debo buscar el primer nivel para el manejo de tipo de cuenta y saldo y bloquear tipo de cuenta
+        // $('#levelToSave').val(levelToSave)
+        return newDataWithMask
+    }
+</script>
