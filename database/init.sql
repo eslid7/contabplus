@@ -215,6 +215,7 @@ CREATE TABLE changeTypes(
 CREATE TABLE accountingAccountSeat(
 	aasId INT AUTO_INCREMENT PRIMARY KEY,
 	accIdFk INT NOT NULL,
+	aasdStatus INT,
 	busIdFk INT NOT NULL,
 	useIdFk INT NOT NULL,
 	aasMonth INT NOT NULL,
@@ -223,7 +224,7 @@ CREATE TABLE accountingAccountSeat(
 	aasNumberSeat VARCHAR(10) NOT NULL,
 	aasIsPreSeat INT NOT NULL,
 	aasNameSeat VARCHAR(65) NOT NULL,
-	aasOrigin INT NOT NULL, --- App origen 1 Contabilidad
+	aasOrigin INT NOT NULL, -- App origen 1 Contabilidad
 	createdAt  TIMESTAMP,
 	updatedAt TIMESTAMP,
 	aasdDebitTotal FLOAT(12,2) NOT NULL,
@@ -233,9 +234,10 @@ CREATE TABLE accountingAccountSeat(
 
 CREATE TABLE accountingAccountSeatDetail(
 	aasdId INT AUTO_INCREMENT PRIMARY KEY,
-	docIdFK INT NOT NULL,
-	aacIdFK INT NOT NULL,
-	chaIdFk INT NOT NULL,
+	aasIdFk INT NOT NULL,
+	docIdFk INT NOT NULL,
+	aacIdFk INT NOT NULL,
+	monIdFk INT NOT NULL,
 	aasdNumberDoc VARCHAR(25) NOT NULL,	
 	aasdDescription VARCHAR(100) NOT NULL,	
 	aasdChangeValue FLOAT(5,2) NOT NULL,

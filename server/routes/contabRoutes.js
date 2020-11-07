@@ -82,6 +82,7 @@ router.route('/getListTypesDocumentsByBussines/:id').get(documentTypesController
 router.route('/viewMoneyTypes').get(moneyTypesController.viewMoneyTypes);
 router.route('/getListMoneyTypes').get(moneyTypesController.getListMoneyTypes);
 router.route('/saveMoneyTypes').post(moneyTypesController.saveMoneyTypes);
+router.route('/getListMoneyTypesByBussines/:id').get(moneyTypesController.getListMoneyTypesByBussines);
 
 //viewChangeTypes
 router.route('/viewChangeTypes').get(viewChangeTypesController.viewChangeTypes);
@@ -90,8 +91,9 @@ router.route('/saveChangeTypes').post(viewChangeTypesController.saveChangeTypes)
 
 //viewSeat
 router.route('/viewSeat').get(seatController.viewSeat);
-router.route('/getListSeat').get(seatController.getListSeat);
-router.route('/saveSeat').post(seatController.saveSeat);
+router.route('/getListSeats/:id').get(seatController.getListSeats);
+router.route('/saveHeatSeat').post(seatController.saveHeatSeat);
+router.route('/saveDetailSeat/:id').post(seatController.saveDetailSeat);
 
 
 module.exports = router;

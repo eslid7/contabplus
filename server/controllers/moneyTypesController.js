@@ -91,8 +91,18 @@ function saveMoneyTypes(req, res){
     })
   }
 }
+
+
+function getListMoneyTypesByBussines(req, res){
+  moneyTypesModel.findAll({where:{'busIdFK': req.params.id }   
+  }).then( moneyTypesCatalog =>{        
+    return res.status(200).json({rows: moneyTypesCatalog, total:moneyTypesCatalog.length});
+  })
+}
+
 module.exports = {
     viewMoneyTypes,
     getListMoneyTypes,
     saveMoneyTypes,
+    getListMoneyTypesByBussines,
 }
