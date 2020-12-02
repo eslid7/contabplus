@@ -240,9 +240,11 @@ CREATE TABLE accountingAccountSeatDetail(
 	monIdFk INT NOT NULL,
 	aasdNumberDoc VARCHAR(25) NOT NULL,	
 	aasdDescription VARCHAR(100) NOT NULL,	
-	aasdChangeValue FLOAT(5,2) NOT NULL,
+	aasdChangeValue FLOAT(7,2) NOT NULL,
 	aasdDebit FLOAT(12,2) NOT NULL,
 	aasdCredit FLOAT(12,2) NOT NULL,
 	createdAt  TIMESTAMP,
 	updatedAt TIMESTAMP
 );
+
+

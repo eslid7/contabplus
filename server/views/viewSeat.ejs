@@ -7,6 +7,9 @@
             width: 140px;
             float: left;
         }
+        .amountsAlign{
+            text-align: right;
+        }
     </style>
 	<!-- BEGIN PAGE -->
 	<div class="page-content">
@@ -166,7 +169,7 @@
                                                         Tipo Cambio
                                                     </label>
                                                     <div class="controls">
-                                                        <input type="text" name="aasdChangeValue" id="aasdChangeValue" class="m-wrap span12" placeholder="Tipo de cambio" maxlength="60">
+                                                        <input type="text" name="aasdChangeValue" id="aasdChangeValue" class="m-wrap span12 numeric amountsAlign" data-inputmask="'alias': 'decimal', 'groupSeparator': '.', 'autoGroup': true, 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"   maxlength="8">
                                                     </div>
                                                 </div>
                                             </div>
@@ -209,7 +212,7 @@
                                                         Débito
                                                     </label>
                                                     <div class="controls">
-                                                        <input type="text" name="aasdDebit" id="aasdDebit" class="m-wrap span12 numeric" placeholder="Débito" maxlength="60">
+                                                        <input type="text" name="aasdDebit" id="aasdDebit" class="m-wrap span12 numeric amountsAlign" data-inputmask="'alias': 'decimal', 'groupSeparator': '.', 'autoGroup': true, 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"  maxlength="60">
                                                     </div>
                                                 </div>                 
                                                 <div class="control-group span3">
@@ -217,13 +220,13 @@
                                                         Crédito 
                                                     </label>
                                                     <div class="controls">
-                                                        <input type="text" name="aasdCredit" id="aasdCredit" class="m-wrap span12 numeric" placeholder="Crédito" maxlength="60">
+                                                        <input type="text" name="aasdCredit" id="aasdCredit" class="m-wrap span12 numeric amountsAlign"  data-inputmask="'alias': 'decimal', 'groupSeparator': '.', 'autoGroup': true, 'digits': 2, 'digitsOptional': false, 'placeholder': '0'" maxlength="60">
                                                     </div>
                                                 </div>
                                                 <div class="control-group span6">
                                                     <div class="control-group span4 ">
                                                         <button id="saveDetailDiv" type="button"  class="btn green" onclick="saveDetail() " style="margin-top:25px;">
-                                                            Guardar <i class="icon-save"></i>
+                                                            Agregar <i class="icon-save"></i>
                                                         </button> 
                                                     </div>  
                                                     <div class="control-group span4 ">
@@ -235,32 +238,36 @@
                                             </div>
                                                                                  
                                     </form>
-                                        <div class="row-fluid" >
+                                        <div class="row-fluid" style="max-height: 300px;overflow-y: scroll;" >
                                             <table id="listSeats" class="bt-table table-striped"
                                                 data-side-pagination="server"
                                                 data-pagination="true"
-                                                data-page-size="20"
-                                                data-page-list="[20, 40, 60]"
+                                                data-page-size="10"
+                                                data-page-list="[10, 40, 60]"
                                                 data-search="true">
                                             </table>                                           
                                         </div> 
                                         <div class="row-fluid">
-                                            <div class="control-group span8 "></div>
+                                            <div class="control-group span7 ">
+                                            </div>
+                                            <div class="control-group span2 ">
+                                                <!-- <button id="cancelSeat" type="button"  class="btn " onclick="clean()">
+                                                    Cancelar <i class="icon-plus"></i>
+                                                </button>   -->
+                                                <button id="addTypeDocu" type="button"  class="btn green" onclick="fnSaveSeat()">
+                                                    Guardar <i class="icon-plus"></i>
+                                                </button>                                                
+                                            </div>
                                             <div class="control-group span3 ">
                                                 <div class="span2"><b>Totales</b>   </div>
-                                                <div id="totalDebit" class="span5" style="text-align: right;">12.789,30</div> 
-                                                <div id="totalCredit" class="span5" style="text-align: right;">12.789,30</div>
+                                                <div id="totalDebit" class="span5" style="text-align: right;">0.00</div> 
+                                                <div id="totalCredit" class="span5" style="text-align: right;padding-right: 22px;">0.00</div>
                                             </div>    
                                         </div>
                                         <div class="row-fluid">
                                             <div class="control-group span9 "></div>
                                             <div class="control-group span3 ">
-                                                <button id="addTypeDocu" type="button"  class="btn green" onclick="fnSaveSeat()">
-                                                    Guardar <i class="icon-plus"></i>
-                                                </button>
-                                                <button id="cancelSeat" type="button"  class="btn " onclick="clean()">
-                                                    Cancelar <i class="icon-plus"></i>
-                                                </button>     
+                                                   
                                             </div>    
                                         </div>
                                     </div>
@@ -293,11 +300,12 @@
 				$('#aasDateSeat').removeClass('invalid').addClass('success');
 			}
         });
+        
         $("#aasDateSeat").inputmask("mask", {"mask": '99/99/9999', "clearIncomplete": false });
         $("#aasMonth").inputmask("mask", {"mask": 99, "clearIncomplete": true });
         $("#aasYear").inputmask("mask", {"mask": 9999, "clearIncomplete": true });
-        // $("#aasdDebit").inputmask("#.##0,00", {reverse: true});
-        // $("#aasdCredit").inputmask("#.##0,00", {reverse: true});
+        // $("#aasdDebit").inputmask();
+        // $("#aasdCredit").inputmask();
         getTypesDocument()
         $('#busId').change(function() {
 			getTypesDocument();			
@@ -314,6 +322,14 @@
                 fnSearch($(this))
             }         
         });
+
+        $("#saveDetailDiv" ).on( "keydown", function(event) {
+            if(event.which == 13 || event.which == 9){
+                $("#s2id_docId").focus();
+            }         
+        });
+
+        
         
         // $("#monCode").inputmask("mask", {"mask": 99, "clearIncomplete": false, 'removeMaskOnSubmit': true,'autoUnmask': true, });
         <% if(business.length == 0) { %>
@@ -461,8 +477,8 @@
             extendDefinitions: {},
             extendAliases: {
                 'numeric': {
-                radixPoint: ',',
-                groupSeparator: '.',
+                radixPoint: '.',
+                groupSeparator: ',',
                 autoGroup: true,
                 placeholder: ''
             },
@@ -875,9 +891,11 @@
                 $('#accountId').val('')
                 $('#aasdDebit').val(0)
                 $('#aasdCredit').val(0)
-
+                $("#docId").focus();
                 /// actualizar totales
-
+                $('#totalDebit').html(formaterNumber(results.result[0].totalAasdDebit));
+                $('#totalCredit').html(formaterNumber(results.result[0].totalAasdCredit));
+                
             }).fail(function () {
                 hideIsLoading();            
             })            
@@ -926,12 +944,16 @@
 					field: 'aasdDebit',
 					title: 'Débito',
 					sortable: false,
-					width: '7%' 
+                    width: '7%',
+                    align: 'right',
+                    formatter: operateFormatterAasdDebit
 				} ,{
 					field: 'aasdCredit',
 					title: 'Crédito',
 					sortable: false,
-					width: '7%', 
+                    width: '7%', 
+                    align: 'right',
+                    formatter: operateFormatterAasdCredit
 				}                 
 			]
 		});
@@ -939,5 +961,19 @@
 
     function refreshTable() {
         $('.bt-table').bootstrapTable('refresh', {url: '/contab/getListSeats/'+$('#aasId').val()});
+    }
+
+    function operateFormatterAasdDebit(value, row, index) {
+        return [
+        formaterNumber(row.aasdDebit)
+        ].join('');
+    }
+    function operateFormatterAasdCredit(value, row, index) {
+        return [
+        formaterNumber(row.aasdCredit)
+        ].join('');
+    }
+    function formaterNumber(dataNumber){
+        return dataNumber.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
     }
 </script>

@@ -1,5 +1,5 @@
 Regla 
-Asp128CF
+asp128CF
 
 CREATE DATABASE contabplusdb;
 

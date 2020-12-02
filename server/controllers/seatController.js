@@ -110,7 +110,7 @@ function saveHeatSeat(req, res){
         aasNameSeat: req.body.aasNameSeat,
         updateAt: moment(new Date()).format('YYYY-MM-DD')
     }, {where : {'aasId' : req.body.aasId}}).then(function () {
-      return  res.status(200).json({ message: "Se ha actualizado con exito" });
+      return  res.status(200).json({ message: "Se ha actualizado con exito", aasId: req.body.aasId });
     })
   }
   else{  
@@ -149,16 +149,23 @@ function saveDetailSeat(req, res){
       monIdFk: req.body.monId,
       aasdNumberDoc: req.body.aasdNumberDoc,
       aasdDescription: req.body.aasdDescription,
-      aasdChangeValue: req.body.aasdChangeValue,
-      aasdDebit: req.body.aasdDebit,
-      aasdCredit: req.body.aasdCredit,
+      aasdChangeValue: req.body.aasdChangeValue.replace(/,/g,''),
+      aasdDebit: req.body.aasdDebit.replace(/,/g,''), 
+      aasdCredit: req.body.aasdCredit.replace(/,/g,''),
       updateAt: moment(new Date()).format('YYYY-MM-DD')
     }, {where : {'aasdId' : req.body.aasdId}}).then(function () {
-      return  res.status(200).json({ message: "Se ha actualizado con exito" });
+
+      accountingAccountSeatDetailModel.findAll({
+        where : {'aasIdFk' : req.params.id },
+        attributes: ['aasIdFk', [sequelize.fn('sum', sequelize.col('aasdDebit')), 'totalAasdDebit'], [sequelize.fn('sum', sequelize.col('aasdCredit')), 'totalAasdCredit']],
+        group : ['aasIdFk']
+      }).then(function(result){
+        return  res.status(200).json({ message: "Se ha actualizado con exito", result :result });
+      })  
     })
   }
   else{   
-    console.log(req.body.monId) 
+
     const dataToSave = new accountingAccountSeatDetailModel({
       aasIdFk: req.params.id,
       docIdFk: req.body.docId,
@@ -166,15 +173,22 @@ function saveDetailSeat(req, res){
       monIdFk: req.body.monId,
       aasdNumberDoc: req.body.aasdNumberDoc,
       aasdDescription: req.body.aasdDescription,
-      aasdChangeValue: req.body.aasdChangeValue,
-      aasdDebit: req.body.aasdDebit, 
-      aasdCredit: req.body.aasdCredit,
+      aasdChangeValue: req.body.aasdChangeValue.replace(/,/g,''),
+      aasdDebit: req.body.aasdDebit.replace(/,/g,''), 
+      aasdCredit: req.body.aasdCredit.replace(/,/g,''),
       createdAt: moment(new Date()).format('YYYY-MM-DD'),
       updateAt: moment(new Date()).format('YYYY-MM-DD')
     });
-    console.log(dataToSave)
+
     return dataToSave.save().then(function (accountingASD) {
-        res.status(200).json({ message: "Se ha creado con exito" , aasdId : accountingASD.aasdId});
+      accountingAccountSeatDetailModel.findAll({
+        where : {'aasIdFk' : req.params.id },
+        attributes: ['aasIdFk', [sequelize.fn('sum', sequelize.col('aasdDebit')), 'totalAasdDebit'], [sequelize.fn('sum', sequelize.col('aasdCredit')), 'totalAasdCredit']],
+        group : ['aasIdFk']
+      }).then(function(result){
+        return  res.status(200).json({ message: "Se ha actualizado con exito", result :result });
+      })  
+      // res.status(200).json({ message: "Se ha creado con exito" , aasdId : accountingASD.aasdId});
     })
   }
 }
