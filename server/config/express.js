@@ -12,6 +12,7 @@ const routes = require('../routes')
 // const { authenticate } = require('../models/dataBD')
 
 
+
 module.exports.initPassport = function initPassport(app) {
   app.use(
     session({

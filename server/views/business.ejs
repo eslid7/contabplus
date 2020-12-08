@@ -108,7 +108,72 @@
                                     <input type="text" name="busPhone" id="busPhone" class="m-wrap span12" placeholder="Teléfono" maxlength="11">
 								</div>
 							</div>
-						</div>							
+	
+						</div>
+						<div class="row-fluid">
+							<div class="control-group span6 ">
+								<label for="accName">
+									País
+								</label>
+								<div class="controls">                                    
+									<input type="text" name="contry" id="contry" class="m-wrap span12" placeholder="País" maxlength="60">
+								</div>
+							</div>
+							<div class="control-group span6 ">
+								<label for="accName">
+									Provincia
+								</label>
+								<div class="controls">                                    
+									<input type="text" name="province" id="province" class="m-wrap span12" placeholder="Provincia" maxlength="60">
+								</div>
+							</div>								
+						</div>	
+						<div class="row-fluid">
+							<div class="control-group span6 ">
+								<label for="accName">
+									Cantón
+								</label>
+								<div class="controls">                                    
+									<input type="text" name="canton" id="canton" class="m-wrap span12" placeholder="Cantón" maxlength="60">
+								</div>
+							</div>
+							<div class="control-group span6 ">
+								<label for="accName">
+									Distrito
+								</label>
+								<div class="controls">                                    
+									<input type="text" name="district" id="district" class="m-wrap span12" placeholder="Distrito" maxlength="60">
+								</div>
+							</div>			
+						</div>
+						<div class="row-fluid">
+							<div class="control-group span6 ">
+								<label for="accName">
+									Dirección
+								</label>
+								<div class="controls">                                    
+									<input type="text" name="address" id="address" class="m-wrap span12" placeholder="Dirección" maxlength="120">
+								</div>
+							</div>
+							<div class="control-group span6 ">
+								<label for="accName">
+									Sitio Web
+								</label>
+								<div class="controls">                                    
+									<input type="text" name="webSite" id="webSite" class="m-wrap span12" placeholder="Sitio Web" maxlength="60">
+								</div>
+							</div>			
+						</div>
+						<div class="row-fluid">
+							<div class="control-group span6 ">
+								<label for="accName">
+									Apartado postal
+								</label>
+								<div class="controls">                                    
+									<input type="text" name="postalMail" id="postalMail" class="m-wrap span12" placeholder="Sitio Web" Apartado postal="60">
+								</div>
+							</div>	
+						</div>			
 					</form>
 				</div>
 				<div class="modal-footer">
@@ -138,22 +203,19 @@
 					sortable: true,
 					width: '10%'
 				},
+				 {
+				 	field: 'busName',
+				 	title: 'Nombre',
+				 	sortable: true,
+				 	width: '20%'
+				 }
+				, 
 				{
-					field: 'busName',
-					title: 'Nombre',
-					sortable: true,
-					width: '20%'
-				}, {
-					field: 'busEmail',
-					title: 'Email',
+					field: 'address',
+					title: 'Dirección',
 					sortable: true,
 					width: '10%'
-				}, {
-					field: 'busPhone',
-					title: 'Teléfono',
-					sortable: true,
-					width: '5%'
-				}, {
+				},{
 					field: 'busStatus',
 					title: 'Editar',
 					sortable: false,
