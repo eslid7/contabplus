@@ -213,23 +213,22 @@ function saveBusiness(req, res){
 
     if(req.body.busId > 0){
         businessModel.update({
-            busName: req.body.busName,//
-            useIdFk: token.useId,//
-            busStatus: 1,//
-            busJuriricalId: req.body.busJuriricalId,//
-            busNameFantasy: req.body.busNameFantasy,//
-            busMoney: req.body.busMoney,//
-            busEmail: req.body.busEmail,//
-            busPhone: req.body.busPhone,//
-
-            contry: req.body.contry,//
-            province: req.body.province,//
-            canton: req.body.canton,//
-            district: req.body.district,//
-            address: req.body.address,//
-            idType: req.body.idType,//
-            webSite: req.body.webSite,//
-            postalMail: req.body.postalMail,//
+            busName: req.body.busName,
+            useIdFk: token.useId,
+            busStatus: 1,
+            busJuriricalId: req.body.busJuriricalId,
+            busNameFantasy: req.body.busNameFantasy,
+            busMoney: req.body.busMoney,
+            busEmail: req.body.busEmail,
+            busPhone: req.body.busPhone,
+            contry: req.body.contry,
+            province: req.body.province,
+            canton: req.body.canton,
+            district: req.body.district,
+            address: req.body.address,
+            idType: req.body.idType,
+            webSite: req.body.webSite,
+            postalMail: req.body.postalMail,
             updateAt: moment(new Date()).format('YYYY-MM-DD')
             }, {where : {'busId': req.body.busId}}).then(function () {
             return  res.status(200).json({ message: "Se ha actualizado con exito" });
@@ -245,6 +244,14 @@ function saveBusiness(req, res){
             busMoney: req.body.busMoney,
             busEmail: req.body.busEmail,
             busPhone: req.body.busPhone,
+            contry: req.body.contry,
+            province: req.body.province,
+            canton: req.body.canton,
+            district: req.body.district,
+            address: req.body.address,
+            idType: req.body.idType,
+            webSite: req.body.webSite,
+            postalMail: req.body.postalMail,
             createdAt: moment(new Date()).format('YYYY-MM-DD'),
             updateAt: moment(new Date()).format('YYYY-MM-DD')
         });

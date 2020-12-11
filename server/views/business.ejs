@@ -50,7 +50,18 @@
 				<div class="modal-body">
 					<form id="businessCatalog" action="#" >
 						<input type="hidden" name="busId" id="busId" >
-						<div class="row-fluid">
+						<div class="row-fluid">							
+							<div class="control-group span6 ">
+								<label for="idType">
+									Tipo de Identificación
+								</label>
+								<div class="controls">
+									<select name="idType" id="idType" class="m-wrap span12">
+										<option value="1">Jurídica</option>
+										<option value="2">Física</option>
+									</select>	
+								</div>
+							</div>
 							<div class="control-group span6 ">
 								<label for="accCode">
 									Cedula Jurídica
@@ -58,7 +69,9 @@
 								<div class="controls">
 									<input type="text" name="busJuriricalId" id="busJuriricalId" class="m-wrap span12" placeholder="Cedula Jurídica" maxlength="100">
 								</div>
-							</div>
+							</div>													
+						</div>
+						<div class="row-fluid">
 							<div class="control-group span6 ">
 								<label for="accCode">
 									Razon social
@@ -66,9 +79,7 @@
 								<div class="controls">
 									<input type="text" name="busName" id="busName" class="m-wrap span12" placeholder="Nombre" maxlength="100">
 								</div>
-							</div>							
-						</div>
-						<div class="row-fluid">
+							</div>	
 							<div class="control-group span6 ">
 								<label for="accCode">
 									Nombre fantasia
@@ -76,19 +87,6 @@
 								<div class="controls">
 									<input type="text" name="busNameFantasy" id="busNameFantasy" class="m-wrap span12" placeholder="Nombre fantasia" maxlength="100">
 								</div>
-							</div>
-							<div class="control-group span6 ">		
-								<div class="control-group span6">
-									<label for="accCode">
-										Moneda
-									</label>
-									<div class="controls" >  
-										<select id="busMoney" name="busMoney" class="span10">
-											<option value="1">Colón</option>
-											<option value="2">Dolar</option>
-										</select>                                               
-									</div>
-								</div>						
 							</div>							
 						</div>
 						<div class="row-fluid">
@@ -170,8 +168,21 @@
 									Apartado postal
 								</label>
 								<div class="controls">                                    
-									<input type="text" name="postalMail" id="postalMail" class="m-wrap span12" placeholder="Sitio Web" Apartado postal="60">
+									<input type="text" name="postalMail" id="postalMail" class="m-wrap span12" placeholder="Apartado postal" Apartado postal="60">
 								</div>
+							</div>
+							<div class="control-group span6 ">		
+								<div class="control-group span6">
+									<label for="accCode">
+										Moneda
+									</label>
+									<div class="controls" >  
+										<select id="busMoney" name="busMoney" class="span10">
+											<option value="1">Colón</option>
+											<option value="2">Dolar</option>
+										</select>                                               
+									</div>
+								</div>						
 							</div>	
 						</div>			
 					</form>
@@ -186,6 +197,7 @@
 <script type="text/javascript">
 	$(document).ready(function(){
 		$('#busMoney').select2({});
+		$('#idType').select2({});
 		$("#busPhone").inputmask("mask", {"mask": "99999999",'removeMaskOnSubmit': true,'autoUnmask': true, "clearIncomplete": false});
 		handleTableData();
 	});
@@ -245,6 +257,14 @@
 		$('#busEmail').val($('#listBusiness').bootstrapTable('getData')[index].busEmail)
 		$('#busPhone').val($('#listBusiness').bootstrapTable('getData')[index].busPhone)
 		$('#busMoney').val($('#listBusiness').bootstrapTable('getData')[index].busMoney).trigger('change');
+		$('#idType').val($('#listBusiness').bootstrapTable('getData')[index].idType).trigger('change');
+		$('#contry').val($('#listBusiness').bootstrapTable('getData')[index].contry)
+		$('#province').val($('#listBusiness').bootstrapTable('getData')[index].province)
+		$('#canton').val($('#listBusiness').bootstrapTable('getData')[index].canton)
+		$('#district').val($('#listBusiness').bootstrapTable('getData')[index].district)
+		$('#address').val($('#listBusiness').bootstrapTable('getData')[index].address)
+		$('#webSite').val($('#listBusiness').bootstrapTable('getData')[index].webSite)
+		$('#postalMail').val($('#listBusiness').bootstrapTable('getData')[index].postalMail)
 		$('#modalBusiness').modal('show')
 	}
 	function operateFormatterState(value, row, index) {

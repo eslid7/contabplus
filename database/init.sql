@@ -248,3 +248,30 @@ CREATE TABLE accountingAccountSeatDetail(
 );
 
 
+ALTER TABLE business
+ADD COLUMN idType int not null AFTER busId;
+
+ALTER TABLE business
+ADD COLUMN webSite VARCHAR(60) not null AFTER busPhone;
+
+ALTER TABLE business
+ADD COLUMN postalMail VARCHAR(10);
+
+ALTER TABLE business
+ADD COLUMN contry VARCHAR(60) not null AFTER postalMail;
+
+
+ALTER TABLE business
+ADD COLUMN province VARCHAR(60) not null AFTER contry;
+
+
+ALTER TABLE business
+ADD COLUMN canton VARCHAR(60) not null AFTER province;
+
+
+ALTER TABLE business
+ADD COLUMN district VARCHAR(60) not null AFTER canton;
+
+
+ALTER TABLE business
+ADD COLUMN address VARCHAR(120) not null AFTER district;
