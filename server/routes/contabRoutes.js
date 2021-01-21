@@ -105,4 +105,7 @@ router.route('/reverSeatService/:id').post(seatController.reverSeatService);
 router.route('/viewBalanceSheet').get(balanceSheetController.viewBalanceSheet);
 router.route('/balanceSheet').post(balanceSheetController.balanceSheet);
 
+
+//view balance reportes
+
 module.exports = router;
