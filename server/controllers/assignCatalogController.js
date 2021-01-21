@@ -126,7 +126,7 @@ function saveAsignCatalog(req, res){
 
 }
 
-function getCatalogByPeriodo(req, res){ 
+function getCatalogByPeriodo(req, res){
     definedAccCatMonthModel.hasOne(accountingCatalogModel,{foreignKey:'accId',sourceKey: 'accIdFk'});
     definedAccCatMonthModel.findAll({where:{ busIdFk: req.params.id, month: req.query.month, year: req.query.year}, 
         include: [{

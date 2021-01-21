@@ -10,6 +10,8 @@ const documentTypesController = require('../controllers/documentTypesController'
 const moneyTypesController = require('../controllers/moneyTypesController');
 const viewChangeTypesController = require('../controllers/viewChangeTypesController');
 const seatController = require('../controllers/seatController');
+const balanceSheetController = require('../controllers/balanceSheetController');
+
 const router = express.Router()
 
 router.route('/users').get(userController.getUsers);
@@ -94,6 +96,13 @@ router.route('/viewSeat').get(seatController.viewSeat);
 router.route('/getListSeats/:id').get(seatController.getListSeats);
 router.route('/saveHeatSeat').post(seatController.saveHeatSeat);
 router.route('/saveDetailSeat/:id').post(seatController.saveDetailSeat);
+router.route('/deleteSeatDetail/:id').delete(seatController.deleteSeatDetail);
+router.route('/applySeat/:id').post(seatController.applySeat);
+router.route('/deleteSeat/:id').delete(seatController.deleteSeat);
+router.route('/reverSeatService/:id').post(seatController.reverSeatService);
 
+//view Close balance
+router.route('/viewBalanceSheet').get(balanceSheetController.viewBalanceSheet);
+router.route('/balanceSheet').post(balanceSheetController.balanceSheet);
 
 module.exports = router;

@@ -102,7 +102,8 @@ CREATE TABLE businessUsersPermit (
 
 CREATE TABLE businessAccountingC (
 	busIdFk INT NOT NULL,
-	accIdFk INT NOT NULL,
+	aacIdFk INT NOT NULL,
+	balance FLOAT(12,2),
 	createdAt  TIMESTAMP, 
 	updatedAt TIMESTAMP
 );
@@ -215,7 +216,7 @@ CREATE TABLE changeTypes(
 CREATE TABLE accountingAccountSeat(
 	aasId INT AUTO_INCREMENT PRIMARY KEY,
 	accIdFk INT NOT NULL,
-	aasdStatus INT,
+	aasdStatus INT, -- 0 No aplicado 1 Aplicado 2 Aplicado y Cerrado no se puede modificar 3 En modificacion pero no aplicado
 	busIdFk INT NOT NULL,
 	useIdFk INT NOT NULL,
 	aasMonth INT NOT NULL,
@@ -238,6 +239,7 @@ CREATE TABLE accountingAccountSeatDetail(
 	docIdFk INT NOT NULL,
 	aacIdFk INT NOT NULL,
 	monIdFk INT NOT NULL,
+--	aasdStatus INT NOT NULL,-- 0 Eliminado, 1 Creado, 2 Aplicado, 3 Modificado 
 	aasdNumberDoc VARCHAR(25) NOT NULL,	
 	aasdDescription VARCHAR(100) NOT NULL,	
 	aasdChangeValue FLOAT(7,2) NOT NULL,
@@ -275,3 +277,26 @@ ADD COLUMN district VARCHAR(60) not null AFTER canton;
 
 ALTER TABLE business
 ADD COLUMN address VARCHAR(120) not null AFTER district;
+
+
+-- ALTER TABLE accountingAccountSeatDetail
+-- ADD oldDebit FLOAT(12,2);
+
+-- ALTER TABLE accountingAccountSeatDetail
+-- ADD oldCredit FLOAT(12,2);
+
+
+CREATE TABLE balanceSheet(
+	bshId INT AUTO_INCREMENT PRIMARY KEY,
+	busIdFk INT NOT NULL,
+	aacIdFk INT NOT NULL,
+--	monIdFk INT NOT NULL,
+	bshMonth INT NOT NULL,
+	bshYear INT NOT NULL,
+	bshPreviousBalance FLOAT(12,2) NOT NULL,
+	bshDebits FLOAT(12,2) NOT NULL,
+	bshCredits FLOAT(12,2) NOT NULL,
+	bshFinalBalance FLOAT(12,2) NOT NULL,
+	createdAt TIMESTAMP,
+	updatedAt TIMESTAMP
+);

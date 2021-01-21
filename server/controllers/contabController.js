@@ -341,6 +341,18 @@ async function saveDefinedAccountingCatalog(req, res){
             if(definedAccountingCatalogOtherB.length > 0){
                 res.status(400).json({ message: "El catálogo individual solo puede asignarse a una empresa." });
             }
+            else{
+                const dataToSave = new definedAccountingCatalogModel({
+                    accIdFk: req.body.accId,
+                    useIdFk: token.useId,
+                    busIdFk: req.body.busId,
+                    createdAt: moment(new Date()).format('YYYY-MM-DD'),
+                    updateAt: moment(new Date()).format('YYYY-MM-DD')
+                });
+                return dataToSave.save().then(function () {
+                    res.status(200).json({ message: "Se ha creado con exito" });
+                }) 
+            }
         }
     }
 

@@ -1,0 +1,246 @@
+<% include partials/header %>
+	<!-- BEGIN PAGE -->
+	<div class="page-content">
+			<!-- BEGIN PAGE CONTAINER-->
+			<div class="container-fluid">
+				<!-- BEGIN PAGE HEADER-->
+				<div class="row-fluid">
+					<div class="span12">
+						<h3>Cierre contable </h3>
+					</div>
+				</div>
+
+				<div class="row-fluid">
+						<div class="span12">
+							<!-- BEGIN EXAMPLE TABLE PORTLET-->
+							<div class="portlet box light-grey">
+								<div class="portlet-title">
+									
+								</div>
+								<div class="portlet-body">									
+                                    <form id="balanceSheetForm" name="balanceSheetForm" action="#">
+                                        <div class="row-fluid">
+                                            <div class="control-group span4">
+                                                <label for="accCode">
+                                                    Empresa
+                                                </label>
+                                                <div class="controls">
+                                                    <% if(business.length == 0) { %>   
+                                                        No hay empresas disponibles
+                                                    <%} else {%>
+                                                    <select id="busId" name="busId" class="span12 select2">   
+                                                        <% for(var j = 0; j < business.length; j++) { %>   
+                                                            <option value="<%=business[j].busId%>"> <%=business[j].busName%></option>
+                                                        <% }%>
+                                                    </select>
+                                                    <% }%>
+                                                </div>
+                                            </div>
+                                            <div class="control-group span2">
+                                                <label for="accCode">
+                                                    Mes
+                                                </label>
+                                                <div class="controls">
+                                                    <input type="text" name="bshMonth" id="bshMonth" class="span8"  maxlength="2">         
+                                                </div>
+                                            </div> 
+                                            <div class="control-group span2 ">                                               
+                                                <label for="accCode">
+                                                Año 
+                                                </label>
+                                                <div class="controls"  > 
+                                                    <input type="text" name="bshYear" id="bshYear" class="span10" maxlength="4">                                                   
+                                                </div>
+                                            </div>                                            
+                                            <div class="control-group span3 ">
+                                                <button id="saveHedaderDiv" type="button"  class="btn green span10" onclick="saveBalanceSheet() " style="margin-top:25px;">
+                                                    Realizar el cierre <i class="icon-save"></i>
+                                                </button> 
+                                            </div> 
+                                        </div>                                        
+                                    </form>
+									<table id="listBalanceSheet" class="bt-table table-striped"
+										data-side-pagination="server"
+										data-pagination="true"
+										data-page-size="10"
+										data-page-list="[10, 20, 30]"
+										data-search="true">
+									</table>
+								</div>
+							</div>
+							<!-- END EXAMPLE TABLE PORTLET-->
+						</div>
+					</div>
+			</div>
+			
+	</div>	
+
+
+<% include partials/footer %>
+<script type="text/javascript">
+	$(document).ready(function(){
+        $('#busId').select2({});
+        $("#busId").on("select2-opening", function() {
+			$('.select2').select2("close");
+        });
+        $("#bshMonth").inputmask("mask", {"mask": 99, "clearIncomplete": false, 'removeMaskOnSubmit': true, 'autoUnmask': true});
+        $("#bshYear").inputmask("mask", {"mask": 9999, "clearIncomplete": true });
+        $("#bshMonth").change(function() {
+			newMonth= $("#bshMonth").val()
+            if($("#bshMonth").val().length<2){
+                newMonth = "0"+$("#bshMonth").val()
+                $("#bshMonth").val(newMonth)
+            }		
+        });
+        <% if(business.length == 0) { %>
+
+        <%} else {%>
+            handleTableData();   
+        <% }%>
+
+        $('#balanceSheetForm').validate({
+            errorElement: 'label', //default input error message container
+            errorClass: 'help-inline', // default input error message class
+            ignore: "",
+            rules: {
+                busId: { required: true},
+                bshMonth: { required: true},
+                bshYear: { required: true}
+            },
+            messages: { // custom messages
+                busId: { required: "Seleccione el catalogo." },
+                bshMonth: { required: "Digite el mes." },
+                bshYear: { required: "Digite el año." }
+            },
+            highlight: function (element) { // hightlight error inputs
+                $(element).closest('.control-group').addClass('error'); // set error class to the control group
+            },
+            success: function (label) {
+                label.closest('.control-group').removeClass('error');
+                label.remove();
+            },
+            errorPlacement: function (error, element) {
+                if (element.closest('.icon-search').size() === 1) {
+                    error.addClass('help-small no-left-padding').insertAfter(element.closest('.icon-search'));
+                } else if (element.next().attr("class")){
+                    error.addClass('help-small no-left-padding').insertAfter(element.next());
+                } else {
+                    error.addClass('help-small no-left-padding').insertAfter(element);
+                }
+            }
+        });
+	});
+	isFirtsDatatable = true;
+	function handleTableData () {
+		$('#listAsignPermit').bootstrapTable({
+			height: getHeight(),
+			method: 'GET',
+			url: '/contab/assignHistory/'+$('#busId').val(),
+			cache: false,
+			columns: [
+				{
+					field: 'accountingCatalog.accName',
+					title: 'Catálogo',
+					sortable: false,
+					width: '20%'
+				}, {
+					field: 'accountingCatalog.accCode',
+					title: 'Número',
+					sortable: false,
+					width: '3%'
+				}, {
+					field: 'accountingCatalog.accIsGlobal',
+					title: 'Tipo Catálogo',
+					sortable: false,
+                    width: '15%',
+					formatter: operateFormatter
+				}, {
+					field: 'user.useName',
+					title: 'Usuario',
+					sortable: false,
+                    width: '15%'
+				}, {
+					field: 'permitId',
+					title: 'Opcion',
+					sortable: false,
+                    width: '15%',
+					formatter: operateFormatter2
+                }, {
+					field: 'bupId',
+					title: 'Eliminar',
+					sortable: false,
+                    width: '15%',
+					formatter: operateFormatter3
+                }
+                
+			]
+		});
+	};
+	function getHeight() {
+		return $(window).height();
+    }
+    
+    function operateFormatter(value, row, index) {
+        return [
+            ((row.accountingCatalog.accIsGlobal == 1) ? "Global" : "Individual"),
+        ].join('');
+    }
+    function operateFormatter2(value, row, index) {
+        return [
+            ((row.permitId == 1) ? "Consultar" : "Modificar"),
+        ].join('');
+    }
+    function operateFormatter3(value, row, index) {
+        return [
+            "<button type='button' class='btn red",
+            " btnActiveInactive' onclick='fnEliminar("+ row.bupId +")'>",
+            "<i class='icon-off'></i> ",
+           "Eliminar",
+            "</button>"
+        ].join('');
+    }
+
+    function refreshTable() {
+        $('.bt-table').bootstrapTable('refresh', {silent: true});
+    }
+
+	function saveBalanceSheet(){
+        if ($('#balanceSheetForm').valid()) {
+            $.ajax({
+                type: "POST",
+                url: "/contab/balanceSheet",
+                data: $('#balanceSheetForm').serialize(), //se envia el form serializado          
+                beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                    showIsLoading("Procesando...");
+                }
+            }).done(function (data) {  
+                fnOpenSusessDialog(data.message)          
+                hideIsLoading();                         
+                //setTimeout(function(){ refreshTable(); }, 300);
+            }).fail(function (data) {
+                hideIsLoading();
+                fnOpenErrorDialog(data.responseJSON.message);
+            })
+        }
+    }
+
+    function fnEliminar(id){
+		$.ajax({
+            type: "POST",
+			url: "/contab/deleteAssignHistory/"+id,            
+            beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                showIsLoading("Procesando...");
+            }
+        }).done(function (data) {            
+            hideIsLoading(); 
+            fnOpenSusessDialog(data.message)
+			refreshTable();
+        }).fail(function (data) {
+            hideIsLoading();
+            fnOpenErrorDialog(data);
+        })
+    }
+
+
+
+</script>
