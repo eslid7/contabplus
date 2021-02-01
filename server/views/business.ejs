@@ -82,10 +82,10 @@
 							</div>	
 							<div class="control-group span6 ">
 								<label for="accCode">
-									Nombre fantasia
+									Nombre Comercial
 								</label>
 								<div class="controls">
-									<input type="text" name="busNameFantasy" id="busNameFantasy" class="m-wrap span12" placeholder="Nombre fantasia" maxlength="100">
+									<input type="text" name="busNameFantasy" id="busNameFantasy" class="m-wrap span12" placeholder="Nombre Comercial" maxlength="100">
 								</div>
 							</div>							
 						</div>
@@ -103,7 +103,7 @@
 									Teléfono
 								</label>
 								<div class="controls">                                    
-                                    <input type="text" name="busPhone" id="busPhone" class="m-wrap span12" placeholder="Teléfono" maxlength="11">
+                                    <input type="text" name="busPhone" id="busPhone" class="m-wrap span12" placeholder="Teléfono" maxlength="25">
 								</div>
 							</div>
 	
@@ -184,6 +184,16 @@
 									</div>
 								</div>						
 							</div>	
+							<div class="row-fluid">
+								<div class="control-group span6 ">
+									<label for="accCode">
+										Numero de identificación Tributaria
+									</label>
+									<div class="controls">
+										<input type="text" name="taxID" id="taxID" class="m-wrap span12" placeholder="Numero de identificación Tributaria" maxlength="100">
+									</div>
+								</div>
+							</div>
 						</div>			
 					</form>
 				</div>
@@ -198,7 +208,7 @@
 	$(document).ready(function(){
 		$('#busMoney').select2({});
 		$('#idType').select2({});
-		$("#busPhone").inputmask("mask", {"mask": "99999999",'removeMaskOnSubmit': true,'autoUnmask': true, "clearIncomplete": false});
+		$("#busPhone").inputmask("mask", {"mask": "9999999999999999999999999",'removeMaskOnSubmit': true,'autoUnmask': true, "clearIncomplete": false});
 		handleTableData();
 	});
 	isFirtsDatatable = true;
@@ -211,7 +221,7 @@
 			columns: [			
 				{
 					field: 'busJuriricalId',
-					title: 'Cedula jurídica',
+					title: 'N° Identificación',
 					sortable: true,
 					width: '10%'
 				},
@@ -287,14 +297,21 @@
             busEmail: {required: true, email: true },
 			busPhone : {required: true},
 			busJuriricalId: {required: true},
-			busNameFantasy: {required: true}
+			busNameFantasy: {required: true},
+			contry: {required: true},
+			province: {required: true},
+			district: {required: true},
+			address: {required: true}
 		},
 		messages: { // custom messages
 			busName: { required: "El campo es requerido." },
             busEmail: { required: "El campo es requerido." , email: "Digite un correo electr&oacute;nico valido"},
 			busPhone: { required: "El campo es requerido." },
 			busJuriricalId: {required: "El campo es requerido." },
-			busNameFantasy: {required: "El campo es requerido." }
+			busNameFantasy: {required: "El campo es requerido." },
+			contry: {required: "El campo es requerido." },
+			province: {required: "El campo es requerido." },
+			address: {required: "El campo es requerido." }
 		},
 		highlight: function (element) { // hightlight error inputs
 			$(element).closest('.control-group').addClass('error'); // set error class to the control group

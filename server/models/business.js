@@ -11,6 +11,7 @@ business.init({
   canton:{type: Sequelize.STRING, allowNull: false},////*/
   district:{type: Sequelize.STRING, allowNull: false},////*/
   address:{type: Sequelize.STRING,allowNull: false},//120 caracteres maximos//*/
+  taxID: {type: Sequelize.INTEGER,allowNull: false},//
   idType:{type: Sequelize.INTEGER, allowNull: true},//Tipo de identificador diferencia con 1/0//*/
   busName: {type:  Sequelize.STRING, allowNull: false},//*/
   busJuriricalId: {type:  Sequelize.STRING, allowNull: false},//*/
