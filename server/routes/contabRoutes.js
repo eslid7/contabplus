@@ -11,6 +11,7 @@ const moneyTypesController = require('../controllers/moneyTypesController');
 const viewChangeTypesController = require('../controllers/viewChangeTypesController');
 const seatController = require('../controllers/seatController');
 const balanceSheetController = require('../controllers/balanceSheetController');
+const reportsController = require('../controllers/reportsController');
 
 const router = express.Router()
 
@@ -104,8 +105,16 @@ router.route('/reverSeatService/:id').post(seatController.reverSeatService);
 //view Close balance
 router.route('/viewBalanceSheet').get(balanceSheetController.viewBalanceSheet);
 router.route('/balanceSheet').post(balanceSheetController.balanceSheet);
+router.route('/getListBalanceSheet/:busId').get(balanceSheetController.getListBalanceSheet);
 
 
 //view balance reportes
+router.route('/viewReportSeats/').get(seatController.viewReportSeats);
+router.route('/getReportSeats/:busId/:month/:year').get(seatController.getReportSeats);
+
+router.route('/viewMovementebyAccount').get(reportsController.viewMovementebyAccount);
+router.route('/viewBalanceVerify').get(reportsController.viewBalanceVerify);
+router.route('/getReportMovementebyAccount/:busId').get(reportsController.getReportMovementebyAccount);
+// router.route('/getReportSeats/:busId/:month/:year').get(reportsController.getReportSeats);
 
 module.exports = router;

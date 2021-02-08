@@ -300,3 +300,14 @@ CREATE TABLE balanceSheet(
 	createdAt TIMESTAMP,
 	updatedAt TIMESTAMP
 );
+
+ALTER TABLE business ADD taxID INT;
+
+CREATE TABLE balanceSheetClose(
+	bscId INT AUTO_INCREMENT PRIMARY KEY,
+	busIdFk INT NOT NULL,
+	bscMonth INT NOT NULL,
+	bscYear INT NOT NULL,
+	createdAt TIMESTAMP,
+	updatedAt TIMESTAMP
+);

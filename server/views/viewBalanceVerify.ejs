@@ -1,0 +1,314 @@
+<% include partials/header %>
+	<!-- BEGIN PAGE -->
+	<div class="page-content">
+			<!-- BEGIN PAGE CONTAINER-->
+			<div class="container-fluid">
+				<!-- BEGIN PAGE HEADER-->
+				<div class="row-fluid">
+					<div class="span12">
+						<h3>Balance de Comprobación </h3>
+					</div>
+				</div>
+
+				<div class="row-fluid">
+						<div class="span12">
+							<!-- BEGIN EXAMPLE TABLE PORTLET-->
+							<div class="portlet box light-grey">
+								<div class="portlet-title">
+									
+								</div>
+								<div class="portlet-body">									
+                                    <form id="balanceSheetForm" name="balanceSheetForm" action="#">
+                                        <div class="row-fluid">
+                                            <div class="control-group span4">
+                                                <label for="accCode">
+                                                    Empresa
+                                                </label>
+                                                <div class="controls">
+                                                    <% if(business.length == 0) { %>   
+                                                        No hay empresas disponibles
+                                                    <%} else {%>
+                                                    <select id="busId" name="busId" class="span12 select2">   
+                                                        <% for(var j = 0; j < business.length; j++) { %>   
+                                                            <option value="<%=business[j].busId%>"> <%=business[j].busName%></option>
+                                                        <% }%>
+                                                    </select>
+                                                    <% }%>
+                                                </div>
+                                            </div>
+                                            <div class="control-group span2">
+                                                <label for="accCode">
+                                                    Mes
+                                                </label>
+                                                <div class="controls">
+                                                    <select id="month"  class="span7 select2" >
+                                                        <option value="1">Enero</option>
+                                                        <option value="2">Febrero</option>
+                                                        <option value="3">Marzo</option>
+                                                        <option value="4">Abril</option>
+                                                        <option value="5">Mayo</option>
+                                                        <option value="6">Junio</option>
+                                                        <option value="7">Julio</option>
+                                                        <option value="8">Agosto</option>
+                                                        <option value="9">Setiembre</option>
+                                                        <option value="10">Octubre</option>
+                                                        <option value="11">Noviembre</option>
+                                                        <option value="12">Diciembre</option>
+                                                    </select>       
+                                                </div>
+                                            </div> 
+                                            <div class="control-group span2 ">                                               
+                                                <label for="accCode">
+                                                Año 
+                                                </label>
+                                                <div class="controls"  > 
+                                                    <select id="year" class="span7 select2">
+                                                        <option value="2020">2020</option>
+                                                        <option value="2021">2021</option>
+                                                        <option value="2022">2022</option>
+                                                        <option value="2023">2023</option>
+                                                    </select>                                                   
+                                                </div>
+                                            </div>                                            
+                                            <div class="control-group span3 ">
+                                            </div> 
+                                        </div>                                        
+                                    </form>
+									<table id="listBalanceSheet" class="bt-table table-striped"
+										data-side-pagination="server"
+										data-pagination="true"
+										data-page-size="10"
+										data-page-list="[10, 20, 30]"
+                                        data-search="true">
+									</table>
+								</div>
+							</div>
+							<!-- END EXAMPLE TABLE PORTLET-->
+						</div>
+					</div>
+			</div>
+			
+	</div>	
+    <div id="modalListSeats" class="modal container hide fade">
+        <div class="modal-header">
+            <button data-dismiss="modal" class="close" type="button">X</button>
+            <h3 id='titleCatalog'>Listado de Asientos</h3>
+        </div>
+        <div class="modal-body">             
+            <div class="row-fluid">
+                <div class="control-group span12 ">
+                    <table id="listSeats" class="bt-table table-striped"
+                        data-side-pagination="server"
+                        data-pagination="true"
+                        data-page-size="10"
+                        data-page-list="[10, 40, 60]"
+                        data-search="true">
+                    </table>
+                </div>                   					
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn dark btn-outline" data-dismiss="modal">Cerrar</button>
+        </div>
+    </div>
+
+<% include partials/footer %>
+<script type="text/javascript">
+	$(document).ready(function(){
+        $('#busId').select2({});
+        $('#month').select2({});
+        $('#year').select2({});
+        $("#busId, #year, #month").on("select2-opening", function() {
+			$('.select2').select2("close");
+        });
+        $("#month").change(function() {
+			refreshTable()	
+        });
+        $("#busId").change(function() {
+			refreshTable()	
+        });
+        $("#year").change(function() {
+			refreshTable()	
+        });
+
+        <% if(business.length == 0) { %>
+
+        <%} else {%>
+            handleTableData();   
+        <% }%>
+
+        $('#balanceSheetForm').validate({
+            errorElement: 'label', //default input error message container
+            errorClass: 'help-inline', // default input error message class
+            ignore: "",
+            rules: {
+                busId: { required: true},
+                bshMonth: { required: true},
+                bshYear: { required: true}
+            },
+            messages: { // custom messages
+                busId: { required: "Seleccione el catalogo." },
+                bshMonth: { required: "Digite el mes." },
+                bshYear: { required: "Digite el año." }
+            },
+            highlight: function (element) { // hightlight error inputs
+                $(element).closest('.control-group').addClass('error'); // set error class to the control group
+            },
+            success: function (label) {
+                label.closest('.control-group').removeClass('error');
+                label.remove();
+            },
+            errorPlacement: function (error, element) {
+                if (element.closest('.icon-search').size() === 1) {
+                    error.addClass('help-small no-left-padding').insertAfter(element.closest('.icon-search'));
+                } else if (element.next().attr("class")){
+                    error.addClass('help-small no-left-padding').insertAfter(element.next());
+                } else {
+                    error.addClass('help-small no-left-padding').insertAfter(element);
+                }
+            }
+        });
+	});
+	isFirtsDatatable = true;
+	function handleTableData () {
+		$('#listBalanceSheet').bootstrapTable({
+			height: getHeight(),
+			method: 'GET',
+			url: '/contab/getReportSeats/'+$('#busId').val()+'/'+$('#month').val()+'/'+$('#year').val(),
+			cache: false,
+			columns: [
+				{
+					field: 'aasNumberSeat',
+					title: 'Número de asiento',
+					sortable: false,
+					width: '20%'
+				}, {
+					field: 'aasDateSeat',
+					title: 'Fecha de asiento',
+					sortable: false,
+					width: '10%'
+				},{
+					field: 'aasNameSeat',
+					title: 'Nombre',
+					sortable: false,
+					width: '10%'
+				}, {
+					field: '',
+					title: 'Ver detalle',
+					sortable: false,
+                    width: '14%',
+                    formatter:operateFormatterEdit
+				}               
+			]
+		});
+	};
+	function getHeight() {
+		return $(window).height();
+    }
+    
+    function operateFormatterEdit(value, row, index) {
+        return [
+            "<button type='button' class='btn green'",
+            " onclick='seeDetail("+ row.aasId +")'>",
+            "<i class='icon-table'></i> ",
+           "Ver detalle",
+            "</button>"
+        ].join('');
+    }
+
+    function refreshTable() {
+        $('#listBalanceSheet').bootstrapTable('refreshOptions', {url: '/contab/getReportSeats/'+$('#busId').val()+'/'+$('#month').val()+'/'+$('#year').val()});
+    }
+
+    function seeDetail(id){
+        if(isFirtsDatatable){
+            handleTableDataDetails(id)
+        } else{
+            refreshTableDetails(id)
+        }
+        $('#modalListSeats').modal('show');
+    }
+
+	function handleTableDataDetails(id) {
+        isFirtsDatatable = false
+		$('#listSeats').bootstrapTable({
+			height: $(window).height(),
+			method: 'GET',
+			url: '/contab/getListSeats/'+id, //$('#aasId').val(),
+            cache: false,
+            search: false,
+			columns: [
+				{
+					field: 'documentType.docName',
+					title: 'Tipo Documento',
+					sortable: false,
+                    width: '5%' 
+				}, {
+					field: 'aasdNumberDoc',
+					title: 'Número Documento',
+					sortable: false,
+                    width: '5%' 
+				}, {
+					field: 'moneyType.monName',
+					title: 'Moneda',
+					sortable: false,
+					width: '3%'
+				}, {
+					field: 'aasdChangeValue',
+					title: 'Tipo Cambio',
+					sortable: false,
+					width: '4%'
+				},{
+					field: 'accountingAccount.aacCode',
+					title: 'Cuenta',
+					sortable: false,
+					width: '10%' 
+				},{
+					field: 'aasdDescription',
+					title: 'Detalle de registro',
+					sortable: false,
+					width: '15%' 
+				} ,{
+					field: 'aasdDebit',
+					title: 'Débito',
+					sortable: false,
+                    width: '7%',
+                    align: 'right',
+                    formatter: operateFormatterAasdDebit
+				} ,{
+					field: 'aasdCredit',
+					title: 'Crédito',
+					sortable: false,
+                    width: '7%', 
+                    align: 'right',
+                    formatter: operateFormatterAasdCredit
+				}                 
+			]
+		});
+    };
+
+    function refreshTableDetails(id) {
+        $('#listSeats').bootstrapTable('refresh', {url: '/contab/getListSeats/'+id});
+    }
+
+    function operateFormatterAasdDebit(value, row, index) {
+        return [
+        formaterNumber(row.aasdDebit)
+        ].join('');
+    }
+
+    function operateFormatterAasdCredit(value, row, index) {
+        return [
+        formaterNumber(row.aasdCredit)
+        ].join('');
+    }
+
+    function formaterNumber(dataNumber){
+        dataNumber = dataNumber+""
+        dataNumber = dataNumber.replace(/[^0-9\.]+/g, "");
+        dataNumber = dataNumber *1
+        dataNumber = dataNumber.toFixed(2)
+        return dataNumber.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    }
+
+</script>

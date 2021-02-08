@@ -69,6 +69,18 @@
 		jQuery(document).ready(function() {    
 		   App.init();
 		});
+		function formaterDate(date){
+			Newdate = new Date(date); 
+			month = Newdate.getMonth() +1
+			if(month.length==1 || month< 10){
+				month = "0"+month
+			}
+			day= Newdate.getDate()
+			if(Newdate.getDate()<10){
+				day="0"+Newdate.getDate()
+			}
+			return day+"/"+month+"/"+Newdate.getFullYear()
+		}
 	</script>
 	<!-- END JAVASCRIPTS -->
 </body>

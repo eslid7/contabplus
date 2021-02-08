@@ -17,7 +17,7 @@ function viewTypesDocuments(req, res){
     const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
     businessModel.findAll({where:{'useIdFK': token.useId}}).then( business => {
       return res.render('viewTypesDocuments' ,{
-        active : 4,
+        active : 3,
         userData: token,
         titlePage : 'Tipo de Documentos',
         processes : token.processes,

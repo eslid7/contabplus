@@ -41,7 +41,7 @@
                                                     Mes
                                                 </label>
                                                 <div class="controls">
-                                                    <input type="text" name="bshMonth" id="bshMonth" class="span8"  maxlength="2">         
+                                                    <input type="text" name="bscMonth" id="bscMonth" class="span8"  maxlength="2">         
                                                 </div>
                                             </div> 
                                             <div class="control-group span2 ">                                               
@@ -49,7 +49,7 @@
                                                 Año 
                                                 </label>
                                                 <div class="controls"  > 
-                                                    <input type="text" name="bshYear" id="bshYear" class="span10" maxlength="4">                                                   
+                                                    <input type="text" name="bscYear" id="bscYear" class="span10" maxlength="4">                                                   
                                                 </div>
                                             </div>                                            
                                             <div class="control-group span3 ">
@@ -83,13 +83,13 @@
         $("#busId").on("select2-opening", function() {
 			$('.select2').select2("close");
         });
-        $("#bshMonth").inputmask("mask", {"mask": 99, "clearIncomplete": false, 'removeMaskOnSubmit': true, 'autoUnmask': true});
-        $("#bshYear").inputmask("mask", {"mask": 9999, "clearIncomplete": true });
-        $("#bshMonth").change(function() {
-			newMonth= $("#bshMonth").val()
-            if($("#bshMonth").val().length<2){
-                newMonth = "0"+$("#bshMonth").val()
-                $("#bshMonth").val(newMonth)
+        $("#bscMonth").inputmask("mask", {"mask": 99, "clearIncomplete": false, 'removeMaskOnSubmit': true, 'autoUnmask': true});
+        $("#bscYear").inputmask("mask", {"mask": 9999, "clearIncomplete": true });
+        $("#bscMonth").change(function() {
+			newMonth= $("#bscMonth").val()
+            if($("#bscMonth").val().length<2){
+                newMonth = "0"+$("#bscMonth").val()
+                $("#bscMonth").val(newMonth)
             }		
         });
         <% if(business.length == 0) { %>
@@ -104,13 +104,13 @@
             ignore: "",
             rules: {
                 busId: { required: true},
-                bshMonth: { required: true},
-                bshYear: { required: true}
+                bscMonth: { required: true},
+                bscYear: { required: true}
             },
             messages: { // custom messages
                 busId: { required: "Seleccione el catalogo." },
-                bshMonth: { required: "Digite el mes." },
-                bshYear: { required: "Digite el año." }
+                bscMonth: { required: "Digite el mes." },
+                bscYear: { required: "Digite el año." }
             },
             highlight: function (element) { // hightlight error inputs
                 $(element).closest('.control-group').addClass('error'); // set error class to the control group
@@ -132,47 +132,29 @@
 	});
 	isFirtsDatatable = true;
 	function handleTableData () {
-		$('#listAsignPermit').bootstrapTable({
+		$('#listBalanceSheet').bootstrapTable({
 			height: getHeight(),
 			method: 'GET',
-			url: '/contab/assignHistory/'+$('#busId').val(),
+			url: '/contab/getListBalanceSheet/'+$('#busId').val(),
 			cache: false,
 			columns: [
 				{
-					field: 'accountingCatalog.accName',
-					title: 'Catálogo',
+					field: 'bscMonth',
+					title: 'Mes',
 					sortable: false,
 					width: '20%'
 				}, {
-					field: 'accountingCatalog.accCode',
-					title: 'Número',
+					field: 'bscYear',
+					title: 'Año',
 					sortable: false,
-					width: '3%'
+					width: '10%'
 				}, {
-					field: 'accountingCatalog.accIsGlobal',
-					title: 'Tipo Catálogo',
+					field: '',
+					title: 'Editar',
 					sortable: false,
-                    width: '15%',
-					formatter: operateFormatter
-				}, {
-					field: 'user.useName',
-					title: 'Usuario',
-					sortable: false,
-                    width: '15%'
-				}, {
-					field: 'permitId',
-					title: 'Opcion',
-					sortable: false,
-                    width: '15%',
-					formatter: operateFormatter2
-                }, {
-					field: 'bupId',
-					title: 'Eliminar',
-					sortable: false,
-                    width: '15%',
-					formatter: operateFormatter3
-                }
-                
+					width: '14%',
+					formatter: operateFormatterEdit
+				}               
 			]
 		});
 	};
@@ -180,22 +162,12 @@
 		return $(window).height();
     }
     
-    function operateFormatter(value, row, index) {
+    function operateFormatterEdit(value, row, index) {
         return [
-            ((row.accountingCatalog.accIsGlobal == 1) ? "Global" : "Individual"),
-        ].join('');
-    }
-    function operateFormatter2(value, row, index) {
-        return [
-            ((row.permitId == 1) ? "Consultar" : "Modificar"),
-        ].join('');
-    }
-    function operateFormatter3(value, row, index) {
-        return [
-            "<button type='button' class='btn red",
-            " btnActiveInactive' onclick='fnEliminar("+ row.bupId +")'>",
-            "<i class='icon-off'></i> ",
-           "Eliminar",
+            "<button type='button' class='btn green'",
+            " onclick='seeDetail("+ row.bscMonth +","+ row.bscYear +")'>",
+            "<i class='icon-table'></i> ",
+           "Ver detalle",
             "</button>"
         ].join('');
     }
@@ -216,7 +188,7 @@
             }).done(function (data) {  
                 fnOpenSusessDialog(data.message)          
                 hideIsLoading();                         
-                //setTimeout(function(){ refreshTable(); }, 300);
+                setTimeout(function(){ refreshTable(); }, 300);
             }).fail(function (data) {
                 hideIsLoading();
                 fnOpenErrorDialog(data.responseJSON.message);

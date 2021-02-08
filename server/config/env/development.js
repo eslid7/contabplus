@@ -3,7 +3,7 @@
 module.exports = {
   	host: 'localhost',
 	user: 'root',
-	password: '00052023',
+	password: 'asp128CF',
 	database: 'contabplusdb',
 	portDB: 3306,
   	env: 'dev',

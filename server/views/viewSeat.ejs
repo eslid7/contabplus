@@ -179,7 +179,7 @@
                                             <div class="row-fluid">
                                                 <div class="control-group span3">
                                                     <label for="accountId">
-                                                        Código Cuenta
+                                                        Código de Cuenta
                                                     </label>
                                                     <div class="controls">
                                                         <input type="text" name="accountId" id="accountId" class="span12 numeric accountId" maxlength="25">                                                   
@@ -220,8 +220,7 @@
                                                     <label for="aasdCredit">
                                                         Crédito 
                                                     </label>
-                                                    <div class="controls">
-                                                        <!-- data-inputmask="'alias': 'decimal', 'groupSeparator': '.', 'autoGroup': true, 'digits': 2, 'digitsOptional': false, 'placeholder': '0'" -->
+                                                    <div class="controls">                                                        
                                                         <input type="text" name="aasdCredit" id="aasdCredit" class="m-wrap span12 numeric amountsAlign"   maxlength="60">
                                                     </div>
                                                 </div>
@@ -386,6 +385,11 @@
 			getCatalog();			
         });
         $("#aasMonth").change(function() {
+            newMonth= $("#aasMonth").val()
+            if($("#aasMonth").val().length<2){
+                newMonth = "0"+$("#aasMonth").val()
+                $("#aasMonth").val(newMonth)
+            }
 			getCatalog();			
         });
         $(".accountId" ).on( "keydown", function(event) {
@@ -564,10 +568,6 @@
     function getCatalog(){
         if($("#aasYear").val()!='' && $("#aasMonth").val()!=''){
             newMonth= $("#aasMonth").val()
-            if($("#aasMonth").val().length<2){
-                newMonth = "0"+$("#aasMonth").val()
-                $("#aasMonth").val(newMonth)
-            }
             $.ajax({
                 type: "GET",
                 url: "/contab/getCatalogByPeriodo/"+$('#busId').val()+"?month="+newMonth+"&year="+$('#aasYear').val(),
@@ -1322,18 +1322,20 @@
     }
 
     function revertSeat(idSeat){
+        revert = false
+        console.log("revertiendo")
         $.ajax({
-                type: "POST",
-                url: "/contab/reverSeatService/"+idSeat,
-                beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
-                    showIsLoading("Procesando...");
-                }
-            }).done(function (results) {       
+            type: "POST",
+            url: "/contab/reverSeatService/"+idSeat,
+            beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                showIsLoading("Procesando...");
+            }
+        }).done(function (results) {       
 
-                hideIsLoading(); 
-            }).fail(function () {
-                hideIsLoading();            
-            })
+            hideIsLoading(); 
+        }).fail(function () {
+            hideIsLoading();            
+        })
     }
 
     function seeData(aacId, index){

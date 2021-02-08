@@ -24,7 +24,7 @@ function viewMantenanceAcco(req, res){
             usersModel.findAll().then(function (usersData){
                 return res.render('viewMantenanceAcco' ,{
                     userData: token,
-                    active : -1,
+                    active : 2,
                     titlePage : 'Mant de cuentas contables',
                     business : business,
                     users : usersData,
@@ -459,7 +459,7 @@ function viewActiInacAcco(req, res){
             usersModel.findAll().then(function (usersData){
                 return res.render('viewActiInacAcco' ,{
                     userData: token,
-                    active : -1,
+                    active : 2,
                     titlePage : 'Activar o Inactivar cuentas',
                     business : business,
                     users : usersData,

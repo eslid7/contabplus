@@ -18,7 +18,7 @@ function viewAsignCatalog(req, res){
         businessModel.findAll({where:{'useIdFK': token.useId}}).then( business => {            
             return res.render('asignCatalog' ,{
                 userData: token,
-                active : 1,
+                active : 2,
                 titlePage : 'Asignar catálogo contable',
                 business: business,
                 processes : token.processes,
