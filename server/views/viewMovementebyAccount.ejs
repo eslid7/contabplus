@@ -18,7 +18,8 @@
 									
 								</div>
 								<div class="portlet-body">									
-                                    <form id="report" name="report" action="#">
+                                    <form id="report" name="report" action="#">                                        
+                                        <input type="hidden" id="accId" name="accId">
                                         <div class="row-fluid">
                                             <div class="control-group span4">
                                                 <label for="accCode">
@@ -35,55 +36,37 @@
                                                     </select>
                                                     <% }%>
                                                 </div>
-                                            </div>
-                                            <div class="control-group span2">
-                                                <label for="accCode">
-                                                    Mes
-                                                </label>
-                                                <div class="controls">
-                                                    <select id="month" name="month"  class="span7 select2" >
-                                                        <option value="">Seleccione</option>
-                                                        <option value="1">Enero</option>
-                                                        <option value="2">Febrero</option>
-                                                        <option value="3">Marzo</option>
-                                                        <option value="4">Abril</option>
-                                                        <option value="5">Mayo</option>
-                                                        <option value="6">Junio</option>
-                                                        <option value="7">Julio</option>
-                                                        <option value="8">Agosto</option>
-                                                        <option value="9">Setiembre</option>
-                                                        <option value="10">Octubre</option>
-                                                        <option value="11">Noviembre</option>
-                                                        <option value="12">Diciembre</option>
-                                                    </select>       
-                                                </div>
-                                            </div> 
-                                            <div class="control-group span2 ">                                               
-                                                <label for="accCode">
-                                                Año 
-                                                </label>
-                                                <div class="controls"  > 
-                                                    <select id="year" name="year" class="span7 select2">
-                                                        <option value="">Seleccione</option>
-                                                        <option value="2020">2020</option>
-                                                        <option value="2021">2021</option>
-                                                        <option value="2022">2022</option>
-                                                        <option value="2023">2023</option>
-                                                    </select>                                                   
-                                                </div>
-                                            </div>                                            
+                                            </div>                                                                                      
                                             <div class="control-group span3 ">
                                                 <label for="accCode">
-                                                    Rango de Fecha
+                                                    Fecha de registro
                                                 </label>
-                                                
+                                                <input type="hidden" name="date_from" 	id="date_from">
+                                                <input type="hidden" name="date_to" 	id="date_to">
+                                                <div id="fdate" class="btn">
+                                                    <i class="icon-calendar"></i>
+                                                    &nbsp;<span></span>
+                                                    <b class="caret"></b>
+                                                </div>
                                             </div> 
                                         </div> 
                                         <div class="row-fluid">
-                                            <div class="control-group span4">
-                                                <label for="accCode">
+                                            <div class="control-group span3">
+                                                <label for="accountId">
                                                     Código de Cuenta
                                                 </label>
+                                                <div class="controls">
+                                                    <input type="hidden" id="aacCode" name="aacCode" >
+                                                    <input type="text" name="accountId" id="accountId" class="span12 numeric accountId" maxlength="25">                                                   
+                                                </div>
+                                            </div>
+                                            <div class="control-group span3">
+                                                <label>
+                                                   Nombre Cuenta
+                                                </label>
+                                                <div class="controls" id="divTextAccount">
+                                                    
+                                                </div>
                                             </div>
                                             <div class="control-group span2">
                                                 <label for="aasNumberSeat" id="aasNumberSeatLabel">
@@ -104,6 +87,10 @@
                                         </div>                                       
                                     </form>
                                     <div style="overflow-x: scroll;">
+                                        <div class="btn-group  span2">
+                                            <button id="exporttable" type="button" class="btn ">Exportar a Excel <i class="icon-angle-down"></i>
+                                            </button>
+                                        </div>
                                         <div style="width: 2400px;">
                                             <table id="listReport" class="bt-table table-striped"
                                                 data-side-pagination="server"
@@ -149,18 +136,10 @@
 <script type="text/javascript">
 	$(document).ready(function(){
         $('#busId').select2({});
-        $('#month').select2({});
-        $('#year').select2({});
-        $("#busId, #year, #month").on("select2-opening", function() {
+        $("#busId").on("select2-opening", function() {
 			$('.select2').select2("close");
         });
-        $("#month").change(function() {
-			refreshTable()	
-        });
         $("#busId").change(function() {
-			refreshTable()	
-        });
-        $("#year").change(function() {
 			refreshTable()	
         });
         $("#aasNumberSeat").change(function() {
@@ -175,8 +154,55 @@
         <%} else {%>
             handleTableData();   
         <% }%>
+        handleDateRangePickers();
+        $(".accountId" ).on( "keydown", function(event) {
+            if(event.which == 13 && $(this).val().length > 0){
+                fnSearch($(this))
+            }         
+        });
+        getCatalog()
 	});
-	isFirtsDatatable = true;
+    isFirtsDatatable = true;
+    $("#exporttable").click(function(e){
+        showIsLoading("Procesando...");
+        $.ajax({
+            type: "GET",
+            url: '/contab/getReportMovementebyAccount/'+$('#busId').val()+'?exportAll=true&'+$('#report').serialize(),
+            beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                showIsLoading("Procesando...");
+            }
+        }).done(function (result) {  
+            console.log(result)
+            dataResponse = new Array();
+            dataYear = encodeURIComponent("&uacute;")
+            console.log(dataYear)
+            for(i=0; i<result.rows.length; i++ ){
+                dataResponse.push({
+                    "Usuario" :result.rows[i].accountingAccountSeat.user.useName, 
+                    "Año" : result.rows[i].accountingAccountSeat.aasYear, 
+                    "Mes": result.rows[i].accountingAccountSeat.aasMonth, 
+                    "Fecha de Registro": formaterDate(result.rows[i].accountingAccountSeat.updatedAt), 
+                    "Fecha de asiento": formaterDate(result.rows[i].accountingAccountSeat.aasDateSeat),
+                    "Número de asiento" : result.rows[i].accountingAccountSeat.aasNumberSeat,
+                    "Nombre": result.rows[i].accountingAccountSeat.aasNameSeat,
+                    "Tipo Documento": result.rows[i].documentType.docName,
+                    "Número Documento":result.rows[i].aasdNumberDoc,
+                    "Código Cuenta": result.rows[i].accountingAccount.aacCode,
+                    "Nombre Cuenta": result.rows[i].accountingAccount.aacName,
+                    "Detalle de registro":result.rows[i].aasdDescription,
+                    "Moneda": result.rows[i].moneyType.monName,
+                    "Tipo Cambio":result.rows[i].aasdChangeValue,
+                    "Débito":formaterNumber(result.rows[i].aasdDebit),
+                    "Crédito": formaterNumber(result.rows[i].aasdCredit)
+                })
+            }
+            JSONToCSVConvertor(dataResponse, "Reporte de Movimientos por Cuenta", true);
+            hideIsLoading();                                         
+        }).fail(function (data) {
+            hideIsLoading();
+            fnOpenErrorDialog(data.responseJSON.message);
+        })                
+    });
 	function handleTableData () {
         
 		$('#listReport').bootstrapTable({
@@ -389,4 +415,340 @@
         dataNumber = dataNumber.toFixed(2)
         return dataNumber.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
     }
+
+    var handleDateRangePickers = function () {
+
+		$('#fdate').daterangepicker(
+			{
+				ranges: {
+					'Hoy': ['today', 'today'],
+					'Ayer': ['yesterday', 'yesterday'],
+					'Últimos 7 Días': [Date.today().add({
+						days: -6
+					}), 'today'],
+					'Mes Actual': [Date.today().moveToFirstDayOfMonth(), Date.today().moveToLastDayOfMonth()],
+					'Mes Anterior': [Date.today().moveToFirstDayOfMonth().add({
+						months: -1
+					}), Date.today().moveToFirstDayOfMonth().add({
+						days: -1
+					})]
+				},
+				opens: (false ? 'left' : 'right'),
+				format: 'dd/MM/yyyy',
+				separator: ' to ',
+				minDate: '-20y',
+				maxDate: '+1y',
+				locale: {
+					applyLabel: 'Aceptar',
+					clearLabel: "Limpiar",
+					fromLabel: 'Desde',
+					toLabel: 'Hasta',
+					customRangeLabel: 'Rango Fechas',
+					daysOfWeek: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'],
+					monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+					firstDay: 1,
+				},
+				allowClear: true,
+				showWeekNumbers: true,
+				applyClass: 'blue',
+				clearClass: 'green',
+				buttonClasses: ['btn-danger']
+			},
+			function (start, end) {
+				var startToString = start.toString('dd/MM/yyyy');
+				var endToString = end.toString('dd/MM/yyyy');
+				var startIsTrue = $.trim(startToString).length > 0;
+				var endIsTrue = $.trim(endToString).length > 0;
+
+				$('#fdate span').html(((startIsTrue && endIsTrue) ? startToString + ' - ' + endToString : ''));
+				$('#date_from').val(startToString);
+				$('#date_to').val(endToString);
+                refreshTable()	
+				_modificationInitDate = start.toString('yyyy/MM/dd');
+				_modificationEndDate = end.toString('yyyy/MM/dd');
+				//checkDateDays(2);
+			}
+		);
+	};
+
+    function getCatalog(){
+        $.ajax({
+            type: "GET",
+            url: "/contab/getOneCatalog/"+$('#busId').val(),
+            beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                showIsLoading("Procesando...");
+            }
+        }).done(function (result) {            
+            hideIsLoading(); 
+            console.log(result)
+            if(result.accountCatalog.accIdFk >0){
+                actualCatalog = result.accountCatalog.accIdFk;
+                $('#accId').val(result.accountCatalog.accIdFk)
+                //ahora definir lo de la mascara de la cuenta
+                showData(result.accountCatalog.accountingCatalog)
+            }
+            else{
+                fnOpenErrorDialog("Para este periodo no se ha definido un catalogo contable.")
+            }
+        }).fail(function (data) {
+            fnOpenErrorDialog(data.responseJSON.message);
+            hideIsLoading();            
+        })
+    }
+
+    function showData(accountCatalog){
+        jsonData = JSON.parse(accountCatalog.accNivels)
+        accSeparator = accountCatalog.accSeparator        
+        // queda pendiente lo de nombre de la cuenta??? y el length
+        //crear la mascara
+        dataMask = ''
+        for(var a=1;  a<=jsonData.accNivel1; a++){																	
+            dataMask = dataMask+'9'		
+        }
+        if(jsonData.accNivel2){
+            dataMask = dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel2; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel3){
+            dataMask=dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel3; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel4){
+            dataMask=dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel4; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel5){
+            dataMask=dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel5; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel6){
+            dataMask = dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel6; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel7){
+            dataMask=dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel7; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel8){
+            dataMask=dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel8; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel9){
+            dataMask=dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel9; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel10){
+            dataMask=dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel10; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel11){
+            dataMask=dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel11; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        if(jsonData.accNivel12){
+            dataMask=dataMask+accSeparator
+            for(var a=1;  a<=jsonData.accNivel12; a++){																	
+                dataMask = dataMask+'9'		
+            }
+        }
+        console.log('defnidia la mascara',dataMask)
+        $(".accountId").inputmask("mask", {"mask": dataMask, "clearIncomplete": false ,'removeMaskOnSubmit': true, 'autoUnmask': true});
+    }
+
+    function fnSearch(data){
+        console.log(data.val())
+        newAccount = data.val();
+        search =false;
+        nivel2= jsonData.accNivel1*1+jsonData.accNivel2*1
+        nivel3= nivel2+jsonData.accNivel3*1
+        nivel4= nivel3+jsonData.accNivel4*1
+        nivel5= nivel4+jsonData.accNivel5*1
+        nivel6= nivel5+jsonData.accNivel6*1
+        nivel7= nivel6+jsonData.accNivel7*1
+        nivel8= nivel7+jsonData.accNivel8*1
+        nivel9= nivel8+jsonData.accNivel9*1
+        nivel10= nivel9+jsonData.accNivel10*1
+        nivel11= nivel10+jsonData.accNivel11*1
+        nivel12= nivel11+jsonData.accNivel12*1
+        if(newAccount.length<jsonData.accNivel1){
+            newAccount = createAccount(newAccount, jsonData.accNivel1, 0)
+            search =true; 
+        }
+        if( newAccount.length== jsonData.accNivel1 || newAccount.length== nivel2 || newAccount.length==nivel3 || newAccount.length==nivel4 || newAccount.length==nivel5 || 
+            newAccount.length== nivel6 || newAccount.length==nivel7 || newAccount.length==nivel8 || newAccount.length==nivel9 || newAccount.length== nivel10 || newAccount.length==nivel11 || newAccount.length==nivel12){
+            newAccount=putMask(newAccount)
+            search =true;            
+        }
+        else{
+           
+            if(newAccount.length<nivel2){
+                newAccount =  createAccount(newAccount, nivel2, jsonData.accNivel1)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel3){
+                newAccount =  createAccount(newAccount, nivel3, nivel2)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel4){
+                newAccount =  createAccount(newAccount, nivel4, nivel3)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel5){
+                newAccount =  createAccount(newAccount, nivel5, nivel4)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel6){
+                newAccount =  createAccount(newAccount, nivel6, nivel5)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel7){
+                newAccount =  createAccount(newAccount, nivel7, nivel6)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel8){
+                newAccount =  createAccount(newAccount, nivel8, nivel7)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel9){
+                newAccount =  createAccount(newAccount, nivel9, nivel8)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel10){
+                newAccount =  createAccount(newAccount, nivel10, nivel9)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel11){
+                newAccount =  createAccount(newAccount, nivel11, nivel10)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+            else if(newAccount.length<nivel12){
+                newAccount =  createAccount(newAccount, nivel12, nivel11)
+                search =true;
+                newAccount=putMask(newAccount) 
+            }
+        }
+        if(search){
+            //obtener el nombre del nivel si existe
+            $.ajax({
+                type: "GET",
+                url: "/contab/getAccountingAccountSearch/"+$('#accId').val()+"?aacCode="+newAccount+"&aacNivelFirst="+$('#aacNivelFirst').val()+"&levelToSave="+$('#levelToSave').val()+"&aacNivelBefore="+$('#aacNivelBefore').val(),       
+                beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                    showIsLoading("Procesando...");
+                }
+            }).done(function (result) {  
+                data.val(newAccount)
+                if(result.accountingAccount!=null){
+                    console.log(result.accountingAccount.aacName)
+                    $('#divTextAccount').html(result.accountingAccount.aacName);
+                    $('#aacId').val(result.accountingAccount.aacId);
+                    $('#aacCode').val(result.accountingAccount.aacCode);
+                    refreshTable()	
+                }
+                else{
+                    $('#divTextAccount').html('');
+                    $('#aacId').val('')
+                }
+
+                if($('#levelToSave').val()>1 &&  result.accountingAccountRaiz!=null){
+                    $('#aacType').val(result.accountingAccountRaiz.aacType).trigger('change');
+                    $('#aacType').prop( "disabled", true );
+                }
+                //aacNivelBefore
+                if($('#levelToSave').val()>1 && result.accountingAccountRaizPrevios==null) {
+                    fnOpenErrorDialog("La cuenta digitada, no se ha registrado la cuenta padre "+$('#aacNivelBefore').val());
+                }
+                hideIsLoading();                                         
+            }).fail(function (data) {
+                hideIsLoading();
+                fnOpenErrorDialog(data.responseJSON.message);
+            })
+        }
+    }
+
+    function createAccount(newAccount, accNivel, previousLevel){
+        dataVal = newAccount
+        diference= accNivel - newAccount.length
+        if(previousLevel>0){
+            dataVal = ''
+            ultimo=''
+            countDiference =0
+            for(a=0; a<accNivel; a++){
+                if(previousLevel> a){
+                    dataVal =dataVal + newAccount.charAt(a)
+                }
+                else{
+                    ultimo = ultimo + newAccount.charAt(a)
+                    if(countDiference <diference){
+                        dataVal = dataVal +'0'
+                        countDiference =countDiference +1
+                    }                    
+                }               
+            }
+            dataVal = dataVal +ultimo
+
+        }
+        else{
+            for(a=newAccount.length; a<accNivel; a++){
+                dataVal = '0'+dataVal
+            }
+        }        
+        // $('#aacCode').val(dataVal)
+        return dataVal
+    }
+
+    function putMask(dataMask){
+        newDataWithMask =''
+        nivel2= jsonData.accNivel1*1+jsonData.accNivel2*1
+        nivel3= nivel2+jsonData.accNivel3*1
+        nivel4= nivel3+jsonData.accNivel4*1
+        nivel5= nivel4+jsonData.accNivel5*1
+        nivel6= nivel5+jsonData.accNivel6*1
+        nivel7= nivel6+jsonData.accNivel7*1
+        nivel8= nivel7+jsonData.accNivel8*1
+        nivel9= nivel8+jsonData.accNivel9*1
+        nivel10= nivel9+jsonData.accNivel10*1
+        nivel11= nivel10+jsonData.accNivel11*1
+        nivel12= nivel11+jsonData.accNivel12*1
+        levelToSave = 1
+        for(var a=0;  a<dataMask.length; a++){	
+            if(jsonData.accNivel1==a||nivel2==a||nivel3==a||nivel4==a||nivel5==a||nivel6==a||nivel7==a||nivel8==a||nivel9==a||nivel10==a||nivel11==a||nivel12==a){
+                levelToSave = levelToSave+1
+                newDataWithMask = newDataWithMask+accSeparator
+            }	            															
+            newDataWithMask = newDataWithMask+dataMask.charAt(a)		
+        }   
+        // debo buscar el primer nivel para el manejo de tipo de cuenta y saldo y bloquear tipo de cuenta
+        return newDataWithMask
+    }
+
 </script>

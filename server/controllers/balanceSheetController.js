@@ -116,9 +116,18 @@ function getListBalanceSheet(req,res){
     }
 }
 
+async function exitsBalanceSheetClose(busId, bscMonth, bscYear){
+    const balanceCloseExist = await balanceSheetCloseModel.findOne({where: {'busIdFk': busId, 'bscMonth' : bscMonth,'bscYear' :bscYear} })
+    if(balanceCloseExist== null){
+        return false
+    } else {
+        return true
+    }
+}
 
 module.exports = {
     viewBalanceSheet,
     balanceSheet,
     getListBalanceSheet,
+    exitsBalanceSheetClose
 }

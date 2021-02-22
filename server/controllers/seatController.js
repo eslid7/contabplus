@@ -9,6 +9,7 @@ const accountingAccountSeatDetailModel = require('../models/accountingAccountSea
 const businessAccountingCModel = require('../models/businessAccountingC')
 const balanceSheetModel = require('../models/balanceSheet')
 const usersController = require('../controllers/usersController')
+const balanceSheetController = require('../controllers/balanceSheetController')
 const moment = require('moment');
 const sequelize = require('sequelize');
 const sequelizeConnect = require('../config/env/connection')
@@ -257,9 +258,13 @@ async function applySeat(req, res){
     return  res.status(400).json({ message: "El asiento no esta balanceado y debe ser distinto de cero"});
   }
   else{
+    const seatData = await accountingAccountSeatModel.findOne({where: { 'aasId': req.params.id }})
+    const balanceCloseExist = await balanceSheetController.exitsBalanceSheetClose(seatData.busIdFk, seatData.aasMonth, seatData.aasYear)
+    if(balanceCloseExist){
+      return  res.status(400).json({ message: "El periodo tiene un cierre contable."});
+    }
     const transaction = await sequelizeConnect.transaction()
-    try{
-      const seatData = await accountingAccountSeatModel.findOne({where: { 'aasId': req.params.id }})
+    try{      
       //nuevo desde cero transacciones
       let errors =''
       console.log(seatData.aasdStatus)
@@ -325,12 +330,12 @@ async function applySeat(req, res){
                     if(negative){
                       if(month ==  accountingAccountSeatDetail[i].dataValues.accountingAccountSeat.aasMonth){
                         bshPreviousBalance =  0
-                        bshFinalBalance = accountingAccountSeatDetail[i].dataValues.aasdCredit - accountingAccountSeatDetail[i].dataValues.aasdDebit                      
+                        bshFinalBalance = accountingAccountSeatDetail[i].dataValues.aasdDebit - accountingAccountSeatDetail[i].dataValues.aasdCredit                       
                         debits = accountingAccountSeatDetail[i].dataValues.aasdDebit
                         credits = accountingAccountSeatDetail[i].dataValues.aasdCredit
                       } else {
-                        bshPreviousBalance = accountingAccountSeatDetail[i].dataValues.aasdCredit - accountingAccountSeatDetail[i].dataValues.aasdDebit
-                        bshFinalBalance = accountingAccountSeatDetail[i].dataValues.aasdCredit - accountingAccountSeatDetail[i].dataValues.aasdDebit
+                        bshPreviousBalance = accountingAccountSeatDetail[i].dataValues.aasdDebit - accountingAccountSeatDetail[i].dataValues.aasdCredit
+                        bshFinalBalance = accountingAccountSeatDetail[i].dataValues.aasdDebit - accountingAccountSeatDetail[i].dataValues.aasdCredit
                         credits = 0
                         debits = 0                        
                       }
@@ -353,7 +358,7 @@ async function applySeat(req, res){
                         let newBshFinalBalance =0;
                         for(let c=0; c< balancePreviusExist.length; c++){
                           if(c==0){
-                            newBshFinalBalance = bshFinalBalance - balancePreviusExist[c].bshDebits +  balancePreviusExist[c].bshCredits
+                            newBshFinalBalance = bshFinalBalance - balancePreviusExist[c].bshCredits + balancePreviusExist[c].bshDebits
                             balanceSheetModel.update({    
                                 bshPreviousBalance : bshFinalBalance,        
                                 bshFinalBalance: newBshFinalBalance,     
@@ -361,7 +366,7 @@ async function applySeat(req, res){
                             }, { where:{ bshId :balancePreviusExist[c].bshId}})
                           } else {
                             bshPreviousBalance = newBshFinalBalance
-                            newBshFinalBalance = bshPreviousBalance - balancePreviusExist[c].bshDebits +  balancePreviusExist[c].bshCredits
+                            newBshFinalBalance = bshPreviousBalance - balancePreviusExist[c].bshCredits +  balancePreviusExist[c].bshDebits
                             balanceSheetModel.update({    
                                 bshPreviousBalance : bshPreviousBalance,        
                                 bshFinalBalance: newBshFinalBalance,     
@@ -375,7 +380,7 @@ async function applySeat(req, res){
 
                       if(month ==  accountingAccountSeatDetail[i].dataValues.accountingAccountSeat.aasMonth){
                         bshPreviousBalance =  balancePreviusExist[maxLenth].bshFinalBalance
-                        bshFinalBalance =  balancePreviusExist[maxLenth].bshFinalBalance - accountingAccountSeatDetail[i].aasdDebit + accountingAccountSeatDetail[i].aasdCredit                       
+                        bshFinalBalance =  balancePreviusExist[maxLenth].bshFinalBalance - accountingAccountSeatDetail[i].aasdCredit + accountingAccountSeatDetail[i].aasdDebit                       
                         credits = accountingAccountSeatDetail[i].aasdCredit
                         debits = accountingAccountSeatDetail[i].aasdDebit
                       } else {
@@ -408,7 +413,7 @@ async function applySeat(req, res){
                   } 
             } else{
               // guardo es el inicial
-              bshFinalBalance = accountingAccountSeatDetail[i].aasdCredit - accountingAccountSeatDetail[i].aasdDebit                       
+              bshFinalBalance = accountingAccountSeatDetail[i].aasdDebit - accountingAccountSeatDetail[i].aasdCredit                       
               const dataToSave = new balanceSheetModel({
                   busIdFk: seatData.busIdFk,
                   aacIdFk: accountingAccountSeatDetail[i].aacIdFk,
@@ -428,7 +433,7 @@ async function applySeat(req, res){
             // update y recalcular todo a futuro
             credits = accountingAccountSeatDetail[i].aasdCredit +  balanceExist.bshCredits
             debits = accountingAccountSeatDetail[i].aasdDebit +  balanceExist.bshDebits 
-            bshFinalBalance = balanceExist.bshPreviousBalance + credits - debits
+            bshFinalBalance = balanceExist.bshPreviousBalance + debits - credits
              
             balanceSheetModel.update({            
                 bshDebits: debits,
@@ -442,7 +447,7 @@ async function applySeat(req, res){
             let newBshFinalBalance =0;
             for(let c=0; c< balanceFutureExist.length; c++){
               if(c==0){
-                newBshFinalBalance = bshFinalBalance - balanceFutureExist[c].bshDebits +  balanceFutureExist[c].bshCredits
+                newBshFinalBalance = bshFinalBalance - balanceFutureExist[c].bshCredits +  balanceFutureExist[c].bshDebits
                 balanceSheetModel.update({    
                     bshPreviousBalance : bshFinalBalance,        
                     bshFinalBalance: newBshFinalBalance,     
@@ -450,7 +455,7 @@ async function applySeat(req, res){
                 }, { where:{ bshId :balanceFutureExist[c].bshId}})
               } else {
                 bshPreviousBalance = newBshFinalBalance
-                newBshFinalBalance = bshPreviousBalance - balanceFutureExist[c].bshDebits +  balanceFutureExist[c].bshCredits
+                newBshFinalBalance = bshPreviousBalance - balanceFutureExist[c].bshCredits +  balanceFutureExist[c].bshDebits
                 balanceSheetModel.update({    
                     bshPreviousBalance : bshPreviousBalance,        
                     bshFinalBalance: newBshFinalBalance,     
@@ -463,7 +468,7 @@ async function applySeat(req, res){
           //averiguo si hay un balance inical
           const balance = await businessAccountingCModel.findOne({where:{aacIdFk :accountingAccountSeatDetail[i].aacIdFk,busIdFk :seatData.busIdFk}})
             if(balance === null){
-              const newBalance = accountingAccountSeatDetail[i].aasdCredit - accountingAccountSeatDetail[i].aasdDebit
+              const newBalance = accountingAccountSeatDetail[i].aasdDebit - accountingAccountSeatDetail[i].aasdCredit 
               const dataToSave = new businessAccountingCModel({            
                 balance: newBalance,
                 aacIdFk :accountingAccountSeatDetail[i].aacIdFk,
@@ -475,7 +480,7 @@ async function applySeat(req, res){
             }
             else{
               //actualizo el saldo
-              const newBalance = balance.balance + accountingAccountSeatDetail[i].aasdCredit - accountingAccountSeatDetail[i].aasdDebit
+              const newBalance = balance.balance + accountingAccountSeatDetail[i].aasdDebit - accountingAccountSeatDetail[i].aasdCredit 
               businessAccountingCModel.update({            
                   balance: newBalance,
                   updateAt: moment(new Date()).format('YYYY-MM-DD')
@@ -523,7 +528,7 @@ async function reverSeat(idSeat){
       }
       else{
         //actualizo el saldo
-        const newBalance = balance.balance - accountingAccountSeatDetail[i].aasdCredit + accountingAccountSeatDetail[i].aasdDebit
+        const newBalance = balance.balance - accountingAccountSeatDetail[i].aasdDebit + accountingAccountSeatDetail[i].aasdCredit
         businessAccountingCModel.update({            
             balance: newBalance,
             updateAt: moment(new Date()).format('YYYY-MM-DD')
@@ -542,7 +547,7 @@ async function reverSeat(idSeat){
             newBshFinalBalance =  balanceFutureExist[c].bshPreviousBalance + credits - debits
             balanceSheetModel.update({    
                 bshPreviousBalance : balanceFutureExist[c].bshPreviousBalance,    
-                bshCredits: debits,
+                bshDebits: debits,
                 bshCredits: credits,
                 bshFinalBalance: newBshFinalBalance,     
                 updateAt: moment(new Date()).format('YYYY-MM-DD')

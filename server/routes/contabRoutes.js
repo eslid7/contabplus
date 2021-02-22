@@ -54,6 +54,7 @@ router.route('/getCatalog/:id').get(assignCatalogController.getCatalog);
 // una empresa puede tener N catalogos
 router.route('/getCatalogs/:id').get(assignCatalogController.getCatalogs);
 router.route('/getCatalogByPeriodo/:id').get(assignCatalogController.getCatalogByPeriodo);
+router.route('/getOneCatalog/:busId').get(assignCatalogController.getOneCatalog);
 
 router.route('/listHistory/:id').get(assignCatalogController.listHistory);
 router.route('/saveAsignCatalog').post(assignCatalogController.saveAsignCatalog);
@@ -115,6 +116,6 @@ router.route('/getReportSeats/:busId/:month/:year').get(seatController.getReport
 router.route('/viewMovementebyAccount').get(reportsController.viewMovementebyAccount);
 router.route('/viewBalanceVerify').get(reportsController.viewBalanceVerify);
 router.route('/getReportMovementebyAccount/:busId').get(reportsController.getReportMovementebyAccount);
-// router.route('/getReportSeats/:busId/:month/:year').get(reportsController.getReportSeats);
+router.route('/getReportBalance/:busId').get(reportsController.getReportBalance);
 
 module.exports = router;

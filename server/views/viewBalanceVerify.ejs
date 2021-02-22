@@ -18,8 +18,8 @@
 									
 								</div>
 								<div class="portlet-body">									
-                                    <form id="balanceSheetForm" name="balanceSheetForm" action="#">
-                                        <div class="row-fluid">
+                                    <form id="report" name="report" action="#">
+                                        <div id="reportHeader" class="row-fluid">
                                             <div class="control-group span4">
                                                 <label for="accCode">
                                                     Empresa
@@ -42,6 +42,7 @@
                                                 </label>
                                                 <div class="controls">
                                                     <select id="month"  class="span7 select2" >
+                                                        <option value="">Seleccione</option>
                                                         <option value="1">Enero</option>
                                                         <option value="2">Febrero</option>
                                                         <option value="3">Marzo</option>
@@ -63,24 +64,46 @@
                                                 </label>
                                                 <div class="controls"  > 
                                                     <select id="year" class="span7 select2">
+                                                        <option value="">Seleccione</option>
                                                         <option value="2020">2020</option>
                                                         <option value="2021">2021</option>
                                                         <option value="2022">2022</option>
                                                         <option value="2023">2023</option>
                                                     </select>                                                   
                                                 </div>
+                                            </div>
+                                            <div class="control-group span2">
+                                                <label for="accCode">
+                                                    Código de Cuenta
+                                                </label>
                                             </div>                                            
-                                            <div class="control-group span3 ">
+                                            <div class="control-group span2 ">
+                                                <button type="button"  class="btn green" style="margin-top: 25px;" onclick="fnGetReport()">
+                                                    Consultar <i class="icon-plus"></i>
+                                                </button>
                                             </div> 
                                         </div>                                        
                                     </form>
-									<table id="listBalanceSheet" class="bt-table table-striped"
+									<!-- <table id="listBalanceSheet" class="bt-table table-striped"
 										data-side-pagination="server"
 										data-pagination="true"
 										data-page-size="10"
 										data-page-list="[10, 20, 30]"
                                         data-search="true">
-									</table>
+                                    </table> -->
+                                    <div id="reportDetail" >
+                                        <table id="dataTable" class="bt-table table-striped table table-hover">
+                                            <tr> 
+                                                <th>Código Cuenta </th>
+                                                <th>Nombre Cuenta </th>
+                                                <th>Saldo inicial </th>
+                                                <th>Débitos </th>
+                                                <th>Créditos </th>
+                                                <th>Movimientos mes </th>
+                                                <th>Saldo Contable </th>
+                                            </tr>
+                                        </table>
+                                    </div>
 								</div>
 							</div>
 							<!-- END EXAMPLE TABLE PORTLET-->
@@ -118,87 +141,62 @@
         $('#busId').select2({});
         $('#month').select2({});
         $('#year').select2({});
+        $('#reportDetail').hide();
         $("#busId, #year, #month").on("select2-opening", function() {
 			$('.select2').select2("close");
         });
         $("#month").change(function() {
-			refreshTable()	
+			//refreshTable()	
         });
         $("#busId").change(function() {
-			refreshTable()	
+			//refreshTable()	
         });
         $("#year").change(function() {
-			refreshTable()	
+			//refreshTable()	
         });
 
         <% if(business.length == 0) { %>
 
         <%} else {%>
-            handleTableData();   
+            //handleTableData();   
         <% }%>
 
-        $('#balanceSheetForm').validate({
-            errorElement: 'label', //default input error message container
-            errorClass: 'help-inline', // default input error message class
-            ignore: "",
-            rules: {
-                busId: { required: true},
-                bshMonth: { required: true},
-                bshYear: { required: true}
-            },
-            messages: { // custom messages
-                busId: { required: "Seleccione el catalogo." },
-                bshMonth: { required: "Digite el mes." },
-                bshYear: { required: "Digite el año." }
-            },
-            highlight: function (element) { // hightlight error inputs
-                $(element).closest('.control-group').addClass('error'); // set error class to the control group
-            },
-            success: function (label) {
-                label.closest('.control-group').removeClass('error');
-                label.remove();
-            },
-            errorPlacement: function (error, element) {
-                if (element.closest('.icon-search').size() === 1) {
-                    error.addClass('help-small no-left-padding').insertAfter(element.closest('.icon-search'));
-                } else if (element.next().attr("class")){
-                    error.addClass('help-small no-left-padding').insertAfter(element.next());
-                } else {
-                    error.addClass('help-small no-left-padding').insertAfter(element);
-                }
-            }
-        });
+       
 	});
 	isFirtsDatatable = true;
 	function handleTableData () {
 		$('#listBalanceSheet').bootstrapTable({
 			height: getHeight(),
 			method: 'GET',
-			url: '/contab/getReportSeats/'+$('#busId').val()+'/'+$('#month').val()+'/'+$('#year').val(),
+			url: '/contab/getReportBalance/'+$('#busId').val()+'?'+$('#report').serialize(),
 			cache: false,
 			columns: [
-				{
-					field: 'aasNumberSeat',
-					title: 'Número de asiento',
+                {
+					field: 'accountingAccount.aacCode',
+					title: 'Código Cuenta',
 					sortable: false,
-					width: '20%'
-				}, {
-					field: 'aasDateSeat',
-					title: 'Fecha de asiento',
+					width: '6%' 
+				},{
+					field: 'accountingAccount.aacName',
+					title: 'Nombre Cuenta',
+					sortable: false,
+                    width: '10%'                    
+				},{
+					field: 'bshPreviousBalance',
+					title: 'Saldo Inicial',
 					sortable: false,
 					width: '10%'
 				},{
-					field: 'aasNameSeat',
-					title: 'Nombre',
+					field: 'bshDebits',
+					title: 'Débitos',
 					sortable: false,
 					width: '10%'
-				}, {
-					field: '',
-					title: 'Ver detalle',
+				},{
+					field: 'bshCredits',
+					title: 'Créditos',
 					sortable: false,
-                    width: '14%',
-                    formatter:operateFormatterEdit
-				}               
+					width: '10%'
+				}            
 			]
 		});
 	};
@@ -305,10 +303,38 @@
 
     function formaterNumber(dataNumber){
         dataNumber = dataNumber+""
-        dataNumber = dataNumber.replace(/[^0-9\.]+/g, "");
+        dataNumber = dataNumber.replace(/[^-0-9\.]+/g, "");
         dataNumber = dataNumber *1
         dataNumber = dataNumber.toFixed(2)
         return dataNumber.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
     }
 
+    function fnGetReport(){
+        $.ajax({
+            type: "GET",
+            url: '/contab/getReportBalance/'+$('#busId').val(),
+            data: $('#report').serialize(), //se envia el form serializado
+            beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                showIsLoading("Procesando...");
+            }
+        }).done(function (data) {
+            console.log(data)
+            for(i=0; i< data.dataReport.length; i++){
+                for(a=0; a< data.arrayMinData.length; a++){
+                    if(data.dataReport[i].aacIdFk == data.arrayMinData[a].aacIdFk){
+                        bshPreviousBalance = data.arrayMinData[a].bshPreviousBalance;
+                        break;
+                    }                    
+                }
+                movements = bshPreviousBalance + data.dataReport[i].bshDebits - data.dataReport[i].bshCredits
+                finalBalance = bshPreviousBalance  + data.dataReport[i].bshDebits - data.dataReport[i].bshCredits
+                $('#dataTable').append('<tr><td>'+data.dataReport[i].accountingAccount.aacCode+'</td><td>'+data.dataReport[i].accountingAccount.aacName+'</td><td style="text-align:right">'+formaterNumber(bshPreviousBalance)+'</td><td style="text-align:right">'+formaterNumber(data.dataReport[i].bshDebits)+'</td><td style="text-align:right">'+formaterNumber(data.dataReport[i].bshCredits)+'</td><td style="text-align:right">'+formaterNumber(movements)+'</td><td style="text-align:right">'+formaterNumber(finalBalance)+'</td></tr>');
+            }
+            $('#reportDetail').show();
+        }).fail(function (data) {
+            fnOpenErrorDialog(data.responseJSON.message);
+        }).always(function (data) {
+            hideIsLoading();
+        });
+    }
 </script>

@@ -3,6 +3,7 @@ const accountingCatalogModel = require('../models/accountingCatalog');
 const businessModel = require('../models/business');
 const definedAccCatMonthModel = require('../models/definedAccontingCatMonth');
 const definedAccountingCatalogModel = require('../models/definedAccountingCatalog');
+const balanceSheetController = require('../controllers/balanceSheetController')
 const sequelize = require('sequelize');
 const moment = require('moment');
 const jwt = require('jwt-simple');
@@ -126,16 +127,34 @@ function saveAsignCatalog(req, res){
 
 }
 
-function getCatalogByPeriodo(req, res){
-    definedAccCatMonthModel.hasOne(accountingCatalogModel,{foreignKey:'accId',sourceKey: 'accIdFk'});
-    definedAccCatMonthModel.findAll({where:{ busIdFk: req.params.id, month: req.query.month, year: req.query.year}, 
-        include: [{
-            model: accountingCatalogModel,
-            require : true
-        }]
-    }).then(definedAccCatMonth=>{
-        return res.status(200).json({ definedAccCatMonth: definedAccCatMonth });    
+async function getCatalogByPeriodo(req, res){
+    const balanceCloseExist = await balanceSheetController.exitsBalanceSheetClose(req.params.id, req.query.month, req.query.year)
+    if(balanceCloseExist){
+        return  res.status(400).json({ message: "El periodo tiene un cierre contable."});
+    } else {
+        definedAccCatMonthModel.hasOne(accountingCatalogModel,{foreignKey:'accId',sourceKey: 'accIdFk'});
+        definedAccCatMonthModel.findAll({where:{ busIdFk: req.params.id, month: req.query.month, year: req.query.year}, 
+            include: [{
+                model: accountingCatalogModel,
+                require : true
+            }]
+        }).then(definedAccCatMonth=>{
+            return res.status(200).json({ definedAccCatMonth: definedAccCatMonth });    
+        })
+    }
+}
+
+function getOneCatalog(req, res){
+    let data = req.headers.cookie.split("=");
+    const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
+    definedAccountingCatalogModel.hasOne(accountingCatalogModel,{foreignKey:'accId',sourceKey: 'accIdFk'});
+    definedAccountingCatalogModel.findOne({where: {'useIdFK': token.useId, 'busIdFk': req.params.busId},include: [{
+        model: accountingCatalogModel,
+        require : true
+    }] }).then( definedCatalog => { 
+        return   res.status(200).json({ accountCatalog: definedCatalog });        
     })
+
 }
 
 module.exports = {
@@ -144,5 +163,6 @@ module.exports = {
     listHistory,
     saveAsignCatalog,
     getCatalogs,
-    getCatalogByPeriodo
+    getCatalogByPeriodo,
+    getOneCatalog
 }

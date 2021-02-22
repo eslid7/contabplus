@@ -586,6 +586,7 @@
                     fnOpenErrorDialog("Para este periodo no se ha definido un catalogo contable.")
                 }
             }).fail(function (data) {
+                fnOpenErrorDialog(data.responseJSON.message);
                 hideIsLoading();            
             })
         }
