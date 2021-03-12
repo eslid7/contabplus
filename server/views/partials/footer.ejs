@@ -74,16 +74,24 @@
 		   App.init();
 		});
 		function formaterDate(date){
-			Newdate = new Date(date); 
-			month = Newdate.getMonth() +1
-			if(month.length==1 || month< 10){
-				month = "0"+month
+			if(date.length>10){
+				Newdate = new Date(date); 
+				month = Newdate.getMonth() +1
+				if(month.length==1 || month< 10){
+					month = "0"+month
+				}
+				day= Newdate.getDate()
+				if(Newdate.getDate()<10){
+					day="0"+Newdate.getDate()
+				}
+				return day+"/"+month+"/"+Newdate.getFullYear()
+			} else {
+				console.log(date)
+				newDate = date.split('-')
+				return newDate[2]+'/'+newDate[1]+'/'+newDate[0]
 			}
-			day= Newdate.getDate()
-			if(Newdate.getDate()<10){
-				day="0"+Newdate.getDate()
-			}
-			return day+"/"+month+"/"+Newdate.getFullYear()
+
+
 		}
 		function JSONToCSVConvertor(JSONData, ReportTitle, ShowLabel) {
 			//If JSONData is not an object then JSON.parse will parse the JSON string in an Object

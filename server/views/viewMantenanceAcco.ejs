@@ -215,8 +215,9 @@
                                                             </label>
                                                             <div class="controls" >  
                                                                 <select id="aacMoney" name="aacMoney" class="span10 select2">
-                                                                    <option value="1">Colón</option>
-                                                                    <option value="2">Dolar</option>
+                                                                    <% for(var j = 0; j < moneyTypes.length; j++) { %>   
+                                                                        <option value="<%=moneyTypes[j].monId%>"> <%=moneyTypes[j].monName%></option>
+                                                                    <% }%>
                                                                 </select>                                               
                                                             </div>
                                                         </div>

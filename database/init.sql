@@ -183,7 +183,7 @@ CREATE TABLE moneyTypes(
 	monId INT AUTO_INCREMENT PRIMARY KEY,
 	busIdFk INT NOT NULL,
 	useIdFk INT NOT NULL,
-	monCode INT NOT NULL,
+	monCode VARCHAR(3) NOT NULL,
 	monName VARCHAR(45) NOT NULL,
 	createdAt  TIMESTAMP,
 	updatedAt TIMESTAMP
@@ -204,10 +204,11 @@ CREATE TABLE changeTypes(
 	monId INT NOT NULL,
 	busIdFk INT NOT NULL,
 	useIdFk INT NOT NULL,
-	chaSaleValue DECIMAL(5,2) NOT NULL,
-	chaPurchaseValue DECIMAL(5,2) NOT NULL,
-	chaSaleValuationValue DECIMAL(5,2) NOT NULL,
-	chaPurchaseValuationValue DECIMAL(5,2) NOT NULL,
+	chaDate DATE NOT NULL,
+	chaSaleValue DECIMAL(8,2) NOT NULL,
+	chaPurchaseValue DECIMAL(8,2) NOT NULL,
+	chaSaleValuationValue DECIMAL(8,2) NOT NULL,
+	chaPurchaseValuationValue DECIMAL(8,2) NOT NULL,
 	createdAt  TIMESTAMP,
 	updatedAt TIMESTAMP
 );
@@ -311,3 +312,10 @@ CREATE TABLE balanceSheetClose(
 	createdAt TIMESTAMP,
 	updatedAt TIMESTAMP
 );
+
+------------------
+Alter table moneyTypes drop COLUMN busIdFk;
+Alter table moneyTypes drop COLUMN monCode;
+ALTER TABLE moneyTypes ADD COLUMN monCode VARCHAR(3);
+
+-- reprocesar la tabla de Tipos de cambios changeTypes

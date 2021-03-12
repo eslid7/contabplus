@@ -31,31 +31,17 @@ function getListMoneyTypes(req,res){
   let data = req.headers.cookie.split("=");
   const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
   let orderBy =[['monCode','ASC']]  
-  if(typeof(req.query.sort) !== "undefined" && req.query.sort !== 'busName'){
-      orderBy =[[`business`,`busName`,`${req.query.order}`]]
-  }
-  moneyTypesModel.hasOne(businessModel,{foreignKey:'busId',sourceKey: 'busIdFk'});
   if(typeof(req.query.search) !== "undefined" && req.query.search !== ''){  
-    let likeData =  [{'monCode': {[sequelize.Op.like]: `%${req.query.search}%`}},{'monName': {[sequelize.Op.like]: `%${req.query.search}%`}},{'$business.busName$': {[sequelize.Op.like]: `%${req.query.search}%`}}]  
-    moneyTypesModel.findAll({where:{'useIdFK': token.useId,
+    let likeData =  [{'monCode': {[sequelize.Op.like]: `%${req.query.search}%`}},{'monName': {[sequelize.Op.like]: `%${req.query.search}%`}}]  
+    moneyTypesModel.findAll({where:{
         [sequelize.Op.or]: likeData
-        },
-        include: [{  
-            model: businessModel,
-            required: true,
-        }] 
-        , order: orderBy    
+        }, order: orderBy    
     }).then( moneyTypesCatalog =>{        
         return res.status(200).json({rows: moneyTypesCatalog, total:moneyTypesCatalog.length});
     })
   }
   else{
-    moneyTypesModel.findAll({where:{'useIdFK': token.useId },
-        include: [{  
-            model: businessModel,
-            required: true,
-        }] 
-        , order: orderBy    
+    moneyTypesModel.findAll({order: orderBy    
     }).then( moneyTypesCatalog =>{        
         return res.status(200).json({rows: moneyTypesCatalog, total:moneyTypesCatalog.length});
     })
@@ -66,7 +52,7 @@ function saveMoneyTypes(req, res){
   let data = req.headers.cookie.split("=");
   const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
 
-  if(req.body.docId > 0){
+  if(req.body.monId > 0){
     moneyTypesModel.update({            
         useIdFk: token.useId,        
         monCode: req.body.monCode,
@@ -78,7 +64,6 @@ function saveMoneyTypes(req, res){
   }
   else{
     const dataToSave = new moneyTypesModel({
-        busIdFk: req.body.busId,
         useIdFk: token.useId,
         monCode: req.body.monCode,
         monName: req.body.monName.toUpperCase(),
@@ -94,9 +79,16 @@ function saveMoneyTypes(req, res){
 
 
 function getListMoneyTypesByBussines(req, res){
-  moneyTypesModel.findAll({where:{'busIdFK': req.params.id }   
-  }).then( moneyTypesCatalog =>{        
-    return res.status(200).json({rows: moneyTypesCatalog, total:moneyTypesCatalog.length});
+    moneyTypesModel.findAll().then( moneyTypesCatalog =>{        
+      return res.status(200).json({rows: moneyTypesCatalog, total:moneyTypesCatalog.length});
+    })
+}
+
+function getListMoneyTypesByBussinesForTC(req, res){
+  businessModel.findOne({where:{'busId': req.params.busId}}).then( business => {
+    moneyTypesModel.findAll({where:{'monId' : {[sequelize.Op.not]: business.busMoney}}}).then( moneyTypesCatalog =>{        
+      return res.status(200).json({rows: moneyTypesCatalog, total:moneyTypesCatalog.length});
+    })
   })
 }
 
@@ -105,4 +97,5 @@ module.exports = {
     getListMoneyTypes,
     saveMoneyTypes,
     getListMoneyTypesByBussines,
+    getListMoneyTypesByBussinesForTC
 }

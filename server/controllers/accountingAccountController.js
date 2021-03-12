@@ -3,6 +3,7 @@ const usersModel = require('../models/users')
 const deleteAccountingAccountModel = require('../models/deleteAccountingAccount');
 const accountingAccountModel = require('../models/accountingAccount')
 const accountingCatalogModel = require('../models/accountingCatalog');
+const moneyTypesModel = require('../models/moneyTypes')
 const moment = require('moment')
 const sequelize = require('sequelize');
 const jwt = require('jwt-simple');
@@ -22,14 +23,17 @@ function viewMantenanceAcco(req, res){
         const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
         businessModel.findAll({where:{'useIdFK': token.useId}}).then( business => {
             usersModel.findAll().then(function (usersData){
-                return res.render('viewMantenanceAcco' ,{
-                    userData: token,
-                    active : 2,
-                    titlePage : 'Mant de cuentas contables',
-                    business : business,
-                    users : usersData,
-                    processes : token.processes,
-                    menu : token.menu
+                moneyTypesModel.findAll().then( moneyTypes => {
+                    return res.render('viewMantenanceAcco' ,{
+                        userData: token,
+                        active : 2,
+                        titlePage : 'Mant de cuentas contables',
+                        business : business,
+                        users : usersData,
+                        processes : token.processes,
+                        menu : token.menu,
+                        moneyTypes : moneyTypes
+                    })
                 })
             })        
         })    

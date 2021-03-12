@@ -392,6 +392,11 @@
             }
 			getCatalog();			
         });
+        
+        $("#monId").change(function() {
+            getTCBussines()			
+        });
+
         $(".accountId" ).on( "keydown", function(event) {
             if(event.which == 13 && $(this).val().length > 0){
                 fnSearch($(this))
@@ -485,7 +490,9 @@
                     error.addClass('help-small no-left-padding').insertAfter(element);
                 }
             }
-        });     
+        });
+        
+        // buscar el tc para esta moneda si es la moneda de la compañia no hay nada
     });
 
         function getTypesDocument(){
@@ -871,6 +878,7 @@
                 $('#monId').select2({});
                 $('#monId').val(monId).trigger('change')
             }
+            getTCBussines()
         }).fail(function () {
             hideIsLoading();            
         })
@@ -936,9 +944,7 @@
                         $('#accId').val(data.responseJSON.seatData.accIdFk)
                         $('#aasId').val(data.responseJSON.seatData.aasId)
                         $('#aasNameSeat').val(data.responseJSON.seatData.aasNameSeat)
-                        date= data.responseJSON.seatData.aasDateSeat
-                        newDate = date.split('-')
-                        $('#aasDateSeat').val(newDate[2]+'/'+newDate[1]+'/'+newDate[0])
+                        $('#aasDateSeat').val(formaterDate(data.responseJSON.seatData.aasDateSeat))
                         if(isFirtsDatatable){
                             handleTableData()
                             handleTableDataAccounting()
@@ -1345,5 +1351,24 @@
         $('#divTextAccount').html($('#listAccountingCatalog').bootstrapTable('getData')[index].aacName);
         $('#accountId').val($('#listAccountingCatalog').bootstrapTable('getData')[index].aacCode);
         $("#modalAccountingCatalog").modal("hide");
+    }
+
+    function getTCBussines(){
+        $.ajax({
+            type: "POST",
+            url: "/contab/getTCBussines/"+$('#busId').val()+"/"+$('#monId').val(),
+            data: $('#headerSeat').serialize(), //se envia el form serializado    
+            beforeSend: function(){ //se muestra una imagen mientras el ajax se ejecuta
+                showIsLoading("Procesando...");
+            }
+        }).done(function (results) {       
+            console.log(results)
+            $('#aasdChangeValue').val(results.tcAmount) 
+            hideIsLoading(); 
+        }).fail(function (data) {
+            $('#aasdChangeValue').val(0);
+            fnOpenErrorDialog(data.responseJSON.message);
+            hideIsLoading();            
+        })
     }
 </script>

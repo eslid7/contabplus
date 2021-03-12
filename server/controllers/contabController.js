@@ -3,6 +3,7 @@ const accountingCatalogModel = require('../models/accountingCatalog');
 const businessModel = require('../models/business');
 const moment = require('moment');
 const definedAccountingCatalogModel = require('../models/definedAccountingCatalog');
+const moneyTypesModel = require('../models/moneyTypes')
 const sequelize = require('sequelize');
 const jwt = require('jwt-simple');
 const usersController = require('../controllers/usersController')
@@ -170,13 +171,16 @@ function viewBusiness(req, res){
     else{
         let data = req.headers.cookie.split("=");
         const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
-        return res.render('business' ,{
+        moneyTypesModel.findAll().then( moneyTypes => {
+            return res.render('business' ,{
                 userData: token,
                 active : 1,
                 titlePage : 'Empresas',
                 processes : token.processes,
-                menu : token.menu 
-            })           
+                menu : token.menu, 
+                moneyTypes : moneyTypes
+            }) 
+        })          
     }    
 }
 
@@ -226,7 +230,7 @@ function saveBusiness(req, res){
             canton: req.body.canton,
             district: req.body.district,
             address: req.body.address,
-            taxID: req.body.taxID,
+            taxID: req.body.taxID ? req.body.taxID : null ,
             idType: req.body.idType,
             webSite: req.body.webSite,
             postalMail: req.body.postalMail,
@@ -250,7 +254,7 @@ function saveBusiness(req, res){
             canton: req.body.canton,
             district: req.body.district,
             address: req.body.address,
-            taxID: req.body.taxID,
+            taxID: req.body.taxID ? req.body.taxID : null ,
             idType: req.body.idType,
             webSite: req.body.webSite,
             postalMail: req.body.postalMail,

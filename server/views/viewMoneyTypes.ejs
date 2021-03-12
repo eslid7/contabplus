@@ -20,28 +20,12 @@
                                     <form id="moneyType" name="moneyType" action="#">
                                         <input type="hidden" name="monId" id="monId">
                                         <div class="row-fluid">
-                                            <div class="control-group span4 ">
-                                                <label for="accCode">
-                                                    Empresa
-                                                </label>
-                                                <div class="controls">
-                                                    <% if(business.length == 0) { %>   
-                                                        No hay empresas disponibles
-                                                    <%} else {%>
-                                                    <select id="busId" name="busId" class="span8 select2">
-                                                        <% for(var j = 0; j < business.length; j++) { %>   
-                                                            <option value="<%=business[j].busId%>"> <%=business[j].busName%></option>
-                                                        <% }%>
-                                                    </select>
-                                                    <% }%>
-                                                </div>
-                                            </div>
                                             <div class="control-group span2 ">                                               
                                                 <label for="accCode">
-                                                   Número 
+                                                   Código Moneda 
                                                 </label>
                                                 <div class="controls"  > 
-                                                    <input type="text" name="monCode" id="monCode" class="span8" maxlength="2">                                                   
+                                                    <input type="text" name="monCode" id="monCode" class="span8" maxlength="3">                                                   
                                                 </div>
                                             </div>	
                                             <div class="control-group span3">
@@ -82,26 +66,18 @@
 <% include partials/footer %>
 <script type="text/javascript">
 	$(document).ready(function(){
-        $('#busId').select2({});
         $('#cancelMonType').hide();
-        $("#monCode").inputmask("mask", {"mask": 99, "clearIncomplete": false, 'removeMaskOnSubmit': true,'autoUnmask': true, });
-        <% if(business.length == 0) { %>
-
-        <%} else {%>
-            handleTableData();           
-        <% }%>
+        handleTableData();  
     });
     $('#moneyType').validate({
         errorElement: 'label', //default input error message container
         errorClass: 'help-inline', // default input error message class
         ignore: "",
         rules: {
-            busId: { required: true},
             monCode: { required: true},
             monName: { required: true}
         },
         messages: { // custom messages
-            busId: { required: "Seleccione el catalogo." },
             monCode: { required: "Digite el número." },
             monName: { required: "Digite el nombre de la moneda." }
         },
@@ -133,17 +109,12 @@
 			columns: [
 				{
 					field: 'monCode',
-					title: 'Número',
+					title: 'Código Moneda',
 					sortable: false,
 					width: '7%'
 				}, {
 					field: 'monName',
 					title: 'Nombre',
-					sortable: false,
-					width: '15%'
-				}, {
-					field: 'business.busName',
-					title: 'Empresa',
 					sortable: false,
 					width: '15%'
 				},{
@@ -170,7 +141,6 @@
     }
     function editData(monId, index){
         $('#monId').val(monId)
-        $('#busId').val($('#listMonTypes').bootstrapTable('getData')[index].busIdFk).trigger('change');
         $('#monName').val($('#listMonTypes').bootstrapTable('getData')[index].monName)
         $('#monCode').val($('#listMonTypes').bootstrapTable('getData')[index].monCode)
         $('#cancelMonType').show();        

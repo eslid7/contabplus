@@ -86,12 +86,14 @@ router.route('/getListTypesDocumentsByBussines/:id').get(documentTypesController
 router.route('/viewMoneyTypes').get(moneyTypesController.viewMoneyTypes);
 router.route('/getListMoneyTypes').get(moneyTypesController.getListMoneyTypes);
 router.route('/saveMoneyTypes').post(moneyTypesController.saveMoneyTypes);
-router.route('/getListMoneyTypesByBussines/:id').get(moneyTypesController.getListMoneyTypesByBussines);
+router.route('/getListMoneyTypesByBussines/:busId').get(moneyTypesController.getListMoneyTypesByBussines);
+router.route('/getListMoneyTypesByBussinesForTC/:busId').get(moneyTypesController.getListMoneyTypesByBussinesForTC);
 
 //viewChangeTypes
 router.route('/viewChangeTypes').get(viewChangeTypesController.viewChangeTypes);
-router.route('/getListChangeTypes').get(viewChangeTypesController.getListChangeTypes);
+router.route('/getListChangeTypes/:busId').get(viewChangeTypesController.getListChangeTypes);
 router.route('/saveChangeTypes').post(viewChangeTypesController.saveChangeTypes);
+router.route('/getTCBussines/:busId/:monId').post(viewChangeTypesController.getTCBussines);
 
 //viewSeat
 router.route('/viewSeat').get(seatController.viewSeat);

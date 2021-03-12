@@ -34,15 +34,15 @@ function viewChangeTypes(req, res){
 function getListChangeTypes(req,res){
   let data = req.headers.cookie.split("=");
   const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
-  let orderBy =[['createdAt','DESC']]  
+  let orderBy =[['updatedAt','DESC']]  
 
   changeTypesModel.hasOne(businessModel,{foreignKey:'busId',sourceKey: 'busIdFk'});
   changeTypesModel.hasOne(moneyTypesModel,{foreignKey:'monId',sourceKey: 'monId'});
 
   if(typeof(req.query.search) !== "undefined" && req.query.search !== ''){  
-    let likeData =  [{'docCode': {[sequelize.Op.like]: `%${req.query.search}%`}},{'docName': {[sequelize.Op.like]: `%${req.query.search}%`}},{'$accountingCatalog.accName$': {[sequelize.Op.like]: `%${req.query.search}%`}}]  
+    let likeData =  [{'$moneyType.monName$': {[sequelize.Op.like]: `%${req.query.search}%`}},{'chaSaleValue': {[sequelize.Op.like]: `%${req.query.search}%`}},{'$business.busName$': {[sequelize.Op.like]: `%${req.query.search}%`}}]  
     
-    changeTypesModel.findAll({where:{'useIdFK': token.useId,
+    changeTypesModel.findAll({where:{ 'busIdFk': req.params.busId , 'useIdFK': token.useId,
         [sequelize.Op.or]: likeData
         },
         include: [{  
@@ -58,7 +58,7 @@ function getListChangeTypes(req,res){
     })
   }
   else{
-    changeTypesModel.findAll({where:{'useIdFK': token.useId },
+    changeTypesModel.findAll({where:{'busIdFk': req.params.busId,'useIdFK': token.useId },
         include: [{  
             model: businessModel,
             required: true,
@@ -77,14 +77,19 @@ function saveChangeTypes(req, res){
   let data = req.headers.cookie.split("=");
   const token =  jwt.decode(data[1],'b33dd00.@','HS512') 
 
+  // debo validar que no exista uno para ese dia
+  const tempDate =req.body.chaDate.split('/')
+  const dateToServer = new Date(`${tempDate[2]}/${tempDate[1]}/${tempDate[0]}`)
+  
   if(req.body.chaId > 0){
     changeTypesModel.update({            
-        useIdFk: token.useId,        
-        chaSaleValue: req.body.chaSaleValue.replace(',','.'),
-        chaPurchaseValue: req.body.chaPurchaseValue.replace(',','.'),
-        chaSaleValuationValue: req.body.chaSaleValuationValue.replace(',','.'),
-        chaPurchaseValuationValue: req.body.chaPurchaseValuationValue.replace(',','.'),
-        updateAt: moment(new Date()).format('YYYY-MM-DD')
+        useIdFk: token.useId,  
+        chaDate : dateToServer,      
+        chaSaleValue: req.body.chaSaleValue.replace(/,/g,''),
+        chaPurchaseValue: req.body.chaPurchaseValue.replace(/,/g,''),
+        chaSaleValuationValue: req.body.chaSaleValuationValue.replace(/,/g,''),
+        chaPurchaseValuationValue: req.body.chaPurchaseValuationValue.replace(/,/g,''),
+        updatedAt: moment(new Date()).format('YYYY-MM-DD')
     }, {where : {'chaId' :req.body.chaId}}).then(function () {
       return  res.status(200).json({ message: "Se ha actualizado con exito" });
     })
@@ -94,12 +99,13 @@ function saveChangeTypes(req, res){
         monId: req.body.monId,
         useIdFk: token.useId,
         busIdFk: req.body.busId,
-        chaSaleValue: req.body.chaSaleValue.replace(',','.'),
-        chaPurchaseValue: req.body.chaPurchaseValue.replace(',','.'),
-        chaSaleValuationValue: req.body.chaSaleValuationValue.replace(',','.'),
-        chaPurchaseValuationValue: req.body.chaPurchaseValuationValue.replace(',','.'),
+        chaDate : dateToServer,
+        chaSaleValue: req.body.chaSaleValue.replace(/,/g,''),
+        chaPurchaseValue: req.body.chaPurchaseValue.replace(/,/g,''),
+        chaSaleValuationValue: req.body.chaSaleValuationValue.replace(/,/g,''),
+        chaPurchaseValuationValue: req.body.chaPurchaseValuationValue.replace(/,/g,''),
         createdAt: moment(new Date()).format('YYYY-MM-DD'),
-        updateAt: moment(new Date()).format('YYYY-MM-DD')
+        updatedAt: moment(new Date()).format('YYYY-MM-DD')
     });
 
     return dataToSave.save().then(function () {
@@ -108,8 +114,36 @@ function saveChangeTypes(req, res){
   }
 }
 
+function getTCBussines(req, res){
+  businessModel.findOne({where:{'busId': req.params.busId}}).then( business => {
+    if(business.busMoney ==req.params.monId){
+      return res.status(200).json({tcAmount: 0});
+    } else {
+      let orderBy =[['updatedAt','DESC']]
+      const tempDate =req.body.aasDateSeat.split('/')
+      const dateToServer =`${tempDate[2]}-${tempDate[1]}-${tempDate[0]}`
+      changeTypesModel.findAll({where:{'monId' : req.params.monId, 'chaDate' : dateToServer }, order :orderBy}).then( tcForDay =>{        
+        if(tcForDay[0]){
+          return res.status(200).json({tcAmount: tcForDay[0].dataValues.chaSaleValue });
+        } else {
+          //buscar otras fechas que sean menores
+          changeTypesModel.findAll({where:{'monId' : req.params.monId, 'chaDate' : {[sequelize.Op.lt]: dateToServer}  }, order :orderBy}).then( tcForOtherDay =>{
+            if(tcForOtherDay[0]){
+              return res.status(200).json({tcAmount: tcForOtherDay[0].dataValues.chaSaleValue });  
+            } else {
+              return res.status(400).json({ message: 'Para esta moneda no hay un tipo de cambio disponible.' });   
+            }
+          })
+        }
+        
+      })
+    }
+  })
+}
+
 module.exports = {
     viewChangeTypes,
     getListChangeTypes,
     saveChangeTypes,
+    getTCBussines,
 }

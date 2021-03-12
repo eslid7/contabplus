@@ -8,6 +8,7 @@ changeTypes.init({
     monId: {type:  Sequelize.INTEGER, allowNull: false},  
     busIdFk: {type:  Sequelize.INTEGER, allowNull: false},  
     useIdFk: {type:  Sequelize.INTEGER, allowNull: false},  
+    chaDate: {type:  Sequelize.DATEONLY, allowNull: false},
     chaSaleValue: {type:  Sequelize.DECIMAL, allowNull: false},
     chaPurchaseValue: {type:  Sequelize.DECIMAL, allowNull: false},   
     chaSaleValuationValue: {type:  Sequelize.DECIMAL, allowNull: false},
